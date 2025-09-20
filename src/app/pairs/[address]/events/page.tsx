@@ -30,14 +30,12 @@ import {
   findPairByAddress,
 } from "@/lib/zilstream";
 
-interface PairEventsPageProps {
-  params: {
-    address: string;
-  };
-}
-
-export default async function PairEventsPage({ params }: PairEventsPageProps) {
-  const pairAddress = params.address;
+export default async function PairEventsPage({
+  params,
+}: {
+  params: Promise<{ address: string }>;
+}) {
+  const { address: pairAddress } = await params;
 
   const [eventsResponse, pair, tokensResponse] = await Promise.all([
     fetchPairEvents(pairAddress),
