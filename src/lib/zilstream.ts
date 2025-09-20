@@ -1,8 +1,14 @@
 const API_BASE_URL = "https://v2-api.zilstream.com";
 
+interface ApiPagination {
+  page: number;
+  per_page: number;
+  has_next: boolean;
+}
+
 interface ApiListResponse<T> {
   data: T[];
-  pagination: Pagination;
+  pagination: ApiPagination;
 }
 
 export interface Pagination {
@@ -132,11 +138,7 @@ async function fetchFromApi<TResponse>(path: string): Promise<TResponse> {
   return res.json() as Promise<TResponse>;
 }
 
-function mapPagination(pagination: {
-  page: number;
-  per_page: number;
-  has_next: boolean;
-}): Pagination {
+function mapPagination(pagination: ApiPagination): Pagination {
   return {
     page: pagination.page,
     perPage: pagination.per_page,
