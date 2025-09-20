@@ -222,8 +222,13 @@ export async function fetchTokens(): Promise<TokenListResponse> {
 export async function fetchPairs(): Promise<PairListResponse> {
   const data = await fetchFromApi<ApiListResponse<PairResponse>>("/pairs");
 
+  const filteredPairs = data.data.filter((pair) => {
+    const liquidity = Number.parseFloat(pair.liquidity_usd ?? "0");
+    return !Number.isFinite(liquidity) || liquidity <= 1_000_000;
+  });
+
   return {
-    data: data.data.map(mapPair),
+    data: filteredPairs.map(mapPair),
     pagination: mapPagination(data.pagination),
   };
 }
@@ -244,10 +249,11 @@ export async function fetchPairEvents(
 export async function findPairByAddress(
   pairAddress: string,
 ): Promise<Pair | undefined> {
-  const { data } = await fetchPairs();
-  return data.find(
+  const data = await fetchFromApi<ApiListResponse<PairResponse>>("/pairs");
+  const match = data.data.find(
     (pair) => pair.address.toLowerCase() === pairAddress.toLowerCase(),
   );
+  return match ? mapPair(match) : undefined;
 }
 
 export { API_BASE_URL };
