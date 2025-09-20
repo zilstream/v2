@@ -81,7 +81,7 @@ export function SiteHeader() {
                   "rounded-md px-3 py-2 transition-colors",
                   isActive
                     ? "border border-primary/20 bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {item.label}
