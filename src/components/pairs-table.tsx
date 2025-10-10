@@ -1,11 +1,14 @@
-import Link from "next/link";
+"use client";
+
+import { useRouter } from "next/navigation";
 
 import { TokenIcon } from "@/components/token-icon";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -24,25 +27,21 @@ interface PairsTableProps {
   pairs: Pair[];
   pagination: Pagination;
   title?: string;
-  description?: string;
+  onPageChange?: (page: number) => void;
 }
 
 export function PairsTable({
   pairs,
   pagination,
   title = "Pairs",
-  description = `Page ${pagination.page} • Showing up to ${pagination.perPage} pairs`,
+  onPageChange,
 }: PairsTableProps) {
+  const router = useRouter();
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </div>
-        <Badge variant={pagination.hasNext ? "secondary" : "outline"}>
-          {pagination.hasNext ? "More available" : "End of list"}
-        </Badge>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="px-0">
         <Table>
@@ -53,36 +52,34 @@ export function PairsTable({
               <TableHead className="text-right">Liquidity (USD)</TableHead>
               <TableHead className="text-right">Volume (24h USD)</TableHead>
               <TableHead className="text-right">Transactions</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pairs.map((pair) => (
-              <TableRow key={pair.address}>
+              <TableRow
+                key={pair.address}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => router.push(`/pairs/${pair.address}/events`)}
+              >
                 <TableCell className="px-6">
-                  <div className="flex items-center gap-3">
-                    <div className="flex -space-x-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-1.5">
                       <TokenIcon
                         address={pair.token0}
                         alt={pair.token0Symbol}
-                        size={32}
+                        size={24}
                         className="ring-2 ring-background"
                       />
                       <TokenIcon
                         address={pair.token1}
                         alt={pair.token1Symbol}
-                        size={32}
+                        size={24}
                         className="ring-2 ring-background"
                       />
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium">
-                        {pair.token0Symbol} / {pair.token1Symbol}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {shortenAddress(pair.address)}
-                      </span>
-                    </div>
+                    <span className="font-medium">
+                      {pair.token0Symbol} / {pair.token1Symbol}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -99,24 +96,36 @@ export function PairsTable({
                 <TableCell className="text-right">
                   {formatNumber(pair.txnCount, 0)}
                 </TableCell>
-                <TableCell className="text-right">
-                  <Link
-                    className="text-primary underline underline-offset-4"
-                    href={`/pairs/${pair.address}/events`}
-                  >
-                    View events
-                  </Link>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </CardContent>
+      {onPageChange && (
+        <CardFooter className="flex items-center justify-between border-t px-6 py-4">
+          <div className="text-sm text-muted-foreground">
+            Page {pagination.page}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(pagination.page - 1)}
+              disabled={pagination.page === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(pagination.page + 1)}
+              disabled={!pagination.hasNext}
+            >
+              Next
+            </Button>
+          </div>
+        </CardFooter>
+      )}
     </Card>
   );
-}
-
-function shortenAddress(address: string) {
-  if (!address) return "";
-  return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }

@@ -122,6 +122,24 @@ export interface PairEventsResponse {
   pagination: Pagination;
 }
 
+interface StatsResponse {
+  data: {
+    total_pairs: number;
+    total_tokens: number;
+    total_liquidity_usd: string;
+    total_volume_usd_24h: string;
+    total_volume_usd_all: string;
+  };
+}
+
+export interface Stats {
+  totalPairs: number;
+  totalTokens: number;
+  totalLiquidityUsd: string;
+  totalVolumeUsd24h: string;
+  totalVolumeUsdAll: string;
+}
+
 async function fetchFromApi<TResponse>(path: string): Promise<TResponse> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
@@ -219,8 +237,8 @@ export async function fetchTokens(): Promise<TokenListResponse> {
   };
 }
 
-export async function fetchPairs(): Promise<PairListResponse> {
-  const data = await fetchFromApi<ApiListResponse<PairResponse>>("/pairs");
+export async function fetchPairs(page = 1, perPage = 50): Promise<PairListResponse> {
+  const data = await fetchFromApi<ApiListResponse<PairResponse>>(`/pairs?page=${page}&per_page=${perPage}`);
 
   const filteredPairs = data.data.filter((pair) => {
     const liquidity = Number.parseFloat(pair.liquidity_usd ?? "0");
@@ -254,6 +272,156 @@ export async function findPairByAddress(
     (pair) => pair.address.toLowerCase() === pairAddress.toLowerCase(),
   );
   return match ? mapPair(match) : undefined;
+}
+
+export async function fetchStats(): Promise<Stats> {
+  const response = await fetchFromApi<StatsResponse>("/stats");
+
+  return {
+    totalPairs: response.data.total_pairs,
+    totalTokens: response.data.total_tokens,
+    totalLiquidityUsd: response.data.total_liquidity_usd,
+    totalVolumeUsd24h: response.data.total_volume_usd_24h,
+    totalVolumeUsdAll: response.data.total_volume_usd_all,
+  };
+}
+
+interface BlockResponse {
+  number: number;
+  hash: string;
+  parent_hash: string;
+  timestamp: number;
+  gas_limit: number;
+  gas_used: number;
+  base_fee_per_gas: string;
+  transaction_count: number;
+}
+
+export interface Block {
+  number: number;
+  hash: string;
+  parentHash: string;
+  timestamp: number;
+  gasLimit: number;
+  gasUsed: number;
+  baseFeePerGas: string;
+  transactionCount: number;
+}
+
+interface TransactionResponse {
+  hash: string;
+  block_number: number;
+  transaction_index: number;
+  from_address: string;
+  to_address: string | null;
+  value: string;
+  gas_price: string;
+  gas_limit: number;
+  gas_used: number;
+  nonce: number;
+  status: number;
+  transaction_type: number;
+  original_type_hex: string | null;
+  max_fee_per_gas: string | null;
+  max_priority_fee_per_gas: string | null;
+  effective_gas_price: string;
+  contract_address: string | null;
+  cumulative_gas_used: number;
+}
+
+export interface Transaction {
+  hash: string;
+  blockNumber: number;
+  transactionIndex: number;
+  fromAddress: string;
+  toAddress: string | null;
+  value: string;
+  gasPrice: string;
+  gasLimit: number;
+  gasUsed: number;
+  nonce: number;
+  status: number;
+  transactionType: number;
+  originalTypeHex: string | null;
+  maxFeePerGas: string | null;
+  maxPriorityFeePerGas: string | null;
+  effectiveGasPrice: string;
+  contractAddress: string | null;
+  cumulativeGasUsed: number;
+}
+
+export interface BlockListResponse {
+  data: Block[];
+  pagination: Pagination;
+}
+
+export interface TransactionListResponse {
+  data: Transaction[];
+  pagination: Pagination;
+}
+
+function mapBlock(block: BlockResponse): Block {
+  return {
+    number: block.number,
+    hash: block.hash,
+    parentHash: block.parent_hash,
+    timestamp: block.timestamp,
+    gasLimit: block.gas_limit,
+    gasUsed: block.gas_used,
+    baseFeePerGas: block.base_fee_per_gas,
+    transactionCount: block.transaction_count,
+  };
+}
+
+function mapTransaction(tx: TransactionResponse): Transaction {
+  return {
+    hash: tx.hash,
+    blockNumber: tx.block_number,
+    transactionIndex: tx.transaction_index,
+    fromAddress: tx.from_address,
+    toAddress: tx.to_address,
+    value: tx.value,
+    gasPrice: tx.gas_price,
+    gasLimit: tx.gas_limit,
+    gasUsed: tx.gas_used,
+    nonce: tx.nonce,
+    status: tx.status,
+    transactionType: tx.transaction_type,
+    originalTypeHex: tx.original_type_hex,
+    maxFeePerGas: tx.max_fee_per_gas,
+    maxPriorityFeePerGas: tx.max_priority_fee_per_gas,
+    effectiveGasPrice: tx.effective_gas_price,
+    contractAddress: tx.contract_address,
+    cumulativeGasUsed: tx.cumulative_gas_used,
+  };
+}
+
+export async function fetchBlocks(page = 1, perPage = 25): Promise<BlockListResponse> {
+  const data = await fetchFromApi<ApiListResponse<BlockResponse>>(`/blocks?page=${page}&per_page=${perPage}`);
+
+  return {
+    data: data.data.map(mapBlock),
+    pagination: mapPagination(data.pagination),
+  };
+}
+
+export async function fetchBlockByNumber(blockNumber: number): Promise<Block> {
+  const response = await fetchFromApi<{ data: BlockResponse }>(`/blocks/${blockNumber}`);
+  return mapBlock(response.data);
+}
+
+export async function fetchTransactions(page = 1, perPage = 25): Promise<TransactionListResponse> {
+  const data = await fetchFromApi<ApiListResponse<TransactionResponse>>(`/transactions?page=${page}&per_page=${perPage}`);
+
+  return {
+    data: data.data.map(mapTransaction),
+    pagination: mapPagination(data.pagination),
+  };
+}
+
+export async function fetchTransactionByHash(hash: string): Promise<Transaction> {
+  const response = await fetchFromApi<{ data: TransactionResponse }>(`/transactions/${hash}`);
+  return mapTransaction(response.data);
 }
 
 export { API_BASE_URL };

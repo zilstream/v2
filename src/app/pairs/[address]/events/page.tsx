@@ -1,3 +1,4 @@
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -18,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { EXPLORER_URL, PLUNDERSWAP_URL } from "@/lib/constants";
 import {
   formatNumber,
   formatTimestamp,
@@ -55,14 +57,7 @@ export default async function PairEventsPage({
   const token1Decimals = tokenIndex.get(pair.token1.toLowerCase())?.decimals;
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">Pair Events</h1>
-        <p className="text-muted-foreground">
-          Recent events for the selected liquidity pool.
-        </p>
-      </div>
-
+    <div className="flex w-full flex-col gap-6 p-6">
       <Card>
         <CardHeader className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -93,7 +88,42 @@ export default async function PairEventsPage({
             <Badge variant="outline" className="capitalize">
               {pair.protocol}
             </Badge>
-            <Badge variant="secondary">{pair.address}</Badge>
+            <Link
+              href={`${PLUNDERSWAP_URL}/swap?inputCurrency=${pair.token0}&outputCurrency=${pair.token1}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+            >
+              Swap
+              <ExternalLink className="h-3 w-3" />
+            </Link>
+            <Link
+              href={`${EXPLORER_URL}/address/${pair.token0}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1 text-sm font-medium transition hover:bg-muted"
+            >
+              {pair.token0Symbol}
+              <ExternalLink className="h-3 w-3" />
+            </Link>
+            <Link
+              href={`${EXPLORER_URL}/address/${pair.token1}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1 text-sm font-medium transition hover:bg-muted"
+            >
+              {pair.token1Symbol}
+              <ExternalLink className="h-3 w-3" />
+            </Link>
+            <Link
+              href={`${EXPLORER_URL}/address/${pair.address}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1 text-sm font-medium transition hover:bg-muted"
+            >
+              Pair
+              <ExternalLink className="h-3 w-3" />
+            </Link>
           </div>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-3">
@@ -110,16 +140,8 @@ export default async function PairEventsPage({
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Events</CardTitle>
-            <CardDescription>
-              {`Page ${pagination.page} • Showing up to ${pagination.perPage} events`}
-            </CardDescription>
-          </div>
-          <Badge variant={pagination.hasNext ? "secondary" : "outline"}>
-            {pagination.hasNext ? "More available" : "End of list"}
-          </Badge>
+        <CardHeader>
+          <CardTitle>Events</CardTitle>
         </CardHeader>
         <CardContent className="px-0">
           <Table>
@@ -161,7 +183,7 @@ export default async function PairEventsPage({
                     <TableCell>
                       <Link
                         className="text-primary underline underline-offset-4"
-                        href={`https://otterscan.zilliqa.com/tx/${event.transactionHash}`}
+                        href={`${EXPLORER_URL}/tx/${event.transactionHash}`}
                         rel="noreferrer"
                         target="_blank"
                       >

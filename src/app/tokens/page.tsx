@@ -22,7 +22,7 @@ export default async function TokensPage() {
   const { data: tokens, pagination } = await fetchTokens();
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-6">
+    <div className="flex w-full flex-col gap-6 p-6">
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold">Tokens</h1>
         <p className="text-muted-foreground">
@@ -31,16 +31,8 @@ export default async function TokensPage() {
       </div>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Tokens</CardTitle>
-            <CardDescription>
-              {`Page ${pagination.page} • Showing up to ${pagination.perPage} tokens`}
-            </CardDescription>
-          </div>
-          <Badge variant={pagination.hasNext ? "secondary" : "outline"}>
-            {pagination.hasNext ? "More available" : "End of list"}
-          </Badge>
+        <CardHeader>
+          <CardTitle>Tokens</CardTitle>
         </CardHeader>
         <CardContent className="px-0">
           <Table>
