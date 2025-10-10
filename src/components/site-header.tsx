@@ -40,7 +40,9 @@ export function SiteHeader() {
           <Suspense fallback={<Skeleton className="h-5 w-64" />}>
             <HeaderStats />
           </Suspense>
-          <ThemeToggle />
+          <div className="ml-2">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </header>
