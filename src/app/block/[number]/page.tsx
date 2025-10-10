@@ -17,7 +17,9 @@ interface BlockDetailPageProps {
   }>;
 }
 
-export default async function BlockDetailPage({ params }: BlockDetailPageProps) {
+export default async function BlockDetailPage({
+  params,
+}: BlockDetailPageProps) {
   const { number } = await params;
   const blockNumber = Number.parseInt(number, 10);
 
@@ -35,7 +37,9 @@ export default async function BlockDetailPage({ params }: BlockDetailPageProps) 
   return (
     <div className="flex w-full flex-col gap-6 p-6">
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">Block #{formatNumber(block.number, 0)}</h1>
+        <h1 className="text-2xl font-semibold">
+          Block #{formatNumber(block.number, 0)}
+        </h1>
         <p className="text-muted-foreground">
           Block details for block {formatNumber(block.number, 0)}
         </p>
@@ -47,10 +51,16 @@ export default async function BlockDetailPage({ params }: BlockDetailPageProps) 
           <CardDescription>Basic block information</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <DetailRow label="Block Number" value={formatNumber(block.number, 0)} />
+          <DetailRow
+            label="Block Number"
+            value={formatNumber(block.number, 0)}
+          />
           <DetailRow label="Block Hash" value={block.hash} copyable />
           <DetailRow label="Parent Hash" value={block.parentHash} copyable />
-          <DetailRow label="Timestamp" value={formatTimestamp(block.timestamp)} />
+          <DetailRow
+            label="Timestamp"
+            value={formatTimestamp(block.timestamp)}
+          />
           <DetailRow
             label="Transactions"
             value={formatNumber(block.transactionCount, 0)}
@@ -68,7 +78,10 @@ export default async function BlockDetailPage({ params }: BlockDetailPageProps) 
             label="Gas Used"
             value={`${formatNumber(block.gasUsed, 0)} (${((block.gasUsed / block.gasLimit) * 100).toFixed(2)}%)`}
           />
-          <DetailRow label="Gas Limit" value={formatNumber(block.gasLimit, 0)} />
+          <DetailRow
+            label="Gas Limit"
+            value={formatNumber(block.gasLimit, 0)}
+          />
           <DetailRow
             label="Base Fee"
             value={`${formatNumber(Number.parseFloat(block.baseFeePerGas) / 1e9, 2)} Gwei`}
@@ -107,9 +120,7 @@ function DetailRow({
       <dt className="min-w-48 text-sm font-medium text-muted-foreground">
         {label}
       </dt>
-      <dd className="flex-1 break-all text-sm font-mono">
-        {value}
-      </dd>
+      <dd className="flex-1 break-all text-sm font-mono">{value}</dd>
     </div>
   );
 }

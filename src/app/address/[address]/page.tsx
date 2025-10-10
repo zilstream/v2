@@ -26,7 +26,7 @@ export default async function AddressPage({
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/addresses/${address}/transactions?page=1&per_page=25`,
-    { next: { revalidate: 60 } }
+    { next: { revalidate: 60 } },
   );
 
   const result = await response.json();
@@ -43,9 +43,7 @@ export default async function AddressPage({
       <Card>
         <CardHeader>
           <CardTitle>Transactions</CardTitle>
-          <CardDescription>
-            All transactions for this address
-          </CardDescription>
+          <CardDescription>All transactions for this address</CardDescription>
         </CardHeader>
         <CardContent className="px-0">
           <Table>
@@ -53,6 +51,7 @@ export default async function AddressPage({
               <TableRow className="border-border/60">
                 <TableHead className="px-6">Transaction Hash</TableHead>
                 <TableHead>Block</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>From</TableHead>
                 <TableHead>To</TableHead>
                 <TableHead className="text-right">Value (ZIL)</TableHead>
@@ -80,6 +79,11 @@ export default async function AddressPage({
                     </Link>
                   </TableCell>
                   <TableCell>
+                    <Badge variant="outline">
+                      {getTransactionType(tx.transaction_type)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
                     <Link
                       href={`/address/${tx.from_address}`}
                       className="font-mono text-sm text-primary hover:underline"
@@ -96,7 +100,9 @@ export default async function AddressPage({
                         {shortenAddress(tx.to_address)}
                       </Link>
                     ) : (
-                      <span className="text-muted-foreground">Contract Creation</span>
+                      <span className="text-muted-foreground">
+                        Contract Creation
+                      </span>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
@@ -106,7 +112,9 @@ export default async function AddressPage({
                     {formatNumber(tx.gas_used, 0)}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={tx.status === 1 ? "default" : "destructive"}>
+                    <Badge
+                      variant={tx.status === 1 ? "default" : "destructive"}
+                    >
                       {tx.status === 1 ? "Success" : "Failed"}
                     </Badge>
                   </TableCell>
@@ -128,4 +136,11 @@ function shortenHash(hash: string) {
 function shortenAddress(address: string) {
   if (!address) return "";
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
+}
+
+function getTransactionType(type: number) {
+  if (type >= 1000) return "Legacy";
+  if (type === 0) return "Legacy";
+  if (type === 2) return "EVM";
+  return "EVM";
 }

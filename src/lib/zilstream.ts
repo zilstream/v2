@@ -237,8 +237,13 @@ export async function fetchTokens(): Promise<TokenListResponse> {
   };
 }
 
-export async function fetchPairs(page = 1, perPage = 50): Promise<PairListResponse> {
-  const data = await fetchFromApi<ApiListResponse<PairResponse>>(`/pairs?page=${page}&per_page=${perPage}`);
+export async function fetchPairs(
+  page = 1,
+  perPage = 50,
+): Promise<PairListResponse> {
+  const data = await fetchFromApi<ApiListResponse<PairResponse>>(
+    `/pairs?page=${page}&per_page=${perPage}`,
+  );
 
   const filteredPairs = data.data.filter((pair) => {
     const liquidity = Number.parseFloat(pair.liquidity_usd ?? "0");
@@ -396,8 +401,13 @@ function mapTransaction(tx: TransactionResponse): Transaction {
   };
 }
 
-export async function fetchBlocks(page = 1, perPage = 25): Promise<BlockListResponse> {
-  const data = await fetchFromApi<ApiListResponse<BlockResponse>>(`/blocks?page=${page}&per_page=${perPage}`);
+export async function fetchBlocks(
+  page = 1,
+  perPage = 25,
+): Promise<BlockListResponse> {
+  const data = await fetchFromApi<ApiListResponse<BlockResponse>>(
+    `/blocks?page=${page}&per_page=${perPage}`,
+  );
 
   return {
     data: data.data.map(mapBlock),
@@ -406,12 +416,19 @@ export async function fetchBlocks(page = 1, perPage = 25): Promise<BlockListResp
 }
 
 export async function fetchBlockByNumber(blockNumber: number): Promise<Block> {
-  const response = await fetchFromApi<{ data: BlockResponse }>(`/blocks/${blockNumber}`);
+  const response = await fetchFromApi<{ data: BlockResponse }>(
+    `/blocks/${blockNumber}`,
+  );
   return mapBlock(response.data);
 }
 
-export async function fetchTransactions(page = 1, perPage = 25): Promise<TransactionListResponse> {
-  const data = await fetchFromApi<ApiListResponse<TransactionResponse>>(`/transactions?page=${page}&per_page=${perPage}`);
+export async function fetchTransactions(
+  page = 1,
+  perPage = 25,
+): Promise<TransactionListResponse> {
+  const data = await fetchFromApi<ApiListResponse<TransactionResponse>>(
+    `/transactions?page=${page}&per_page=${perPage}`,
+  );
 
   return {
     data: data.data.map(mapTransaction),
@@ -419,8 +436,12 @@ export async function fetchTransactions(page = 1, perPage = 25): Promise<Transac
   };
 }
 
-export async function fetchTransactionByHash(hash: string): Promise<Transaction> {
-  const response = await fetchFromApi<{ data: TransactionResponse }>(`/transactions/${hash}`);
+export async function fetchTransactionByHash(
+  hash: string,
+): Promise<Transaction> {
+  const response = await fetchFromApi<{ data: TransactionResponse }>(
+    `/transactions/${hash}`,
+  );
   return mapTransaction(response.data);
 }
 

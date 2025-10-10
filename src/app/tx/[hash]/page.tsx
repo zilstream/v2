@@ -103,7 +103,9 @@ export default async function TransactionDetailPage({
       <Card>
         <CardHeader>
           <CardTitle>Value & Gas</CardTitle>
-          <CardDescription>Transaction value and gas information</CardDescription>
+          <CardDescription>
+            Transaction value and gas information
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <DetailRow
@@ -111,14 +113,8 @@ export default async function TransactionDetailPage({
             value={`${formatTokenAmount(tx.value, 18, 6)} ZIL`}
           />
           <DetailRow label="Nonce" value={formatNumber(tx.nonce, 0)} />
-          <DetailRow
-            label="Gas Used"
-            value={formatNumber(tx.gasUsed, 0)}
-          />
-          <DetailRow
-            label="Gas Limit"
-            value={formatNumber(tx.gasLimit, 0)}
-          />
+          <DetailRow label="Gas Used" value={formatNumber(tx.gasUsed, 0)} />
+          <DetailRow label="Gas Limit" value={formatNumber(tx.gasLimit, 0)} />
           <DetailRow
             label="Gas Price"
             value={`${formatNumber(Number.parseFloat(tx.gasPrice) / 1e9, 2)} Gwei`}
@@ -167,7 +163,7 @@ function getTransactionType(type: number, originalTypeHex: string | null) {
   if (type >= 1000) {
     return `Zilliqa Pre-EVM (Type ${originalTypeHex ?? type - 1000})`;
   }
-  
+
   const types = ["Legacy", "EIP-2930", "EIP-1559", "Type 3"];
   return types[type] ?? `Type ${type}`;
 }
@@ -184,9 +180,7 @@ function DetailRow({
       <dt className="min-w-48 text-sm font-medium text-muted-foreground">
         {label}
       </dt>
-      <dd className="flex-1 break-all text-sm font-mono">
-        {value}
-      </dd>
+      <dd className="flex-1 break-all text-sm font-mono">{value}</dd>
     </div>
   );
 }

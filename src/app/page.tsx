@@ -86,10 +86,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <LivePairsSection
-        initialPairs={pairs}
-        initialPagination={pagination}
-      />
+      <LivePairsSection initialPairs={pairs} initialPagination={pagination} />
     </main>
   );
 }

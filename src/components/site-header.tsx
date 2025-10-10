@@ -29,8 +29,8 @@ export function SiteHeader() {
               sideOffset={10}
               className="max-w-xs text-left"
             >
-              This is early access—the interface and data views will continue
-              to evolve rapidly.
+              This is early access—the interface and data views will continue to
+              evolve rapidly.
             </TooltipContent>
           </Tooltip>
         </div>
