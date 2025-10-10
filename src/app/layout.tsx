@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { NavigationProgress } from "@/components/navigation-progress";
@@ -39,7 +40,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NavigationProgress />
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
           <SidebarProvider>
             <AppSidebar />
             <main className="flex min-h-screen w-full flex-col">
