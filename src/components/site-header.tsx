@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { HeaderStats } from "@/components/header-stats";
 import { SearchBar } from "@/components/search-bar";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -35,9 +36,12 @@ export function SiteHeader() {
           </Tooltip>
         </div>
         <SearchBar />
-        <Suspense fallback={<Skeleton className="h-5 w-64" />}>
-          <HeaderStats />
-        </Suspense>
+        <div className="flex items-center gap-2">
+          <Suspense fallback={<Skeleton className="h-5 w-64" />}>
+            <HeaderStats />
+          </Suspense>
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
