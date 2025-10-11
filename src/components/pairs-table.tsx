@@ -63,7 +63,7 @@ export function PairsTable({
               >
                 <TableCell className="px-6">
                   <div className="flex items-center gap-2">
-                    <div className="flex -space-x-1.5">
+                    <div className="flex shrink-0 -space-x-1.5">
                       <TokenIcon
                         address={pair.token0}
                         alt={pair.token0Symbol}

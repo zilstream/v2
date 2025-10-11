@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BlockLoading() {
   return (
-    <div className="flex w-full flex-col gap-6 p-6">
+    <div className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
       <div className="space-y-1">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-4 w-64" />

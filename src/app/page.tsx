@@ -25,8 +25,8 @@ export default async function HomePage() {
   const totalTokens = stats.totalTokens;
 
   return (
-    <main className="flex w-full flex-col gap-6 p-6">
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background p-6">
+    <main className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background p-4 md:p-6">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.35),transparent_60%)]" />
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-2xl space-y-3">

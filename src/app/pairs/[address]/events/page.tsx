@@ -57,11 +57,11 @@ export default async function PairEventsPage({
   const token1Decimals = tokenIndex.get(pair.token1.toLowerCase())?.decimals;
 
   return (
-    <div className="flex w-full flex-col gap-6 p-6">
+    <div className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
       <Card>
         <CardHeader className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex -space-x-2">
+            <div className="flex shrink-0 -space-x-2">
               <TokenIcon
                 address={pair.token0}
                 alt={pair.token0Symbol}
