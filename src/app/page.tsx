@@ -30,16 +30,18 @@ export default async function HomePage() {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.35),transparent_60%)]" />
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-2xl space-y-3">
-            <Badge variant="secondary" className="bg-white/70 text-primary dark:bg-primary/20 dark:text-white dark:border-primary/30">
+            <Badge
+              variant="secondary"
+              className="bg-white/70 text-primary dark:bg-primary/20 dark:text-white dark:border-primary/30"
+            >
               ZilStream V2 • EVM + Zilliqa 2.0
             </Badge>
             <h1 className="text-balance text-2xl font-semibold leading-tight sm:text-3xl">
-              Discover on-chain liquidity powering the next chapter of Zilliqa.
+              Zilliqa EVM ecosystem market data
             </h1>
             <p className="text-muted-foreground text-sm">
-              Follow the most active pools, track cross-chain tokens, and stay
-              ahead as ZilStream pivots toward an EVM-first future on Zilliqa
-              2.0.
+              Welcome to newly updated ZilStream. Track pools, tokens,
+              transactions and more in real-time powered by Zilliqa 2.0 EVM.
             </p>
             <div className="flex flex-wrap gap-2">
               <Link

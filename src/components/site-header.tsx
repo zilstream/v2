@@ -40,8 +40,8 @@ export function SiteHeader() {
               sideOffset={10}
               className="max-w-xs text-left"
             >
-              This is early access—the interface and data views will continue to
-              evolve rapidly.
+              ZilStream V2 is currently in very early access. Data may not be
+              correct and many things will change.
             </TooltipContent>
           </Tooltip>
         </div>
