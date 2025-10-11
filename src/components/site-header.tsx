@@ -45,7 +45,7 @@ export function SiteHeader() {
             </TooltipContent>
           </Tooltip>
         </div>
-        <div className="hidden flex-1 md:block">
+        <div className="hidden flex-1 md:flex md:justify-center">
           <SearchBar />
         </div>
         <div className="flex items-center gap-1 md:gap-2">
