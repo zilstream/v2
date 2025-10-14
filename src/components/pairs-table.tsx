@@ -59,7 +59,7 @@ export function PairsTable({
               <TableRow
                 key={pair.address}
                 className="cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => router.push(`/pairs/${pair.address}/events`)}
+                onClick={() => router.push(`/pairs/${pair.address}`)}
               >
                 <TableCell className="px-6">
                   <div className="flex items-center gap-2">
