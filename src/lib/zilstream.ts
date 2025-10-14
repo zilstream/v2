@@ -48,6 +48,7 @@ interface PairResponse {
   reserve1: string;
   liquidity_usd: string;
   volume_usd: string;
+  volume_usd_24h: string;
   txn_count: number;
 }
 
@@ -64,6 +65,7 @@ export interface Pair {
   reserve1: string;
   liquidityUsd: string;
   volumeUsd: string;
+  volumeUsd24h: string;
   txnCount: number;
 }
 
@@ -189,6 +191,7 @@ function mapPair(pair: PairResponse): Pair {
     reserve1: pair.reserve1,
     liquidityUsd: pair.liquidity_usd,
     volumeUsd: pair.volume_usd,
+    volumeUsd24h: pair.volume_usd_24h,
     txnCount: pair.txn_count,
   };
 }

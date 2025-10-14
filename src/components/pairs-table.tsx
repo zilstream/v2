@@ -91,7 +91,7 @@ export function PairsTable({
                   {formatUsd(pair.liquidityUsd)}
                 </TableCell>
                 <TableCell className="text-right">
-                  {formatUsd(pair.volumeUsd)}
+                  {formatUsd(pair.volumeUsd24h)}
                 </TableCell>
                 <TableCell className="text-right">
                   {formatNumber(pair.txnCount, 0)}

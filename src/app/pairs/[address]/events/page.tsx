@@ -131,7 +131,7 @@ export default async function PairEventsPage({
             label="Liquidity USD"
             value={formatUsd(pair.liquidityUsd)}
           />
-          <StatBlock label="24h Volume USD" value={formatUsd(pair.volumeUsd)} />
+          <StatBlock label="24h Volume USD" value={formatUsd(pair.volumeUsd24h)} />
           <StatBlock
             label="Transactions"
             value={formatNumber(pair.txnCount, 0)}
@@ -162,6 +162,8 @@ export default async function PairEventsPage({
                   amount?.token === 0 ? token0Decimals : token1Decimals;
                 const tokenSymbol =
                   amount?.token === 0 ? pair.token0Symbol : pair.token1Symbol;
+                const tokenAddress =
+                  amount?.token === 0 ? pair.token0 : pair.token1;
 
                 return (
                   <TableRow key={event.id}>
@@ -172,10 +174,24 @@ export default async function PairEventsPage({
                     </TableCell>
                     <TableCell>{formatTimestamp(event.timestamp)}</TableCell>
                     <TableCell className="text-right">
-                      {tokenSymbol ?? "-"}
+                      <div className="flex items-center justify-end gap-2">
+                        <TokenIcon
+                          address={tokenAddress}
+                          alt={tokenSymbol}
+                          size={20}
+                        />
+                        {tokenSymbol ?? "-"}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      {formatTokenAmount(amount?.value, tokenDecimals)}
+                      <div className="flex items-center justify-end gap-2">
+                        <TokenIcon
+                          address={tokenAddress}
+                          alt={tokenSymbol}
+                          size={20}
+                        />
+                        {formatTokenAmount(amount?.value, tokenDecimals)}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       {formatUsd(event.amountUsd, 4)}

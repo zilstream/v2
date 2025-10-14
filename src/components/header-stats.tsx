@@ -4,18 +4,22 @@ import { BarChart3, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { formatUsd } from "@/lib/format";
-import { fetchStats } from "@/lib/zilstream";
 
 export function HeaderStats() {
   const [stats, setStats] = useState({ liquidity: 0, volume: 0 });
 
   useEffect(() => {
-    fetchStats().then((data) => {
-      setStats({
-        liquidity: Number.parseFloat(data.totalLiquidityUsd),
-        volume: Number.parseFloat(data.totalVolumeUsd24h),
+    fetch("/api/stats")
+      .then((res) => res.json())
+      .then((data) => {
+        setStats({
+          liquidity: Number.parseFloat(data.totalLiquidityUsd),
+          volume: Number.parseFloat(data.totalVolumeUsd24h),
+        });
+      })
+      .catch((error) => {
+        console.error("Failed to fetch stats:", error);
       });
-    });
   }, []);
 
   return (
