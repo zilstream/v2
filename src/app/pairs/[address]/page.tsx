@@ -27,9 +27,9 @@ import {
   formatUsd,
 } from "@/lib/format";
 import {
+  fetchPairByAddress,
   fetchPairEvents,
   fetchTokens,
-  findPairByAddress,
 } from "@/lib/zilstream";
 
 export default async function PairEventsPage({
@@ -41,13 +41,9 @@ export default async function PairEventsPage({
 
   const [eventsResponse, pair, tokensResponse] = await Promise.all([
     fetchPairEvents(pairAddress),
-    findPairByAddress(pairAddress),
+    fetchPairByAddress(pairAddress),
     fetchTokens(),
   ]);
-
-  if (!pair) {
-    notFound();
-  }
 
   const { data: events, pagination } = eventsResponse;
   const tokenIndex = new Map(

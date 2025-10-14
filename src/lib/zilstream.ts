@@ -272,14 +272,13 @@ export async function fetchPairEvents(
   };
 }
 
-export async function findPairByAddress(
+export async function fetchPairByAddress(
   pairAddress: string,
-): Promise<Pair | undefined> {
-  const data = await fetchFromApi<ApiListResponse<PairResponse>>("/pairs");
-  const match = data.data.find(
-    (pair) => pair.address.toLowerCase() === pairAddress.toLowerCase(),
+): Promise<Pair> {
+  const response = await fetchFromApi<{ data: PairResponse }>(
+    `/pairs/${pairAddress}`,
   );
-  return match ? mapPair(match) : undefined;
+  return mapPair(response.data);
 }
 
 export async function fetchStats(): Promise<Stats> {
