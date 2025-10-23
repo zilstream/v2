@@ -44,6 +44,7 @@ interface PairResponse {
   token0_name: string;
   token1_symbol: string;
   token1_name: string;
+  fee?: string;
   reserve0: string;
   reserve1: string;
   liquidity_usd: string;
@@ -61,6 +62,7 @@ export interface Pair {
   token0Name: string;
   token1Symbol: string;
   token1Name: string;
+  fee?: string;
   reserve0: string;
   reserve1: string;
   liquidityUsd: string;
@@ -187,6 +189,7 @@ function mapPair(pair: PairResponse): Pair {
     token0Name: pair.token0_name,
     token1Symbol: pair.token1_symbol,
     token1Name: pair.token1_name,
+    fee: pair.fee,
     reserve0: pair.reserve0,
     reserve1: pair.reserve1,
     liquidityUsd: pair.liquidity_usd,

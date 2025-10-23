@@ -80,6 +80,11 @@ export function PairsTable({
                     <span className="font-medium">
                       {pair.token0Symbol} / {pair.token1Symbol}
                     </span>
+                    {pair.fee && (
+                      <Badge variant="secondary" className="text-xs">
+                        {(Number.parseInt(pair.fee) / 10000).toFixed(2)}%
+                      </Badge>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell>
