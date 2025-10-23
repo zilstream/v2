@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_URL = "https://v2-api.zilstream.com";
+const API_URL = "https://api-v2.zilstream.com";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ address: string }> },
+  { params }: { params: Promise<{ address: string }> }
 ) {
   const { address } = await params;
   const searchParams = request.nextUrl.searchParams;
@@ -21,7 +21,7 @@ export async function GET(
     if (!response.ok) {
       return NextResponse.json(
         { error: "Failed to fetch address transactions" },
-        { status: response.status },
+        { status: response.status }
       );
     }
 
@@ -31,7 +31,7 @@ export async function GET(
     console.error("Failed to fetch address transactions:", error);
     return NextResponse.json(
       { error: "Failed to fetch address transactions" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -18,7 +18,7 @@ bun install
 bun run dev
 ```
 
-The development server defaults to <http://localhost:3000>. Data is fetched directly from the public `v2-api.zilstream.com` endpoints, so an internet connection is required.
+The development server defaults to <http://localhost:3000>. Data is fetched directly from the public `api-v2.zilstream.com` endpoints, so an internet connection is required.
 
 ## Available Scripts
 

@@ -1,6 +1,6 @@
 ## Host
 
-v2-api.zilstream.com
+api-v2.zilstream.com
 
 ## /tokens
 
