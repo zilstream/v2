@@ -1,6 +1,7 @@
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
+import { CopyAddress } from "@/components/copy-address";
 import { TokenIcon } from "@/components/token-icon";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -58,15 +59,18 @@ export default async function TokenDetailPage({
               </CardDescription>
             </div>
           </div>
-          <Link
-            href={`${EXPLORER_URL}/address/${token.address}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1 text-sm font-medium transition hover:bg-muted"
-          >
-            View on Explorer
-            <ExternalLink className="h-3 w-3" />
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <CopyAddress address={token.address} />
+            <Link
+              href={`${EXPLORER_URL}/address/${token.address}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-sm font-medium transition hover:bg-muted"
+            >
+              View on Explorer
+              <ExternalLink className="h-3 w-3" />
+            </Link>
+          </div>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatBlock
