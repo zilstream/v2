@@ -13,7 +13,7 @@ export default async function BlocksPage() {
         </p>
       </div>
 
-      <LiveBlocksSection 
+      <LiveBlocksSection
         initialBlocks={blocks}
         initialPagination={pagination}
       />

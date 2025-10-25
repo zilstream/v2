@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { TokenIcon } from "@/components/token-icon";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -39,37 +41,82 @@ export default async function TokensPage() {
             <TableHeader>
               <TableRow className="border-border/60">
                 <TableHead className="px-6">Token</TableHead>
-                <TableHead>Symbol</TableHead>
-                <TableHead className="text-right">Decimals</TableHead>
-                <TableHead className="text-right">Price (USD)</TableHead>
-                <TableHead className="text-right">Total Volume (USD)</TableHead>
+                <TableHead className="text-right">Price</TableHead>
+                <TableHead className="text-right">24h %</TableHead>
+                <TableHead className="text-right">7d %</TableHead>
+                <TableHead className="text-right">Market Cap</TableHead>
+                <TableHead className="text-right">Volume (24h)</TableHead>
+                <TableHead className="text-right">Liquidity</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {tokens.map((token) => (
                 <TableRow key={token.address}>
                   <TableCell className="px-6">
-                    <div className="flex items-center gap-3">
+                    <Link
+                      href={`/tokens/${token.address}`}
+                      className="flex items-center gap-3 transition hover:opacity-80"
+                    >
                       <TokenIcon
                         address={token.address}
-                        alt={token.symbol ?? token.name}
+                        alt={token.symbol ?? token.name ?? "Token"}
                         size={36}
                       />
-                      <div className="flex flex-col">
-                        <span className="font-medium">{token.name}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {shortenAddress(token.address)}
-                        </span>
+                      <div className="font-medium">
+                        {token.name ?? "-"}{" "}
+                        {token.symbol && (
+                          <span className="text-muted-foreground">
+                            {token.symbol}
+                          </span>
+                        )}
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{token.symbol}</TableCell>
-                  <TableCell className="text-right">{token.decimals}</TableCell>
-                  <TableCell className="text-right">
-                    {formatNumber(token.priceUsd, token.priceUsd ? 6 : 2)}
+                    </Link>
                   </TableCell>
                   <TableCell className="text-right">
-                    {formatUsd(token.totalVolumeUsd)}
+                    {token.priceUsd ? formatUsd(token.priceUsd) : "-"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {token.priceChange24h ? (
+                      <span
+                        className={
+                          Number.parseFloat(token.priceChange24h) >= 0
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }
+                      >
+                        {Number.parseFloat(token.priceChange24h) >= 0
+                          ? "+"
+                          : ""}
+                        {formatNumber(token.priceChange24h, 2)}%
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {token.priceChange7d ? (
+                      <span
+                        className={
+                          Number.parseFloat(token.priceChange7d) >= 0
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }
+                      >
+                        {Number.parseFloat(token.priceChange7d) >= 0 ? "+" : ""}
+                        {formatNumber(token.priceChange7d, 2)}%
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {token.marketCapUsd ? formatUsd(token.marketCapUsd) : "-"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {token.volume24hUsd ? formatUsd(token.volume24hUsd) : "-"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {token.liquidityUsd ? formatUsd(token.liquidityUsd) : "-"}
                   </TableCell>
                 </TableRow>
               ))}

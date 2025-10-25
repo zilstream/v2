@@ -54,7 +54,9 @@ export default function TransactionLoading() {
       <Card>
         <CardHeader>
           <CardTitle>Value & Gas</CardTitle>
-          <CardDescription>Transaction value and gas information</CardDescription>
+          <CardDescription>
+            Transaction value and gas information
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {Array.from({ length: 7 }).map((_, i) => (

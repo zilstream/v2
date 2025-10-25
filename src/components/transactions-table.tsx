@@ -98,9 +98,7 @@ export function TransactionsTable({
                   {formatNumber(tx.gasUsed, 0)}
                 </TableCell>
                 <TableCell>
-                  <Badge
-                    variant={tx.status === 0 ? "default" : "destructive"}
-                  >
+                  <Badge variant={tx.status === 0 ? "default" : "destructive"}>
                     {tx.status === 0 ? "Success" : "Failed"}
                   </Badge>
                 </TableCell>

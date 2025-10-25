@@ -127,7 +127,10 @@ export default async function PairEventsPage({
             label="Liquidity USD"
             value={formatUsd(pair.liquidityUsd)}
           />
-          <StatBlock label="24h Volume USD" value={formatUsd(pair.volumeUsd24h)} />
+          <StatBlock
+            label="24h Volume USD"
+            value={formatUsd(pair.volumeUsd24h)}
+          />
           <StatBlock
             label="Transactions"
             value={formatNumber(pair.txnCount, 0)}

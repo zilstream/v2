@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { Monitor, Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
+import { Monitor, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@/components/ui/tooltip";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="inline-flex h-9 items-center gap-0.5 rounded-md border border-border bg-muted/50 p-1">
@@ -81,5 +81,5 @@ export function ThemeToggle() {
         </Tooltip>
       </TooltipProvider>
     </div>
-  )
+  );
 }

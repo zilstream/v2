@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { usePathname, useSearchParams } from "next/navigation"
-import { NProgress } from "@tanem/react-nprogress"
+import { useEffect, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { NProgress } from "@tanem/react-nprogress";
 
 export function NavigationProgress() {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const [isAnimating, setIsAnimating] = useState(false)
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    setIsAnimating(true)
-    const timer = setTimeout(() => setIsAnimating(false), 200)
-    return () => clearTimeout(timer)
-  }, [pathname, searchParams])
+    setIsAnimating(true);
+    const timer = setTimeout(() => setIsAnimating(false), 200);
+    return () => clearTimeout(timer);
+  }, [pathname, searchParams]);
 
   return (
     <NProgress isAnimating={isAnimating}>
@@ -55,5 +55,5 @@ export function NavigationProgress() {
         </div>
       )}
     </NProgress>
-  )
+  );
 }

@@ -20,7 +20,9 @@ export function LiveTransactionsSection({
   const handlePageChange = async (newPage: number) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/transactions?page=${newPage}&per_page=50`);
+      const response = await fetch(
+        `/api/transactions?page=${newPage}&per_page=50`,
+      );
       const data = await response.json();
       setTransactions(data.data);
       setPagination(data.pagination);

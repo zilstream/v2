@@ -13,7 +13,7 @@ export default async function TransactionsPage() {
         </p>
       </div>
 
-      <LiveTransactionsSection 
+      <LiveTransactionsSection
         initialTransactions={transactions}
         initialPagination={pagination}
       />
