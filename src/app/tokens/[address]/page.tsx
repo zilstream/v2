@@ -146,14 +146,16 @@ export default async function TokenDetailPage({
                 <TableHead className="text-right">Liquidity</TableHead>
                 <TableHead className="text-right">Volume (24h)</TableHead>
                 <TableHead className="text-right">Transactions</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {pairs.map((pair) => (
-                <TableRow key={pair.address}>
+                <TableRow key={pair.address} className="cursor-pointer">
                   <TableCell className="px-6">
-                    <div className="flex items-center gap-3">
+                    <Link
+                      href={`/pairs/${pair.address}`}
+                      className="flex items-center gap-3 transition hover:opacity-80"
+                    >
                       <div className="flex shrink-0 -space-x-2">
                         <TokenIcon
                           address={pair.token0}
@@ -171,7 +173,7 @@ export default async function TokenDetailPage({
                       <div className="font-medium">
                         {pair.token0Symbol} / {pair.token1Symbol}
                       </div>
-                    </div>
+                    </Link>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="capitalize">
@@ -186,14 +188,6 @@ export default async function TokenDetailPage({
                   </TableCell>
                   <TableCell className="text-right">
                     {formatNumber(pair.txnCount, 0)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Link
-                      href={`/pairs/${pair.address}`}
-                      className="text-primary underline underline-offset-4"
-                    >
-                      View
-                    </Link>
                   </TableCell>
                 </TableRow>
               ))}
