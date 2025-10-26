@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useState } from "react";
 
 import { getTokenIconUrl } from "@/lib/tokens";
@@ -38,7 +37,7 @@ export function TokenIcon({
   }
 
   return (
-    <Image
+    <img
       src={src}
       alt={alt}
       width={size}
