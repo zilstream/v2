@@ -2,6 +2,7 @@ import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ExplorerDropdown } from "@/components/explorer-dropdown";
 import { TokenIcon } from "@/components/token-icon";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -94,32 +95,18 @@ export default async function PairEventsPage({
               <ExternalLink className="h-3 w-3" />
             </Link>
             <Link
-              href={`${EXPLORER_URL}/address/${pair.token0}`}
-              target="_blank"
-              rel="noreferrer"
+              href={`/tokens/${pair.token0}`}
               className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1 text-sm font-medium transition hover:bg-muted"
             >
               {pair.token0Symbol}
-              <ExternalLink className="h-3 w-3" />
             </Link>
             <Link
-              href={`${EXPLORER_URL}/address/${pair.token1}`}
-              target="_blank"
-              rel="noreferrer"
+              href={`/tokens/${pair.token1}`}
               className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1 text-sm font-medium transition hover:bg-muted"
             >
               {pair.token1Symbol}
-              <ExternalLink className="h-3 w-3" />
             </Link>
-            <Link
-              href={`${EXPLORER_URL}/address/${pair.address}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1 text-sm font-medium transition hover:bg-muted"
-            >
-              Pair
-              <ExternalLink className="h-3 w-3" />
-            </Link>
+            <ExplorerDropdown type="address" value={pair.address} />
           </div>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-3">
@@ -198,9 +185,7 @@ export default async function PairEventsPage({
                     <TableCell>
                       <Link
                         className="text-primary underline underline-offset-4"
-                        href={`${EXPLORER_URL}/tx/${event.transactionHash}`}
-                        rel="noreferrer"
-                        target="_blank"
+                        href={`/tx/${event.transactionHash}`}
                       >
                         {event.transactionHash.slice(0, 6)}…
                         {event.transactionHash.slice(-4)}

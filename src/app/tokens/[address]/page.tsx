@@ -1,7 +1,7 @@
-import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 import { CopyAddress } from "@/components/copy-address";
+import { ExplorerDropdown } from "@/components/explorer-dropdown";
 import { TokenIcon } from "@/components/token-icon";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -19,7 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { EXPLORER_URL } from "@/lib/constants";
 import { formatNumber, formatUsd } from "@/lib/format";
 import {
   fetchTokenByAddress,
@@ -61,15 +60,7 @@ export default async function TokenDetailPage({
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <CopyAddress address={token.address} />
-            <Link
-              href={`${EXPLORER_URL}/address/${token.address}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-sm font-medium transition hover:bg-muted"
-            >
-              View on Explorer
-              <ExternalLink className="h-3 w-3" />
-            </Link>
+            <ExplorerDropdown type="address" value={token.address} />
           </div>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -7,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ExplorerDropdown } from "@/components/explorer-dropdown";
 import { formatNumber, formatTimestamp } from "@/lib/format";
-import { EXPLORER_URL } from "@/lib/constants";
 import { fetchBlockByNumber } from "@/lib/zilstream";
 
 interface BlockDetailPageProps {
@@ -36,13 +36,16 @@ export default async function BlockDetailPage({
 
   return (
     <div className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">
-          Block #{formatNumber(block.number, 0)}
-        </h1>
-        <p className="text-muted-foreground">
-          Block details for block {formatNumber(block.number, 0)}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold">
+            Block #{formatNumber(block.number, 0)}
+          </h1>
+          <p className="text-muted-foreground">
+            Block details for block {formatNumber(block.number, 0)}
+          </p>
+        </div>
+        <ExplorerDropdown type="block" value={block.number} />
       </div>
 
       <Card>
@@ -89,19 +92,9 @@ export default async function BlockDetailPage({
         </CardContent>
       </Card>
 
-      <div className="flex gap-4">
-        <Link
-          href={`${EXPLORER_URL}/block/${block.number}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-primary hover:underline"
-        >
-          View on Explorer →
-        </Link>
-        <Link href="/blocks" className="text-sm text-primary hover:underline">
-          ← Back to blocks
-        </Link>
-      </div>
+      <Link href="/blocks" className="text-sm text-primary hover:underline">
+        ← Back to blocks
+      </Link>
     </div>
   );
 }

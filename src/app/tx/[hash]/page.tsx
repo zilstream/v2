@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ExplorerDropdown } from "@/components/explorer-dropdown";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -9,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatNumber, formatTokenAmount } from "@/lib/format";
-import { EXPLORER_URL } from "@/lib/constants";
 import { fetchTransactionByHash } from "@/lib/zilstream";
 
 interface TransactionDetailPageProps {
@@ -32,11 +32,14 @@ export default async function TransactionDetailPage({
 
   return (
     <div className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">Transaction Details</h1>
-        <p className="text-muted-foreground font-mono text-sm break-all">
-          {tx.hash}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold">Transaction Details</h1>
+          <p className="text-muted-foreground font-mono text-sm break-all">
+            {tx.hash}
+          </p>
+        </div>
+        <ExplorerDropdown type="tx" value={tx.hash} />
       </div>
 
       <Card>
@@ -142,19 +145,9 @@ export default async function TransactionDetailPage({
         </CardContent>
       </Card>
 
-      <div className="flex gap-4">
-        <Link
-          href={`${EXPLORER_URL}/tx/${tx.hash}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-primary hover:underline"
-        >
-          View on Explorer →
-        </Link>
-        <Link href="/txs" className="text-sm text-primary hover:underline">
-          ← Back to transactions
-        </Link>
-      </div>
+      <Link href="/txs" className="text-sm text-primary hover:underline">
+        ← Back to transactions
+      </Link>
     </div>
   );
 }
