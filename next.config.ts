@@ -10,6 +10,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/token/:address",
+        destination: "/tokens/:address",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
