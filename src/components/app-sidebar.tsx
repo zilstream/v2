@@ -56,6 +56,14 @@ const items = [
 export function AppSidebar() {
   const pathname = usePathname();
 
+  const isItemActive = (itemUrl: string) => {
+    if (pathname === itemUrl) return true;
+    if (itemUrl === "/") return false;
+    if (itemUrl === "/blocks" && pathname.startsWith("/block")) return true;
+    if (itemUrl === "/txs" && pathname.startsWith("/tx")) return true;
+    return pathname.startsWith(itemUrl);
+  };
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -85,7 +93,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={pathname === item.url}>
+                  <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
                     <Link
                       href={item.url}
                       className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
