@@ -133,62 +133,81 @@ export default async function PairEventsPage({
           <Table>
             <TableHeader>
               <TableRow className="border-border/60">
-                <TableHead className="px-6">Event</TableHead>
-                <TableHead>Timestamp</TableHead>
-                <TableHead className="text-right">Token</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead className="text-right">Amount (USD)</TableHead>
-                <TableHead>Transaction</TableHead>
+                <TableHead className="w-32 px-6">Timestamp</TableHead>
+                <TableHead className="w-24">Event</TableHead>
+                <TableHead className="w-32 text-right">{pair.token0Symbol}</TableHead>
+                <TableHead className="w-32 text-right">{pair.token1Symbol}</TableHead>
+                <TableHead className="w-32 text-right">Amount (USD)</TableHead>
+                <TableHead className="w-28 text-right">Maker</TableHead>
+                <TableHead className="w-12 text-right">Tx</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {events.map((event) => {
-                const amount = getRelevantAmount(event);
-                const tokenDecimals =
-                  amount?.token === 0 ? token0Decimals : token1Decimals;
-                const tokenSymbol =
-                  amount?.token === 0 ? pair.token0Symbol : pair.token1Symbol;
-                const tokenAddress =
-                  amount?.token === 0 ? pair.token0 : pair.token1;
+                const eventColor = getEventColor(event);
+                const badgeColor = getBadgeColor(event);
+                
+                const token0Amount = event.amount0In && event.amount0In !== "0" 
+                  ? event.amount0In 
+                  : event.amount0Out && event.amount0Out !== "0" 
+                    ? event.amount0Out 
+                    : undefined;
+                
+                const token1Amount = event.amount1In && event.amount1In !== "0" 
+                  ? event.amount1In 
+                  : event.amount1Out && event.amount1Out !== "0" 
+                    ? event.amount1Out 
+                    : undefined;
 
                 return (
-                  <TableRow key={event.id}>
-                    <TableCell className="px-6">
-                      <Badge variant="outline" className="capitalize">
-                        {event.eventType}
+                  <TableRow key={event.id} className={eventColor}>
+                    <TableCell className="px-6 text-muted-foreground">{formatTimestamp(event.timestamp)}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={badgeColor}>
+                        {getEventAction(event)}
                       </Badge>
                     </TableCell>
-                    <TableCell>{formatTimestamp(event.timestamp)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <TokenIcon
-                          address={tokenAddress}
-                          alt={tokenSymbol}
+                          address={pair.token0}
+                          alt={pair.token0Symbol}
                           size={20}
                         />
-                        {tokenSymbol ?? "-"}
+                        {token0Amount ? formatTokenAmount(token0Amount, token0Decimals) : "-"}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <TokenIcon
-                          address={tokenAddress}
-                          alt={tokenSymbol}
+                          address={pair.token1}
+                          alt={pair.token1Symbol}
                           size={20}
                         />
-                        {formatTokenAmount(amount?.value, tokenDecimals)}
+                        {token1Amount ? formatTokenAmount(token1Amount, token1Decimals) : "-"}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
                       {formatUsd(event.amountUsd, 4)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="truncate text-right">
+                      {event.sender ? (
+                        <Link
+                          className="underline underline-offset-4"
+                          href={`/address/${event.sender}`}
+                        >
+                          {event.sender.slice(0, 6)}…{event.sender.slice(-4)}
+                        </Link>
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
                       <Link
-                        className="text-primary underline underline-offset-4"
+                        className="inline-flex items-center justify-end text-muted-foreground"
                         href={`/tx/${event.transactionHash}`}
                       >
-                        {event.transactionHash.slice(0, 6)}…
-                        {event.transactionHash.slice(-4)}
+                        <ExternalLink className="h-4 w-4" />
                       </Link>
                     </TableCell>
                   </TableRow>
@@ -214,6 +233,65 @@ function StatBlock({ label, value }: StatBlockProps) {
       <p className="text-lg font-semibold">{value}</p>
     </div>
   );
+}
+
+function getEventAction(event: {
+  eventType: string;
+  amount0In?: string;
+  amount0Out?: string;
+  amount1In?: string;
+  amount1Out?: string;
+}): string {
+  const type = event.eventType.toLowerCase();
+
+  if (type === "swap") {
+    if (event.amount0Out && event.amount0Out !== "0") {
+      return "Buy";
+    }
+    if (event.amount0In && event.amount0In !== "0") {
+      return "Sell";
+    }
+  }
+
+  return event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1);
+}
+
+function getEventColor(event: {
+  eventType: string;
+  amount0In?: string;
+  amount0Out?: string;
+}): string {
+  const type = event.eventType.toLowerCase();
+
+  if (type === "swap") {
+    if (event.amount0Out && event.amount0Out !== "0") {
+      return "text-emerald-600/80 dark:text-emerald-400/90";
+    }
+    if (event.amount0In && event.amount0In !== "0") {
+      return "text-rose-600/80 dark:text-rose-400/90";
+    }
+  }
+
+  return "";
+}
+
+function getBadgeColor(event: {
+  eventType: string;
+  amount0In?: string;
+  amount0Out?: string;
+}): string {
+  const type = event.eventType.toLowerCase();
+
+  if (type === "swap") {
+    if (event.amount0Out && event.amount0Out !== "0") {
+      return "border-emerald-600/50 bg-emerald-600/10 text-emerald-600 dark:border-emerald-400/50 dark:bg-emerald-400/10 dark:text-emerald-400";
+    }
+    if (event.amount0In && event.amount0In !== "0") {
+      return "border-rose-600/50 bg-rose-600/10 text-rose-600 dark:border-rose-400/50 dark:bg-rose-400/10 dark:text-rose-400";
+    }
+  }
+
+  return "";
 }
 
 function getRelevantAmount(event: {
