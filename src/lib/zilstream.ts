@@ -22,12 +22,17 @@ interface TokenResponse {
   symbol?: string;
   name?: string;
   decimals?: number;
+  total_supply?: string;
   price_usd?: string;
+  price_eth?: string;
   market_cap_usd?: string;
   liquidity_usd?: string;
   volume_24h_usd?: string;
+  total_volume_usd?: string;
   price_change_24h?: string;
   price_change_7d?: string;
+  first_seen_block?: number;
+  first_seen_timestamp?: number;
 }
 
 export interface Token {
@@ -35,12 +40,17 @@ export interface Token {
   symbol?: string;
   name?: string;
   decimals?: number;
+  totalSupply?: string;
   priceUsd?: string;
+  priceEth?: string;
   marketCapUsd?: string;
   liquidityUsd?: string;
   volume24hUsd?: string;
+  totalVolumeUsd?: string;
   priceChange24h?: string;
   priceChange7d?: string;
+  firstSeenBlock?: number;
+  firstSeenTimestamp?: number;
 }
 
 interface PairResponse {
@@ -182,12 +192,17 @@ function mapToken(token: TokenResponse): Token {
     symbol: token.symbol,
     name: token.name,
     decimals: token.decimals,
+    totalSupply: token.total_supply,
     priceUsd: token.price_usd,
+    priceEth: token.price_eth,
     marketCapUsd: token.market_cap_usd,
     liquidityUsd: token.liquidity_usd,
     volume24hUsd: token.volume_24h_usd,
+    totalVolumeUsd: token.total_volume_usd,
     priceChange24h: token.price_change_24h,
     priceChange7d: token.price_change_7d,
+    firstSeenBlock: token.first_seen_block,
+    firstSeenTimestamp: token.first_seen_timestamp,
   };
 }
 
@@ -311,6 +326,42 @@ export async function fetchTokenByAddress(address: string): Promise<Token> {
     `/tokens/${address}`,
   );
   return mapToken(response.data);
+}
+
+export interface TokenChartData {
+  address: string;
+  protocol: string;
+  base_token: {
+    address: string;
+    symbol: string;
+    decimals: number;
+  };
+  quote: string;
+  timeframe: string;
+  interval: string;
+  points: {
+    timestamp: string;
+    price: string;
+    source: string;
+  }[];
+}
+
+export async function fetchTokenChart(
+  address: string,
+): Promise<TokenChartData> {
+  const response = await fetchFromApi<{ data: TokenChartData }>(
+    `/tokens/${address}/chart/price`,
+  );
+  return response.data;
+}
+
+export async function fetchPairChart(
+  address: string,
+): Promise<TokenChartData> {
+  const response = await fetchFromApi<{ data: TokenChartData }>(
+    `/pairs/${address}/chart/price`,
+  );
+  return response.data;
 }
 
 export async function fetchTokenPairs(

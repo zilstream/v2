@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { formatNumber, formatTokenAmount, formatTimestamp } from "@/lib/format";
 import { AddressInfo } from "@/components/address-info";
+import { AddressEvents } from "@/components/address-events";
 import { CopyButton } from "@/components/copy-button";
 import { ExplorerDropdown } from "@/components/explorer-dropdown";
 
@@ -27,13 +28,23 @@ export default async function AddressPage({
 }) {
   const { address } = await params;
 
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/addresses/${address}/transactions?page=1&per_page=25`,
-    { next: { revalidate: 60 } },
-  );
+  const [txResponse, eventsResponse] = await Promise.all([
+    fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/addresses/${address}/transactions?page=1&per_page=25`,
+      { next: { revalidate: 60 } },
+    ),
+    fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/addresses/${address}/events?page=1&per_page=10`,
+      { next: { revalidate: 60 } },
+    ),
+  ]);
 
-  const result = await response.json();
+  const result = await txResponse.json();
   const transactions = result?.data || [];
+
+  const eventsResult = await eventsResponse.json();
+  const events = eventsResult?.data || [];
+  const hasMoreEvents = eventsResult?.pagination?.has_more || false;
 
   return (
     <div className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
@@ -52,6 +63,12 @@ export default async function AddressPage({
         </div>
         <AddressInfo address={address} />
       </div>
+
+      <AddressEvents
+        initialEvents={events}
+        initialHasMore={hasMoreEvents}
+        address={address}
+      />
 
       <Card>
         <CardHeader>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ExplorerDropdown } from "@/components/explorer-dropdown";
+import { PairPriceChart } from "@/components/pair-price-chart";
 import { TokenIcon } from "@/components/token-icon";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -29,6 +30,7 @@ import {
 } from "@/lib/format";
 import {
   fetchPairByAddress,
+  fetchPairChart,
   fetchPairEvents,
   fetchTokens,
 } from "@/lib/zilstream";
@@ -40,10 +42,11 @@ export default async function PairEventsPage({
 }) {
   const { address: pairAddress } = await params;
 
-  const [eventsResponse, pair, tokensResponse] = await Promise.all([
+  const [eventsResponse, pair, tokensResponse, chartData] = await Promise.all([
     fetchPairEvents(pairAddress),
     fetchPairByAddress(pairAddress),
     fetchTokens(),
+    fetchPairChart(pairAddress),
   ]);
 
   const { data: events, pagination } = eventsResponse;
@@ -125,6 +128,11 @@ export default async function PairEventsPage({
         </CardContent>
       </Card>
 
+      <PairPriceChart
+        data={chartData}
+        pairName={`${pair.token0Symbol} / ${pair.token1Symbol}`}
+      />
+
       <Card>
         <CardHeader>
           <CardTitle>Events</CardTitle>
@@ -135,8 +143,12 @@ export default async function PairEventsPage({
               <TableRow className="border-border/60">
                 <TableHead className="w-32 px-6">Timestamp</TableHead>
                 <TableHead className="w-24">Event</TableHead>
-                <TableHead className="w-32 text-right">{pair.token0Symbol}</TableHead>
-                <TableHead className="w-32 text-right">{pair.token1Symbol}</TableHead>
+                <TableHead className="w-32 text-right">
+                  {pair.token0Symbol}
+                </TableHead>
+                <TableHead className="w-32 text-right">
+                  {pair.token1Symbol}
+                </TableHead>
                 <TableHead className="w-32 text-right">Amount (USD)</TableHead>
                 <TableHead className="w-28 text-right">Maker</TableHead>
                 <TableHead className="w-12 text-right">Tx</TableHead>
@@ -146,22 +158,26 @@ export default async function PairEventsPage({
               {events.map((event) => {
                 const eventColor = getEventColor(event);
                 const badgeColor = getBadgeColor(event);
-                
-                const token0Amount = event.amount0In && event.amount0In !== "0" 
-                  ? event.amount0In 
-                  : event.amount0Out && event.amount0Out !== "0" 
-                    ? event.amount0Out 
-                    : undefined;
-                
-                const token1Amount = event.amount1In && event.amount1In !== "0" 
-                  ? event.amount1In 
-                  : event.amount1Out && event.amount1Out !== "0" 
-                    ? event.amount1Out 
-                    : undefined;
+
+                const token0Amount =
+                  event.amount0In && event.amount0In !== "0"
+                    ? event.amount0In
+                    : event.amount0Out && event.amount0Out !== "0"
+                      ? event.amount0Out
+                      : undefined;
+
+                const token1Amount =
+                  event.amount1In && event.amount1In !== "0"
+                    ? event.amount1In
+                    : event.amount1Out && event.amount1Out !== "0"
+                      ? event.amount1Out
+                      : undefined;
 
                 return (
                   <TableRow key={event.id} className={eventColor}>
-                    <TableCell className="px-6 text-muted-foreground">{formatTimestamp(event.timestamp)}</TableCell>
+                    <TableCell className="px-6 text-muted-foreground">
+                      {formatTimestamp(event.timestamp)}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="outline" className={badgeColor}>
                         {getEventAction(event)}
@@ -174,7 +190,9 @@ export default async function PairEventsPage({
                           alt={pair.token0Symbol}
                           size={20}
                         />
-                        {token0Amount ? formatTokenAmount(token0Amount, token0Decimals) : "-"}
+                        {token0Amount
+                          ? formatTokenAmount(token0Amount, token0Decimals)
+                          : "-"}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -184,23 +202,34 @@ export default async function PairEventsPage({
                           alt={pair.token1Symbol}
                           size={20}
                         />
-                        {token1Amount ? formatTokenAmount(token1Amount, token1Decimals) : "-"}
+                        {token1Amount
+                          ? formatTokenAmount(token1Amount, token1Decimals)
+                          : "-"}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
                       {formatUsd(event.amountUsd, 4)}
                     </TableCell>
                     <TableCell className="truncate text-right">
-                      {event.sender ? (
-                        <Link
-                          className="underline underline-offset-4"
-                          href={`/address/${event.sender}`}
-                        >
-                          {event.sender.slice(0, 6)}…{event.sender.slice(-4)}
-                        </Link>
-                      ) : (
-                        "-"
-                      )}
+                      {(() => {
+                        // For swaps, show recipient for buys (user receives token0) and toAddress for sells (user sends token0)
+                        const isBuy =
+                          event.amount0Out && event.amount0Out !== "0";
+                        const userAddress = isBuy
+                          ? event.recipient || event.toAddress
+                          : event.toAddress || event.recipient;
+
+                        return userAddress ? (
+                          <Link
+                            className="underline underline-offset-4"
+                            href={`/address/${userAddress}`}
+                          >
+                            {userAddress.slice(0, 6)}…{userAddress.slice(-4)}
+                          </Link>
+                        ) : (
+                          "-"
+                        );
+                      })()}
                     </TableCell>
                     <TableCell className="text-right">
                       <Link
