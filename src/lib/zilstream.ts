@@ -369,6 +369,7 @@ interface TransactionResponse {
   effective_gas_price: string;
   contract_address: string | null;
   cumulative_gas_used: number;
+  timestamp: number;
 }
 
 export interface Transaction {
@@ -390,6 +391,7 @@ export interface Transaction {
   effectiveGasPrice: string;
   contractAddress: string | null;
   cumulativeGasUsed: number;
+  timestamp: number;
 }
 
 export interface BlockListResponse {
@@ -435,6 +437,7 @@ function mapTransaction(tx: TransactionResponse): Transaction {
     effectiveGasPrice: tx.effective_gas_price,
     contractAddress: tx.contract_address,
     cumulativeGasUsed: tx.cumulative_gas_used,
+    timestamp: tx.timestamp,
   };
 }
 

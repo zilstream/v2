@@ -23,6 +23,7 @@ export function ThemeToggle() {
               variant="ghost"
               size="icon"
               onClick={() => setTheme("light")}
+              suppressHydrationWarning
               className={`h-7 w-7 ${
                 theme === "light"
                   ? "bg-background text-foreground shadow-sm"
@@ -44,6 +45,7 @@ export function ThemeToggle() {
               variant="ghost"
               size="icon"
               onClick={() => setTheme("dark")}
+              suppressHydrationWarning
               className={`h-7 w-7 ${
                 theme === "dark"
                   ? "bg-background text-foreground shadow-sm"
@@ -65,6 +67,7 @@ export function ThemeToggle() {
               variant="ghost"
               size="icon"
               onClick={() => setTheme("system")}
+              suppressHydrationWarning
               className={`h-7 w-7 ${
                 theme === "system"
                   ? "bg-background text-foreground shadow-sm"

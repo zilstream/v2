@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatNumber, formatTokenAmount } from "@/lib/format";
+import { formatNumber, formatTokenAmount, formatTimestamp } from "@/lib/format";
 import { fetchTransactionByHash } from "@/lib/zilstream";
 
 interface TransactionDetailPageProps {
@@ -72,6 +72,7 @@ export default async function TransactionDetailPage({
             label="Transaction Index"
             value={formatNumber(tx.transactionIndex, 0)}
           />
+          <DetailRow label="Timestamp" value={formatTimestamp(tx.timestamp)} />
           <DetailRow
             label="Transaction Type"
             value={getTransactionType(tx.transactionType, tx.originalTypeHex)}
@@ -154,7 +155,7 @@ export default async function TransactionDetailPage({
 
 function getTransactionType(type: number, originalTypeHex: string | null) {
   if (type >= 1000) {
-    return `Zilliqa Pre-EVM (Type ${originalTypeHex ?? type - 1000})`;
+    return "Zilliqa Legacy";
   }
 
   const types = ["Legacy", "EIP-2930", "EIP-1559", "Type 3"];

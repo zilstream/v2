@@ -31,7 +31,10 @@ export function SiteHeader() {
           <SidebarTrigger />
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="rounded-full bg-orange-200/70 px-3 py-0.5 text-xs font-medium uppercase tracking-wide text-orange-700">
+              <span
+                suppressHydrationWarning
+                className="rounded-full bg-orange-200/70 px-3 py-0.5 text-xs font-medium uppercase tracking-wide text-orange-700"
+              >
                 Early preview
               </span>
             </TooltipTrigger>

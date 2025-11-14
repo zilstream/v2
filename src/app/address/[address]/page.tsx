@@ -15,7 +15,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatNumber, formatTokenAmount } from "@/lib/format";
+import { formatNumber, formatTokenAmount, formatTimestamp } from "@/lib/format";
+import { AddressInfo } from "@/components/address-info";
+import { CopyButton } from "@/components/copy-button";
+import { ExplorerDropdown } from "@/components/explorer-dropdown";
 
 export default async function AddressPage({
   params,
@@ -31,13 +34,23 @@ export default async function AddressPage({
 
   const result = await response.json();
   const transactions = result?.data || [];
-  const pagination = result?.pagination;
 
   return (
     <div className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">Address</h1>
-        <p className="font-mono text-sm text-muted-foreground">{address}</p>
+      <div className="space-y-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-semibold">Address</h1>
+            <div className="flex items-center gap-2">
+              <p className="font-mono text-sm text-muted-foreground break-all">
+                {address}
+              </p>
+              <CopyButton text={address} />
+            </div>
+          </div>
+          <ExplorerDropdown type="address" value={address} />
+        </div>
+        <AddressInfo address={address} />
       </div>
 
       <Card>
@@ -51,24 +64,30 @@ export default async function AddressPage({
               <TableRow className="border-border/60">
                 <TableHead className="px-6">Transaction Hash</TableHead>
                 <TableHead>Block</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead>Timestamp</TableHead>
                 <TableHead>From</TableHead>
                 <TableHead>To</TableHead>
                 <TableHead className="text-right">Value (ZIL)</TableHead>
                 <TableHead className="text-right">Gas Used</TableHead>
-                <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {transactions.map((tx: any) => (
                 <TableRow key={tx.hash}>
                   <TableCell className="px-6">
-                    <Link
-                      href={`/tx/${tx.hash}`}
-                      className="font-medium text-primary hover:underline font-mono text-sm"
-                    >
-                      {shortenHash(tx.hash)}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/tx/${tx.hash}`}
+                        className="font-medium text-primary hover:underline font-mono text-sm"
+                      >
+                        {shortenHash(tx.hash)}
+                      </Link>
+                      {tx.status !== 0 && (
+                        <Badge variant="destructive" className="text-xs">
+                          Failed
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Link
@@ -79,26 +98,34 @@ export default async function AddressPage({
                     </Link>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">
-                      {getTransactionType(tx.transaction_type)}
-                    </Badge>
+                    <span className="text-sm">
+                      {formatTimestamp(tx.timestamp)}
+                    </span>
                   </TableCell>
                   <TableCell>
-                    <Link
-                      href={`/address/${tx.from_address}`}
-                      className="font-mono text-sm text-primary hover:underline"
-                    >
-                      {shortenAddress(tx.from_address)}
-                    </Link>
+                    {tx.from_address.toLowerCase() === address.toLowerCase() ? (
+                      <Badge variant="secondary">You</Badge>
+                    ) : (
+                      <Link
+                        href={`/address/${tx.from_address}`}
+                        className="font-mono text-sm text-primary hover:underline"
+                      >
+                        {shortenAddress(tx.from_address)}
+                      </Link>
+                    )}
                   </TableCell>
                   <TableCell>
                     {tx.to_address ? (
-                      <Link
-                        href={`/address/${tx.to_address}`}
-                        className="font-mono text-sm text-primary hover:underline"
-                      >
-                        {shortenAddress(tx.to_address)}
-                      </Link>
+                      tx.to_address.toLowerCase() === address.toLowerCase() ? (
+                        <Badge variant="secondary">You</Badge>
+                      ) : (
+                        <Link
+                          href={`/address/${tx.to_address}`}
+                          className="font-mono text-sm text-primary hover:underline"
+                        >
+                          {shortenAddress(tx.to_address)}
+                        </Link>
+                      )
                     ) : (
                       <span className="text-muted-foreground">
                         Contract Creation
@@ -110,13 +137,6 @@ export default async function AddressPage({
                   </TableCell>
                   <TableCell className="text-right">
                     {formatNumber(tx.gas_used, 0)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={tx.status === 1 ? "default" : "destructive"}
-                    >
-                      {tx.status === 1 ? "Success" : "Failed"}
-                    </Badge>
                   </TableCell>
                 </TableRow>
               ))}
@@ -136,11 +156,4 @@ function shortenHash(hash: string) {
 function shortenAddress(address: string) {
   if (!address) return "";
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
-}
-
-function getTransactionType(type: number) {
-  if (type >= 1000) return "Legacy";
-  if (type === 0) return "Legacy";
-  if (type === 2) return "EVM";
-  return "EVM";
 }

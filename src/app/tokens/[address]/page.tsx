@@ -20,10 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatNumber, formatUsd } from "@/lib/format";
-import {
-  fetchTokenByAddress,
-  fetchTokenPairs,
-} from "@/lib/zilstream";
+import { fetchTokenByAddress, fetchTokenPairs } from "@/lib/zilstream";
 
 export default async function TokenDetailPage({
   params,

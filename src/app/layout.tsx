@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { NavigationProgress } from "@/components/navigation-progress";
+import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -34,23 +35,25 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Suspense fallback={null}>
-            <NavigationProgress />
-          </Suspense>
-          <SidebarProvider>
-            <AppSidebar />
-            <main className="flex min-h-screen w-full flex-col">
-              <SiteHeader />
-              <div className="flex-1">{children}</div>
-            </main>
-          </SidebarProvider>
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Suspense fallback={null}>
+              <NavigationProgress />
+            </Suspense>
+            <SidebarProvider>
+              <AppSidebar />
+              <main className="flex min-h-screen w-full flex-col">
+                <SiteHeader />
+                <div className="flex-1">{children}</div>
+              </main>
+            </SidebarProvider>
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatNumber, formatTokenAmount } from "@/lib/format";
+import { formatNumber, formatTokenAmount, formatTimestamp } from "@/lib/format";
 import type { Pagination, Transaction } from "@/lib/zilstream";
 
 interface TransactionsTableProps {
@@ -43,24 +43,30 @@ export function TransactionsTable({
             <TableRow className="border-border/60">
               <TableHead className="px-6">Transaction Hash</TableHead>
               <TableHead>Block</TableHead>
-              <TableHead>Type</TableHead>
+              <TableHead>Timestamp</TableHead>
               <TableHead>From</TableHead>
               <TableHead>To</TableHead>
               <TableHead className="text-right">Value (ZIL)</TableHead>
               <TableHead className="text-right">Gas Used</TableHead>
-              <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {transactions.map((tx) => (
               <TableRow key={tx.hash}>
                 <TableCell className="px-6">
-                  <Link
-                    href={`/tx/${tx.hash}`}
-                    className="font-medium text-primary hover:underline font-mono text-sm"
-                  >
-                    {shortenHash(tx.hash)}
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/tx/${tx.hash}`}
+                      className="font-medium text-primary hover:underline font-mono text-sm"
+                    >
+                      {shortenHash(tx.hash)}
+                    </Link>
+                    {tx.status !== 0 && (
+                      <Badge variant="destructive" className="text-xs">
+                        Failed
+                      </Badge>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Link
@@ -71,9 +77,9 @@ export function TransactionsTable({
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">
-                    {getTransactionType(tx.transactionType)}
-                  </Badge>
+                  <span className="text-sm">
+                    {formatTimestamp(tx.timestamp)}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <span className="font-mono text-sm">
@@ -96,11 +102,6 @@ export function TransactionsTable({
                 </TableCell>
                 <TableCell className="text-right">
                   {formatNumber(tx.gasUsed, 0)}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={tx.status === 0 ? "default" : "destructive"}>
-                    {tx.status === 0 ? "Success" : "Failed"}
-                  </Badge>
                 </TableCell>
               </TableRow>
             ))}
@@ -144,11 +145,4 @@ function shortenHash(hash: string) {
 function shortenAddress(address: string) {
   if (!address) return "";
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
-}
-
-function getTransactionType(type: number) {
-  if (type >= 1000) return "Legacy";
-  if (type === 0) return "Legacy";
-  if (type === 2) return "EVM";
-  return "EVM";
 }
