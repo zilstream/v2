@@ -51,6 +51,8 @@ export function PairsTable({
               <TableHead>Protocol</TableHead>
               <TableHead className="text-right">Liquidity (USD)</TableHead>
               <TableHead className="text-right">Volume (24h USD)</TableHead>
+              <TableHead className="text-right">24h %</TableHead>
+              <TableHead className="text-right">7d %</TableHead>
               <TableHead className="text-right">Transactions</TableHead>
             </TableRow>
           </TableHeader>
@@ -97,6 +99,38 @@ export function PairsTable({
                 </TableCell>
                 <TableCell className="text-right">
                   {formatUsd(pair.volumeUsd24h)}
+                </TableCell>
+                <TableCell className="text-right">
+                  {pair.priceChange24h && Number.parseFloat(pair.priceChange24h) !== 0 ? (
+                    <span
+                      className={
+                        Number.parseFloat(pair.priceChange24h) >= 0
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
+                      {Number.parseFloat(pair.priceChange24h) >= 0 ? "+" : ""}
+                      {formatNumber(pair.priceChange24h, 2)}%
+                    </span>
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  {pair.priceChange7d && Number.parseFloat(pair.priceChange7d) !== 0 ? (
+                    <span
+                      className={
+                        Number.parseFloat(pair.priceChange7d) >= 0
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
+                      {Number.parseFloat(pair.priceChange7d) >= 0 ? "+" : ""}
+                      {formatNumber(pair.priceChange7d, 2)}%
+                    </span>
+                  ) : (
+                    "-"
+                  )}
                 </TableCell>
                 <TableCell className="text-right">
                   {formatNumber(pair.txnCount, 0)}

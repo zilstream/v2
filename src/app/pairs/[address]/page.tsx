@@ -112,7 +112,7 @@ export default async function PairEventsPage({
             <ExplorerDropdown type="address" value={pair.address} />
           </div>
         </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-3">
+        <CardContent className="grid gap-4 sm:grid-cols-3 md:grid-cols-5">
           <StatBlock
             label="Liquidity USD"
             value={formatUsd(pair.liquidityUsd)}
@@ -124,6 +124,44 @@ export default async function PairEventsPage({
           <StatBlock
             label="Transactions"
             value={formatNumber(pair.txnCount, 0)}
+          />
+          <StatBlock
+            label="24h Change"
+            value={
+              pair.priceChange24h && Number.parseFloat(pair.priceChange24h) !== 0 ? (
+                <span
+                  className={
+                    Number.parseFloat(pair.priceChange24h) >= 0
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }
+                >
+                  {Number.parseFloat(pair.priceChange24h) >= 0 ? "+" : ""}
+                  {formatNumber(pair.priceChange24h, 2)}%
+                </span>
+              ) : (
+                "-"
+              )
+            }
+          />
+          <StatBlock
+            label="7d Change"
+            value={
+              pair.priceChange7d && Number.parseFloat(pair.priceChange7d) !== 0 ? (
+                <span
+                  className={
+                    Number.parseFloat(pair.priceChange7d) >= 0
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }
+                >
+                  {Number.parseFloat(pair.priceChange7d) >= 0 ? "+" : ""}
+                  {formatNumber(pair.priceChange7d, 2)}%
+                </span>
+              ) : (
+                "-"
+              )
+            }
           />
         </CardContent>
       </Card>
@@ -252,7 +290,7 @@ export default async function PairEventsPage({
 
 interface StatBlockProps {
   label: string;
-  value: string;
+  value: string | React.ReactNode;
 }
 
 function StatBlock({ label, value }: StatBlockProps) {

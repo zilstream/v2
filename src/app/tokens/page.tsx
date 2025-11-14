@@ -76,7 +76,7 @@ export default async function TokensPage() {
                     {token.priceUsd ? formatUsd(token.priceUsd) : "-"}
                   </TableCell>
                   <TableCell className="text-right">
-                    {token.priceChange24h ? (
+                    {token.priceChange24h && Number.parseFloat(token.priceChange24h) !== 0 ? (
                       <span
                         className={
                           Number.parseFloat(token.priceChange24h) >= 0
@@ -94,7 +94,7 @@ export default async function TokensPage() {
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    {token.priceChange7d ? (
+                    {token.priceChange7d && Number.parseFloat(token.priceChange7d) !== 0 ? (
                       <span
                         className={
                           Number.parseFloat(token.priceChange7d) >= 0

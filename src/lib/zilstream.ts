@@ -69,6 +69,8 @@ interface PairResponse {
   volume_usd: string;
   volume_usd_24h: string;
   txn_count: number;
+  price_change_24h?: string;
+  price_change_7d?: string;
 }
 
 export interface Pair {
@@ -87,6 +89,8 @@ export interface Pair {
   volumeUsd: string;
   volumeUsd24h: string;
   txnCount: number;
+  priceChange24h?: string;
+  priceChange7d?: string;
 }
 
 interface PairEventResponse {
@@ -223,6 +227,8 @@ function mapPair(pair: PairResponse): Pair {
     volumeUsd: pair.volume_usd,
     volumeUsd24h: pair.volume_usd_24h,
     txnCount: pair.txn_count,
+    priceChange24h: pair.price_change_24h,
+    priceChange7d: pair.price_change_7d,
   };
 }
 
@@ -343,6 +349,8 @@ export interface TokenChartData {
     timestamp: string;
     price: string;
     source: string;
+    price_change_24h?: string;
+    price_change_7d?: string;
   }[];
 }
 

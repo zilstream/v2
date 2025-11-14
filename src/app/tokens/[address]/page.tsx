@@ -224,7 +224,7 @@ export default async function TokenDetailPage({
             <DetailItem
               label="24h Change"
               value={
-                token.priceChange24h ? (
+                token.priceChange24h && Number.parseFloat(token.priceChange24h) !== 0 ? (
                   <span
                     className={
                       Number.parseFloat(token.priceChange24h) >= 0
@@ -243,7 +243,7 @@ export default async function TokenDetailPage({
             <DetailItem
               label="7d Change"
               value={
-                token.priceChange7d ? (
+                token.priceChange7d && Number.parseFloat(token.priceChange7d) !== 0 ? (
                   <span
                     className={
                       Number.parseFloat(token.priceChange7d) >= 0
