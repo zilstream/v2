@@ -65,8 +65,12 @@ export function AddressEvents({
         `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/addresses/${address}/events?page=${newPage}&per_page=10`,
       );
       const result = await response.json();
-      setEvents(result.data || []);
-      setHasMore(result.pagination?.has_more || false);
+      const newEvents = result.data || [];
+      setEvents(newEvents);
+      setHasMore(
+        result.pagination?.has_next || 
+        newEvents.length === 10
+      );
       setPage(newPage);
     } catch (error) {
       console.error("Failed to fetch events:", error);
@@ -82,18 +86,18 @@ export function AddressEvents({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Events</CardTitle>
+        <CardTitle>Recent Events</CardTitle>
       </CardHeader>
       <CardContent className="px-0">
         <Table>
           <TableHeader>
             <TableRow className="border-border/60">
-              <TableHead className="w-32 px-6">Timestamp</TableHead>
-              <TableHead className="w-24">Event</TableHead>
-              <TableHead className="w-32 text-right">Token 0</TableHead>
-              <TableHead className="w-32 text-right">Token 1</TableHead>
-              <TableHead className="w-32 text-right">Amount (USD)</TableHead>
-              <TableHead className="w-12 text-right">Tx</TableHead>
+              <TableHead className="w-32 px-6 py-2">Timestamp</TableHead>
+              <TableHead className="w-24 py-2">Event</TableHead>
+              <TableHead className="w-32 text-right py-2">Token 0</TableHead>
+              <TableHead className="w-32 text-right py-2">Token 1</TableHead>
+              <TableHead className="w-32 text-right py-2">Amount (USD)</TableHead>
+              <TableHead className="w-12 text-right py-2">Tx</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -117,15 +121,15 @@ export function AddressEvents({
 
               return (
                 <TableRow key={event.id} className={eventColor}>
-                  <TableCell className="px-6 text-muted-foreground">
+                  <TableCell className="px-6 py-2 text-muted-foreground">
                     {formatTimestamp(event.timestamp)}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="py-2">
                     <Badge variant="outline" className={badgeColor}>
                       {getEventAction(event)}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right py-2">
                     <div className="flex items-center justify-end gap-2">
                       {event.token0 && (
                         <TokenIcon
@@ -139,7 +143,7 @@ export function AddressEvents({
                         : "-"}
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right py-2">
                     <div className="flex items-center justify-end gap-2">
                       {event.token1 && (
                         <TokenIcon
@@ -153,10 +157,10 @@ export function AddressEvents({
                         : "-"}
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right py-2">
                     {formatUsd(event.amountUsd, 4)}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right py-2">
                     <Link
                       className="inline-flex items-center justify-end text-muted-foreground"
                       href={`/tx/${event.transactionHash}`}
