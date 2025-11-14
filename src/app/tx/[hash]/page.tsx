@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { formatNumber, formatTokenAmount, formatTimestamp } from "@/lib/format";
 import { fetchTransactionByHash } from "@/lib/zilstream";
+import { decodeEvent, formatDecodedArg } from "@/lib/event-decoder";
 
 interface TransactionDetailPageProps {
   params: Promise<{
@@ -145,6 +146,75 @@ export default async function TransactionDetailPage({
           />
         </CardContent>
       </Card>
+
+      {tx.events && tx.events.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Events</CardTitle>
+            <CardDescription>
+              {tx.events.length} event{tx.events.length !== 1 ? "s" : ""} emitted
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {tx.events.map((event, index) => {
+              const decoded = decodeEvent(event);
+              return (
+                <div
+                  key={event.logIndex}
+                  className="space-y-3 border-b border-border/60 pb-6 last:border-0 last:pb-0"
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">Event {index}</Badge>
+                    {decoded && (
+                      <Badge variant="default">{decoded.eventName}</Badge>
+                    )}
+                    <span className="text-xs text-muted-foreground">
+                      Log Index: {event.logIndex}
+                    </span>
+                  </div>
+                  <DetailRow label="Address" value={event.address} />
+                  
+                  {decoded ? (
+                    <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
+                      <dt className="min-w-48 text-sm font-medium text-muted-foreground">
+                        Decoded Arguments
+                      </dt>
+                      <dd className="flex-1 space-y-2 text-sm">
+                        {Object.entries(decoded.args).map(([key, value]) => (
+                          <div key={key} className="flex flex-col gap-1">
+                            <span className="text-xs text-muted-foreground font-medium">
+                              {key}
+                            </span>
+                            <span className="font-mono break-all text-foreground">
+                              {formatDecodedArg(value)}
+                            </span>
+                          </div>
+                        ))}
+                      </dd>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
+                        <dt className="min-w-48 text-sm font-medium text-muted-foreground">
+                          Topics
+                        </dt>
+                        <dd className="flex-1 space-y-1 text-sm">
+                          {event.topics.map((topic, i) => (
+                            <div key={i} className="font-mono break-all">
+                              {i}: {topic}
+                            </div>
+                          ))}
+                        </dd>
+                      </div>
+                      <DetailRow label="Data" value={event.data} />
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
 
       <Link href="/txs" className="text-sm text-primary hover:underline">
         ← Back to transactions

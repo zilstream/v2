@@ -409,6 +409,15 @@ export interface Block {
   transactionCount: number;
 }
 
+interface TransactionEventResponse {
+  log_index: number;
+  address: string;
+  topics: string[];
+  data: string;
+  transaction_index: number;
+  block_number: number;
+}
+
 interface TransactionResponse {
   hash: string;
   block_number: number;
@@ -429,6 +438,16 @@ interface TransactionResponse {
   contract_address: string | null;
   cumulative_gas_used: number;
   timestamp: number;
+  events?: TransactionEventResponse[];
+}
+
+export interface TransactionEvent {
+  logIndex: number;
+  address: string;
+  topics: string[];
+  data: string;
+  transactionIndex: number;
+  blockNumber: number;
 }
 
 export interface Transaction {
@@ -451,6 +470,7 @@ export interface Transaction {
   contractAddress: string | null;
   cumulativeGasUsed: number;
   timestamp: number;
+  events?: TransactionEvent[];
 }
 
 export interface BlockListResponse {
@@ -497,6 +517,14 @@ function mapTransaction(tx: TransactionResponse): Transaction {
     contractAddress: tx.contract_address,
     cumulativeGasUsed: tx.cumulative_gas_used,
     timestamp: tx.timestamp,
+    events: tx.events?.map(event => ({
+      logIndex: event.log_index,
+      address: event.address,
+      topics: event.topics,
+      data: event.data,
+      transactionIndex: event.transaction_index,
+      blockNumber: event.block_number,
+    })),
   };
 }
 
