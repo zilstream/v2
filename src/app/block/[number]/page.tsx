@@ -92,6 +92,94 @@ export default async function BlockDetailPage({
         </CardContent>
       </Card>
 
+      {block.transactions && block.transactions.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Transactions</CardTitle>
+            <CardDescription>
+              {block.transactions.length} transaction
+              {block.transactions.length !== 1 ? "s" : ""} in this block
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border/60">
+                    <th className="pb-3 text-left font-medium text-muted-foreground">
+                      Hash
+                    </th>
+                    <th className="pb-3 text-left font-medium text-muted-foreground">
+                      From
+                    </th>
+                    <th className="pb-3 text-left font-medium text-muted-foreground">
+                      To
+                    </th>
+                    <th className="pb-3 text-right font-medium text-muted-foreground">
+                      Value
+                    </th>
+                    <th className="pb-3 text-right font-medium text-muted-foreground">
+                      Gas Used
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {block.transactions.map((tx) => (
+                    <tr key={tx.hash} className="border-b border-border/40">
+                      <td className="py-3">
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/tx/${tx.hash}`}
+                            className="font-mono text-primary hover:underline"
+                          >
+                            {tx.hash.slice(0, 10)}...{tx.hash.slice(-8)}
+                          </Link>
+                          {tx.status !== 0 && (
+                            <span className="inline-block rounded bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-500">
+                              Failed
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3">
+                        <Link
+                          href={`/address/${tx.fromAddress}`}
+                          className="font-mono text-primary hover:underline"
+                        >
+                          {tx.fromAddress.slice(0, 6)}...
+                          {tx.fromAddress.slice(-4)}
+                        </Link>
+                      </td>
+                      <td className="py-3">
+                        {tx.toAddress ? (
+                          <Link
+                            href={`/address/${tx.toAddress}`}
+                            className="font-mono text-primary hover:underline"
+                          >
+                            {tx.toAddress.slice(0, 6)}...
+                            {tx.toAddress.slice(-4)}
+                          </Link>
+                        ) : (
+                          <span className="font-mono text-muted-foreground">
+                            Contract Creation
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 text-right font-mono">
+                        {(Number.parseFloat(tx.value) / 1e18).toFixed(4)} ZIL
+                      </td>
+                      <td className="py-3 text-right font-mono">
+                        {formatNumber(tx.gasUsed, 0)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Link href="/blocks" className="text-sm text-primary hover:underline">
         ← Back to blocks
       </Link>

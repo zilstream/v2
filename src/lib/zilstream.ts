@@ -396,6 +396,7 @@ interface BlockResponse {
   gas_used: number;
   base_fee_per_gas: string;
   transaction_count: number;
+  transactions?: TransactionResponse[];
 }
 
 export interface Block {
@@ -407,6 +408,7 @@ export interface Block {
   gasUsed: number;
   baseFeePerGas: string;
   transactionCount: number;
+  transactions?: Transaction[];
 }
 
 interface TransactionEventResponse {
@@ -493,6 +495,7 @@ function mapBlock(block: BlockResponse): Block {
     gasUsed: block.gas_used,
     baseFeePerGas: block.base_fee_per_gas,
     transactionCount: block.transaction_count,
+    transactions: block.transactions?.map(mapTransaction),
   };
 }
 
