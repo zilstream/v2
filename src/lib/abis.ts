@@ -58,12 +58,74 @@ export const ERC20_ABI = [
   },
 ] as const;
 
-export const PLUNDER_PROXY_ADDRESS = "0x3150D498168acCbef6A002572Af779D18d29f772" as const;
-export const PLUNDERSWAP_SMART_ROUTER = "0xe30161F32A019d876F082d9FF13ed451a03A2086" as const;
-export const PLUNDERSWAP_QUOTER_V2 = "0xAE4474364B8fc6Ce0fe8F888752540C05948AD94" as const;
-export const PLUNDERSWAP_V2_ROUTER = "0x33C6a20D2a605da9Fd1F506ddEd449355f0564fe" as const;
+export const PLUNDER_PROXY_ADDRESS =
+  "0x3150D498168acCbef6A002572Af779D18d29f772" as const;
+export const PLUNDERSWAP_SMART_ROUTER =
+  "0xe30161F32A019d876F082d9FF13ed451a03A2086" as const;
+export const PLUNDERSWAP_QUOTER_V2 =
+  "0xAE4474364B8fc6Ce0fe8F888752540C05948AD94" as const;
+export const PLUNDERSWAP_V2_ROUTER =
+  "0x33C6a20D2a605da9Fd1F506ddEd449355f0564fe" as const;
 
 export const PLUNDERSWAP_SMART_ROUTER_ABI = [
+  {
+    inputs: [
+      { internalType: "uint256", name: "deadline", type: "uint256" },
+      { internalType: "bytes[]", name: "data", type: "bytes[]" },
+    ],
+    name: "multicall",
+    outputs: [{ internalType: "bytes[]", name: "results", type: "bytes[]" }],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "amountMinimum", type: "uint256" },
+      { internalType: "address", name: "recipient", type: "address" },
+    ],
+    name: "unwrapWETH9",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "refundETH",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
+    name: "wrapETH",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        components: [
+          { internalType: "bytes", name: "path", type: "bytes" },
+          { internalType: "address", name: "recipient", type: "address" },
+          { internalType: "uint256", name: "deadline", type: "uint256" },
+          { internalType: "uint256", name: "amountIn", type: "uint256" },
+          {
+            internalType: "uint256",
+            name: "amountOutMinimum",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct IV3SwapRouter.ExactInputParams",
+        name: "params",
+        type: "tuple",
+      },
+    ],
+    name: "exactInput",
+    outputs: [{ internalType: "uint256", name: "amountOut", type: "uint256" }],
+    stateMutability: "payable",
+    type: "function",
+  },
   {
     inputs: [
       {
@@ -73,8 +135,16 @@ export const PLUNDERSWAP_SMART_ROUTER_ABI = [
           { internalType: "uint24", name: "fee", type: "uint24" },
           { internalType: "address", name: "recipient", type: "address" },
           { internalType: "uint256", name: "amountIn", type: "uint256" },
-          { internalType: "uint256", name: "amountOutMinimum", type: "uint256" },
-          { internalType: "uint160", name: "sqrtPriceLimitX96", type: "uint160" },
+          {
+            internalType: "uint256",
+            name: "amountOutMinimum",
+            type: "uint256",
+          },
+          {
+            internalType: "uint160",
+            name: "sqrtPriceLimitX96",
+            type: "uint160",
+          },
         ],
         internalType: "struct IV3SwapRouter.ExactInputSingleParams",
         name: "params",
@@ -109,7 +179,11 @@ export const PLUNDERSWAP_QUOTER_V2_ABI = [
           { internalType: "address", name: "tokenOut", type: "address" },
           { internalType: "uint256", name: "amountIn", type: "uint256" },
           { internalType: "uint24", name: "fee", type: "uint24" },
-          { internalType: "uint160", name: "sqrtPriceLimitX96", type: "uint160" },
+          {
+            internalType: "uint160",
+            name: "sqrtPriceLimitX96",
+            type: "uint160",
+          },
         ],
         internalType: "struct IQuoterV2.QuoteExactInputSingleParams",
         name: "params",
@@ -120,7 +194,11 @@ export const PLUNDERSWAP_QUOTER_V2_ABI = [
     outputs: [
       { internalType: "uint256", name: "amountOut", type: "uint256" },
       { internalType: "uint160", name: "sqrtPriceX96After", type: "uint160" },
-      { internalType: "uint32", name: "initializedTicksCrossed", type: "uint32" },
+      {
+        internalType: "uint32",
+        name: "initializedTicksCrossed",
+        type: "uint32",
+      },
       { internalType: "uint256", name: "gasEstimate", type: "uint256" },
     ],
     stateMutability: "nonpayable",
@@ -129,16 +207,18 @@ export const PLUNDERSWAP_QUOTER_V2_ABI = [
 ] as const;
 
 export const PLUNDERSWAP_V2_ROUTER_ABI = [
-    {
-        inputs: [
-            { internalType: "uint256", name: "amountIn", type: "uint256" },
-            { internalType: "address[]", name: "path", type: "address[]" }
-        ],
-        name: "getAmountsOut",
-        outputs: [{ internalType: "uint256[]", name: "amounts", type: "uint256[]" }],
-        stateMutability: "view",
-        type: "function"
-    }
+  {
+    inputs: [
+      { internalType: "uint256", name: "amountIn", type: "uint256" },
+      { internalType: "address[]", name: "path", type: "address[]" },
+    ],
+    name: "getAmountsOut",
+    outputs: [
+      { internalType: "uint256[]", name: "amounts", type: "uint256[]" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
 ] as const;
 
 export const PLUNDER_PROXY_ABI = [

@@ -9,6 +9,7 @@ import { RainbowKitProvider } from "@/components/rainbow-provider";
 import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -53,6 +54,7 @@ export default function RootLayout({
                   <SiteHeader />
                   <div className="flex-1">{children}</div>
                 </main>
+                <Toaster />
               </SidebarProvider>
             </RainbowKitProvider>
           </ThemeProvider>

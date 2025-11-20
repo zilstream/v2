@@ -48,7 +48,9 @@ export function PairDetailView({
   tokens,
 }: PairDetailViewProps) {
   const [pair, setPair] = useState(initialPair);
-  const [activeTab, setActiveTab] = useState<"info" | "chart" | "trades">("info");
+  const [activeTab, setActiveTab] = useState<"info" | "chart" | "trades">(
+    "info",
+  );
 
   usePairSubscription(pair.address, (updatedPair) => {
     setPair(updatedPair);
@@ -490,7 +492,11 @@ export function PairDetailView({
 
           <div className="h-px bg-border" />
 
-          <SwapWidget pair={pair} token0Decimals={token0Decimals} token1Decimals={token1Decimals} />
+          <SwapWidget
+            pair={pair}
+            token0Decimals={token0Decimals}
+            token1Decimals={token1Decimals}
+          />
         </div>
       </div>
     </div>
