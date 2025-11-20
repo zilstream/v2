@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { EXPLORER_URL, PLUNDERSWAP_URL } from "@/lib/constants";
+import { PLUNDERSWAP_URL } from "@/lib/constants";
 import {
   formatNumber,
   formatTimestamp,
@@ -61,8 +61,8 @@ export function PairDetailView({
   // Calculate initial price for chart scaling
   const initialPrice = (() => {
     if (!pair.reserve0 || !pair.reserve1 || pair.reserve0 === "0") return undefined;
-    const r0 = Number(pair.reserve0) / Math.pow(10, token0Decimals);
-    const r1 = Number(pair.reserve1) / Math.pow(10, token1Decimals);
+    const r0 = Number(pair.reserve0) / 10 ** token0Decimals;
+    const r1 = Number(pair.reserve1) / 10 ** token1Decimals;
     return r0 > 0 ? (r1 / r0).toString() : undefined;
   })();
 
@@ -147,15 +147,13 @@ export function PairDetailView({
                   <TableHead className="w-16">Type</TableHead>
                   <TableHead className="text-right">{pair.token0Symbol}</TableHead>
                   <TableHead className="text-right">{pair.token1Symbol}</TableHead>
+                  <TableHead className="text-right">Value</TableHead>
                   <TableHead className="text-right">Price</TableHead>
                   <TableHead className="text-right pr-4">Maker</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {events.map((event) => {
-                  const eventColor = getEventColor(event);
-                  const badgeColor = getBadgeColor(event);
-
                   const token0Amount =
                     event.amount0In && event.amount0In !== "0"
                       ? event.amount0In
@@ -169,11 +167,27 @@ export function PairDetailView({
                       : event.amount1Out && event.amount1Out !== "0"
                         ? event.amount1Out
                         : undefined;
+
+                  if (!token0Amount && !token1Amount) return null;
+
+                  const eventColor = getEventColor(event);
+                  const badgeColor = getBadgeColor(event);
                   
-                  // Calculate price for this trade
-                  const price = token0Amount && token1Amount 
-                    ? Number(token1Amount) / Number(token0Amount)
+                  const amount0 = token0Amount
+                    ? Number(token0Amount) / Math.pow(10, token0Decimals)
                     : 0;
+                  const amount1 = token1Amount
+                    ? Number(token1Amount) / Math.pow(10, token1Decimals)
+                    : 0;
+
+                  // Calculate price for this trade
+                  // Prefer using USD amount if available for accurate pricing, otherwise fallback to token ratio
+                  const price =
+                    event.amountUsd && event.amountUsd !== "0" && amount0 > 0
+                      ? Number(event.amountUsd) / amount0
+                      : amount0 > 0 && amount1 > 0
+                        ? amount1 / amount0
+                        : 0;
 
                   return (
                     <TableRow key={event.id} className={cn("hover:bg-muted/50", eventColor)}>
@@ -210,6 +224,9 @@ export function PairDetailView({
                         </div>
                       </TableCell>
                       <TableCell className="py-2 text-right text-xs">
+                        {event.amountUsd ? formatUsd(event.amountUsd) : "-"}
+                      </TableCell>
+                      <TableCell className="py-2 text-right text-xs">
                         {price > 0 ? `$${formatNumber(price, 6)}` : "-"}
                       </TableCell>
                       <TableCell className="py-2 pr-4 text-right">
@@ -243,9 +260,9 @@ export function PairDetailView({
 
       {/* Sidebar (Info & Stats) */}
       <div className="w-full shrink-0 overflow-y-auto border-t bg-card md:w-[320px] md:border-l md:border-t-0 lg:w-[360px]">
-        <div className="flex flex-col gap-6 p-4 md:p-6">
+        <div className="flex flex-col gap-4 p-4">
           {/* Header Info */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex shrink-0 -space-x-2">
@@ -281,7 +298,7 @@ export function PairDetailView({
                   href={`${PLUNDERSWAP_URL}/swap?inputCurrency=${pair.token0}&outputCurrency=${pair.token1}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex h-7 items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground shadow hover:bg-primary/90"
+                  className="inline-flex h-5 items-center gap-1.5 rounded-md bg-primary px-2 text-[10px] font-medium text-primary-foreground shadow hover:bg-primary/90"
                 >
                   Swap <ExternalLink className="h-3 w-3" />
                 </Link>
@@ -290,19 +307,19 @@ export function PairDetailView({
              <div className="grid grid-cols-2 gap-2 text-xs">
                 <Link
                   href={`/tokens/${pair.token0}`}
-                  className="inline-flex items-center justify-center gap-1 rounded-md border px-2 py-1.5 hover:bg-accent"
+                  className="inline-flex items-center justify-center gap-1 rounded-md border px-2 py-1.5 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {pair.token0Symbol}
                 </Link>
                 <Link
                   href={`/tokens/${pair.token1}`}
-                  className="inline-flex items-center justify-center gap-1 rounded-md border px-2 py-1.5 hover:bg-accent"
+                  className="inline-flex items-center justify-center gap-1 rounded-md border px-2 py-1.5 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {pair.token1Symbol}
                 </Link>
              </div>
              
-             <div className="flex items-center justify-between text-xs text-muted-foreground">
+             <div className="flex items-center justify-between text-xs text-muted-foreground bg-muted/30 p-2 rounded-md border">
                 <span>Pair Address</span>
                 <div className="flex items-center gap-2">
                    <span className="font-mono">{pair.address.slice(0, 6)}...{pair.address.slice(-4)}</span>
@@ -314,7 +331,7 @@ export function PairDetailView({
           <div className="h-px bg-border" />
 
           {/* Stats */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-1">
+          <div className="grid grid-cols-2 gap-2">
             <StatBlock
               label="Liquidity"
               value={formatUsd(pair.liquidityUsd)}
@@ -324,13 +341,13 @@ export function PairDetailView({
               value={formatUsd(pair.volumeUsd24h)}
             />
             <StatBlock
-              label="Transactions (24h)"
+              label="Transactions"
               value={formatNumber(pair.txnCount, 0)}
             />
-             <div className="rounded-lg border bg-muted/30 p-3">
-              <p className="text-xs font-medium text-muted-foreground mb-1">24h Change</p>
-              <div className="text-lg font-semibold">
-                {pair.priceChange24h && Number.parseFloat(pair.priceChange24h) !== 0 ? (
+            <StatBlock
+              label="24h Change"
+              value={
+                  pair.priceChange24h && Number.parseFloat(pair.priceChange24h) !== 0 ? (
                     <span
                       className={
                         Number.parseFloat(pair.priceChange24h) >= 0
@@ -343,13 +360,13 @@ export function PairDetailView({
                     </span>
                   ) : (
                     "-"
-                  )}
-              </div>
-            </div>
-             <div className="rounded-lg border bg-muted/30 p-3">
-              <p className="text-xs font-medium text-muted-foreground mb-1">7d Change</p>
-              <div className="text-lg font-semibold">
-                {pair.priceChange7d && Number.parseFloat(pair.priceChange7d) !== 0 ? (
+                  )
+              }
+            />
+            <StatBlock
+              label="7d Change"
+              value={
+                  pair.priceChange7d && Number.parseFloat(pair.priceChange7d) !== 0 ? (
                     <span
                       className={
                         Number.parseFloat(pair.priceChange7d) >= 0
@@ -362,9 +379,9 @@ export function PairDetailView({
                     </span>
                   ) : (
                     "-"
-                  )}
-              </div>
-            </div>
+                  )
+              }
+            />
           </div>
         </div>
       </div>
@@ -375,13 +392,15 @@ export function PairDetailView({
 interface StatBlockProps {
   label: string;
   value: string | React.ReactNode;
+  className?: string;
+  valueClassName?: string;
 }
 
-function StatBlock({ label, value }: StatBlockProps) {
+function StatBlock({ label, value, className, valueClassName }: StatBlockProps) {
   return (
-    <div className="rounded-lg border bg-muted/30 p-3">
-      <p className="text-xs font-medium text-muted-foreground mb-1">{label}</p>
-      <p className="text-lg font-semibold">{value}</p>
+    <div className={cn("rounded-md border bg-muted/30 p-2.5", className)}>
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-0.5">{label}</p>
+      <p className={cn("text-sm font-semibold", valueClassName)}>{value}</p>
     </div>
   );
 }
