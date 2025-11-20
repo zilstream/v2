@@ -12,7 +12,7 @@ export const articles: Article[] = [
   {
     title: "Welcome to ZilStream V2",
     slug: "welcome-to-zilstream-v2",
-    date: "January 20, 2024",
+    date: "November 20, 2025",
     category: "Announcement",
     excerpt:
       "We're proud to unveil the next generation of the Zilliqa blockchain explorer and analytics platform, built for the future of DeFi.",
@@ -61,7 +61,7 @@ export const articles: Article[] = [
   {
     title: "Advanced Charting with TradingView",
     slug: "tradingview-integration",
-    date: "January 19, 2024",
+    date: "November 20, 2025",
     category: "Features",
     image: "/tradingview.svg",
     excerpt:
@@ -96,7 +96,7 @@ export const articles: Article[] = [
   {
     title: "Sunsetting ZilStream Legacy",
     slug: "sunsetting-zilstream-legacy",
-    date: "January 18, 2024",
+    date: "November 20, 2025",
     category: "Important",
     image: "/logo-faded.svg",
     excerpt:
