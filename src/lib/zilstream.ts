@@ -297,11 +297,25 @@ function normalizeProtocolName(protocol: string) {
   }
 }
 
-export async function fetchTokens(): Promise<TokenListResponse> {
-  const data = await fetchFromApi<ApiListResponse<TokenResponse>>("/tokens");
+export async function fetchTokens(
+  page = 1,
+  perPage = 100,
+): Promise<TokenListResponse> {
+  const data = await fetchFromApi<ApiListResponse<TokenResponse>>(
+    `/tokens?page=${page}&per_page=${perPage}`,
+  );
+
+  const tokens = data.data.map(mapToken);
+
+  // Sort by liquidity descending
+  tokens.sort((a, b) => {
+    const liqA = Number.parseFloat(a.liquidityUsd || "0");
+    const liqB = Number.parseFloat(b.liquidityUsd || "0");
+    return liqB - liqA;
+  });
 
   return {
-    data: data.data.map(mapToken),
+    data: tokens,
     pagination: mapPagination(data.pagination),
   };
 }
