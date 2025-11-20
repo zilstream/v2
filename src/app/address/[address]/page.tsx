@@ -24,15 +24,13 @@ export default async function AddressPage({
 
   const txResult = await txResponse.json();
   const transactions = txResult?.data || [];
-  const hasMoreTx = 
-    txResult?.pagination?.has_next || 
-    (transactions.length === 25);
+  const hasMoreTx =
+    txResult?.pagination?.has_next || transactions.length === 25;
 
   const eventsResult = await eventsResponse.json();
   const events = eventsResult?.data || [];
-  const hasMoreEvents = 
-    eventsResult?.pagination?.has_next || 
-    (events.length === 10);
+  const hasMoreEvents =
+    eventsResult?.pagination?.has_next || events.length === 10;
 
   return (
     <div className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
@@ -52,7 +50,7 @@ export default async function AddressPage({
         <AddressInfo address={address} />
       </div>
 
-      <AddressEvents 
+      <AddressEvents
         initialEvents={events}
         initialHasMore={hasMoreEvents}
         address={address}

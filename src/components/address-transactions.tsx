@@ -58,10 +58,7 @@ export function AddressTransactions({
       const result = await response.json();
       const newTransactions = result.data || [];
       setTransactions(newTransactions);
-      setHasMore(
-        result.pagination?.has_next || 
-        newTransactions.length === 25
-      );
+      setHasMore(result.pagination?.has_next || newTransactions.length === 25);
       setPage(newPage);
     } catch (error) {
       console.error("Failed to fetch transactions:", error);

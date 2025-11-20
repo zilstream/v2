@@ -15,11 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TokenIcon } from "@/components/token-icon";
-import {
-  formatTimestamp,
-  formatTokenAmount,
-  formatUsd,
-} from "@/lib/format";
+import { formatTimestamp, formatTokenAmount, formatUsd } from "@/lib/format";
 
 interface AddressEvent {
   eventType: string;
@@ -67,10 +63,7 @@ export function AddressEvents({
       const result = await response.json();
       const newEvents = result.data || [];
       setEvents(newEvents);
-      setHasMore(
-        result.pagination?.has_next || 
-        newEvents.length === 10
-      );
+      setHasMore(result.pagination?.has_next || newEvents.length === 10);
       setPage(newPage);
     } catch (error) {
       console.error("Failed to fetch events:", error);
@@ -96,7 +89,9 @@ export function AddressEvents({
               <TableHead className="w-24 py-2">Event</TableHead>
               <TableHead className="w-32 text-right py-2">Token 0</TableHead>
               <TableHead className="w-32 text-right py-2">Token 1</TableHead>
-              <TableHead className="w-32 text-right py-2">Amount (USD)</TableHead>
+              <TableHead className="w-32 text-right py-2">
+                Amount (USD)
+              </TableHead>
               <TableHead className="w-12 text-right py-2">Tx</TableHead>
             </TableRow>
           </TableHeader>

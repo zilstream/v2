@@ -152,7 +152,8 @@ export default async function TransactionDetailPage({
           <CardHeader>
             <CardTitle>Events</CardTitle>
             <CardDescription>
-              {tx.events.length} event{tx.events.length !== 1 ? "s" : ""} emitted
+              {tx.events.length} event{tx.events.length !== 1 ? "s" : ""}{" "}
+              emitted
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -173,7 +174,7 @@ export default async function TransactionDetailPage({
                     </span>
                   </div>
                   <DetailRow label="Address" value={event.address} />
-                  
+
                   {decoded ? (
                     <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
                       <dt className="min-w-48 text-sm font-medium text-muted-foreground">

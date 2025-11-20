@@ -101,7 +101,8 @@ export function PairsTable({
                   {formatUsd(pair.volumeUsd24h)}
                 </TableCell>
                 <TableCell className="text-right">
-                  {pair.priceChange24h && Number.parseFloat(pair.priceChange24h) !== 0 ? (
+                  {pair.priceChange24h &&
+                  Number.parseFloat(pair.priceChange24h) !== 0 ? (
                     <span
                       className={
                         Number.parseFloat(pair.priceChange24h) >= 0
@@ -117,7 +118,8 @@ export function PairsTable({
                   )}
                 </TableCell>
                 <TableCell className="text-right">
-                  {pair.priceChange7d && Number.parseFloat(pair.priceChange7d) !== 0 ? (
+                  {pair.priceChange7d &&
+                  Number.parseFloat(pair.priceChange7d) !== 0 ? (
                     <span
                       className={
                         Number.parseFloat(pair.priceChange7d) >= 0

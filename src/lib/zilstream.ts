@@ -53,7 +53,7 @@ export interface Token {
   firstSeenTimestamp?: number;
 }
 
-interface PairResponse {
+export interface PairResponse {
   protocol: string;
   address: string;
   token0: string;
@@ -210,7 +210,7 @@ function mapToken(token: TokenResponse): Token {
   };
 }
 
-function mapPair(pair: PairResponse): Pair {
+export function mapPair(pair: PairResponse): Pair {
   return {
     protocol: normalizeProtocolName(pair.protocol),
     address: pair.address,
@@ -363,9 +363,7 @@ export async function fetchTokenChart(
   return response.data;
 }
 
-export async function fetchPairChart(
-  address: string,
-): Promise<TokenChartData> {
+export async function fetchPairChart(address: string): Promise<TokenChartData> {
   const response = await fetchFromApi<{ data: TokenChartData }>(
     `/pairs/${address}/chart/price`,
   );
@@ -520,7 +518,7 @@ function mapTransaction(tx: TransactionResponse): Transaction {
     contractAddress: tx.contract_address,
     cumulativeGasUsed: tx.cumulative_gas_used,
     timestamp: tx.timestamp,
-    events: tx.events?.map(event => ({
+    events: tx.events?.map((event) => ({
       logIndex: event.log_index,
       address: event.address,
       topics: event.topics,

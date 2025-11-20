@@ -18,13 +18,13 @@ export function decodeEvent(event: EventLog): DecodedEvent | null {
   }
 
   // Ensure topics and data have 0x prefix
-  const topics = event.topics.map(topic => 
-    topic.startsWith('0x') ? topic : `0x${topic}`
+  const topics = event.topics.map((topic) =>
+    topic.startsWith("0x") ? topic : `0x${topic}`,
   ) as [`0x${string}`, ...`0x${string}`[]];
-  
-  const data = event.data.startsWith('0x') 
-    ? event.data as `0x${string}` 
-    : `0x${event.data}` as `0x${string}`;
+
+  const data = event.data.startsWith("0x")
+    ? (event.data as `0x${string}`)
+    : (`0x${event.data}` as `0x${string}`);
 
   try {
     const decoded = decodeEventLog({

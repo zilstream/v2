@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PairsTable } from "@/components/pairs-table";
 import type { Pair, Pagination } from "@/lib/zilstream";
+import { useBatchPairsSubscription } from "@/hooks/use-websocket";
 
 interface PairsPageSectionProps {
   initialPairs: Pair[];
@@ -16,6 +17,25 @@ export function PairsPageSection({
   const [pairs, setPairs] = useState(initialPairs);
   const [pagination, setPagination] = useState(initialPagination);
   const [isLoading, setIsLoading] = useState(false);
+
+  useBatchPairsSubscription((updatedPairs) => {
+    setPairs((currentPairs) => {
+      const newPairs = [...currentPairs];
+      let hasChanges = false;
+
+      for (const updatedPair of updatedPairs) {
+        const index = newPairs.findIndex(
+          (p) => p.address.toLowerCase() === updatedPair.address.toLowerCase(),
+        );
+        if (index !== -1) {
+          newPairs[index] = updatedPair;
+          hasChanges = true;
+        }
+      }
+
+      return hasChanges ? newPairs : currentPairs;
+    });
+  });
 
   const handlePageChange = async (newPage: number) => {
     setIsLoading(true);

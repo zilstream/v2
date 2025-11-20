@@ -78,12 +78,12 @@ export async function GET(
     }
 
     const result = await response.json();
-    
+
     const mappedResult = {
       data: result.data?.map(mapEvent) || [],
       pagination: result.pagination,
     };
-    
+
     return NextResponse.json(mappedResult);
   } catch (error) {
     console.error("Failed to fetch address events:", error);
