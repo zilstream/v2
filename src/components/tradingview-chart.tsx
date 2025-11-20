@@ -28,12 +28,19 @@ export function TradingViewChart({
   const [libLoaded, setLibLoaded] = useState(false);
 
   useEffect(() => {
+    // If the script is already loaded (e.g. from navigating back), set state immediately
+    if (window.TradingView) {
+      setLibLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!libLoaded || !containerRef.current || !window.TradingView) return;
 
     const widget = new window.TradingView.widget({
       // Debug
       debug: false,
-      
+
       // Basic settings
       symbol: pairName,
       interval: "60", // Default interval
@@ -49,14 +56,14 @@ export function TradingViewChart({
       fullscreen: false,
       autosize: true,
       theme: "Dark", // Assuming dark mode based on project style
-      
+
       // Datafeed
       datafeed: createDatafeed(pairAddress, {
         symbol: pairName,
         name: pairName,
         price: initialPrice,
       }),
-      
+
       // Customization
       overrides: {
         "paneProperties.background": "#09090b", // Match typical shadcn card bg
@@ -74,7 +81,9 @@ export function TradingViewChart({
   }, [libLoaded, pairAddress, pairName, initialPrice]);
 
   return (
-    <div className={`relative w-full overflow-hidden bg-card text-card-foreground ${className || "h-[500px] rounded-xl border shadow"}`}>
+    <div
+      className={`relative w-full overflow-hidden bg-card text-card-foreground ${className || "h-[500px] rounded-xl border shadow"}`}
+    >
       <Script
         src="/charting_library/charting_library.standalone.js"
         onLoad={() => setLibLoaded(true)}

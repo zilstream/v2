@@ -1,6 +1,9 @@
 import { useEffect, useRef } from "react";
 import { useWebSocketContext } from "@/components/websocket-provider";
-import { type Subscription, PublicationContext } from "centrifuge/build/protobuf";
+import {
+  type Subscription,
+  PublicationContext,
+} from "centrifuge/build/protobuf";
 import { type Pair, mapPair } from "@/lib/zilstream";
 import type { BatchUpdate, PairUpdate } from "@/lib/websocket-types";
 
