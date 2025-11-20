@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { Providers } from "@/components/providers";
+import { RainbowKitProvider } from "@/components/rainbow-provider";
 import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -42,16 +43,18 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Suspense fallback={null}>
-              <NavigationProgress />
-            </Suspense>
-            <SidebarProvider>
-              <AppSidebar />
-              <main className="flex min-h-screen w-full flex-col">
-                <SiteHeader />
-                <div className="flex-1">{children}</div>
-              </main>
-            </SidebarProvider>
+            <RainbowKitProvider>
+              <Suspense fallback={null}>
+                <NavigationProgress />
+              </Suspense>
+              <SidebarProvider>
+                <AppSidebar />
+                <main className="flex min-h-screen w-full flex-col">
+                  <SiteHeader />
+                  <div className="flex-1">{children}</div>
+                </main>
+              </SidebarProvider>
+            </RainbowKitProvider>
           </ThemeProvider>
         </Providers>
       </body>

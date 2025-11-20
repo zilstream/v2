@@ -2,10 +2,8 @@
 
 import {
   ArrowLeftRight,
-  BarChart3,
   Coins,
   Home,
-  Settings,
   Square,
   TrendingUp,
 } from "lucide-react";
@@ -16,6 +14,7 @@ import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -52,6 +51,8 @@ const items = [
     icon: ArrowLeftRight,
   },
 ];
+
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -108,6 +109,11 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <div className="flex justify-center p-2">
+          <ThemeToggle />
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }

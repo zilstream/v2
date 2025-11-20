@@ -5,7 +5,7 @@ import { SearchIcon } from "lucide-react";
 
 import { HeaderStats } from "@/components/header-stats";
 import { SearchBar } from "@/components/search-bar";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ConnectWalletButton } from "@/components/connect-button";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -67,7 +67,7 @@ export function SiteHeader() {
             </Suspense>
           </div>
           <div className="ml-1 md:ml-2">
-            <ThemeToggle />
+            <ConnectWalletButton />
           </div>
         </div>
       </div>
