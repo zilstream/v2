@@ -167,19 +167,46 @@ export interface Stats {
 }
 
 async function fetchFromApi<TResponse>(path: string): Promise<TResponse> {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      accept: "application/json",
-    },
-    // Refresh data roughly once a minute while keeping ISR benefits.
-    next: { revalidate: 60 },
-  });
+  const maxRetries = 3;
+  const baseDelay = 500;
 
-  if (!res.ok) {
-    throw new Error(`ZilStream API request failed with status ${res.status}`);
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const res = await fetch(`${API_BASE_URL}${path}`, {
+        headers: {
+          accept: "application/json",
+        },
+        // Refresh data roughly once a minute while keeping ISR benefits.
+        next: { revalidate: 60 },
+      });
+
+      if (!res.ok) {
+        // Don't retry 4xx errors
+        if (res.status >= 400 && res.status < 500) {
+          throw new Error(`ZilStream API request failed with status ${res.status}`);
+        }
+        // Throw for 5xx errors so they can be retried
+        throw new Error(`Server error: ${res.status}`);
+      }
+
+      return res.json() as Promise<TResponse>;
+    } catch (error) {
+      // If we've exhausted retries, or it's a 4xx error (which we re-threw above), throw it
+      if (
+        i === maxRetries - 1 ||
+        (error instanceof Error && error.message.includes("status 4"))
+      ) {
+        throw error;
+      }
+
+      // Wait before retrying (exponential backoff)
+      await new Promise((resolve) =>
+        setTimeout(resolve, baseDelay * Math.pow(2, i))
+      );
+    }
   }
 
-  return res.json() as Promise<TResponse>;
+  throw new Error("ZilStream API request failed after retries");
 }
 
 function mapPagination(pagination: ApiPagination): Pagination {
