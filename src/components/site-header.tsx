@@ -1,9 +1,11 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Link from "next/link";
 import { SearchIcon } from "lucide-react";
 
 import { HeaderStats } from "@/components/header-stats";
+import { ZilStreamLogo } from "@/components/zilstream-logo";
 import { SearchBar } from "@/components/search-bar";
 import { ConnectWalletButton } from "@/components/connect-button";
 import { Button } from "@/components/ui/button";
@@ -29,11 +31,14 @@ export function SiteHeader() {
       <div className="flex h-16 w-full items-center justify-between gap-2 px-3 md:gap-6 md:px-6">
         <div className="flex items-center gap-2 md:gap-4">
           <SidebarTrigger />
+          <Link href="/" className="md:hidden">
+            <ZilStreamLogo className="h-8 w-8 text-primary" />
+          </Link>
           <Tooltip>
             <TooltipTrigger asChild>
               <span
                 suppressHydrationWarning
-                className="rounded-full bg-orange-200/70 px-3 py-0.5 text-xs font-medium uppercase tracking-wide text-orange-700"
+                className="hidden rounded-full bg-orange-200/70 px-3 py-0.5 text-xs font-medium uppercase tracking-wide text-orange-700 md:block"
               >
                 Early preview
               </span>
