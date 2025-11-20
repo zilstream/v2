@@ -846,6 +846,61 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
          </div>
       </div>
 
+      {/* Price Info */}
+      {quote && tokenIn && tokenOut && amount && !isFetchingQuote && (
+        <div className="space-y-2 rounded-xl border bg-card p-3 text-sm shadow-sm">
+          {(() => {
+            const inputAmount = exactField === "in" ? Number(amount) : Number(quote);
+            const outputAmount = exactField === "in" ? Number(quote) : Number(amount);
+            
+            const usdIn = inputAmount * Number(tokenIn.priceUsd || 0);
+            const usdOut = outputAmount * Number(tokenOut.priceUsd || 0);
+            
+            let impactPercentage = 0;
+            if (usdIn > 0) {
+               impactPercentage = ((usdIn - usdOut) / usdIn) * 100;
+            }
+            
+            // Cap at 0 if negative (due to oracle lag where output is worth more than input)
+            // Or should we show negative impact (green)? Usually distinct from positive impact (loss).
+            // Let's assume positive impact means loss.
+            // If impact is negative (gain), show as 0 or <0.01.
+            if (impactPercentage < 0) impactPercentage = 0;
+
+            let impactColor = "text-emerald-500";
+            if (impactPercentage >= 5) impactColor = "text-rose-500";
+            else if (impactPercentage >= 3) impactColor = "text-orange-500";
+            else if (impactPercentage >= 1) impactColor = "text-yellow-500";
+
+            const slippageNum = Number(slippage) || 0.5;
+            const minRec = outputAmount * (1 - slippageNum / 100);
+            const maxSold = inputAmount * (1 + slippageNum / 100);
+
+            return (
+              <div className="space-y-1">
+                 <div className="flex justify-between">
+                    <span className="text-muted-foreground">Price Impact</span>
+                    <span className={cn("font-medium", impactColor)}>
+                       {impactPercentage < 0.01 ? "<0.01%" : `${impactPercentage.toFixed(2)}%`}
+                    </span>
+                 </div>
+                 <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                        {exactField === "in" ? "Min. Received" : "Max. Sold"}
+                    </span>
+                    <span className="font-medium text-foreground">
+                        {exactField === "in" 
+                           ? `${formatNumber(minRec, 4)} ${tokenOut.symbol}`
+                           : `${formatNumber(maxSold, 4)} ${tokenIn.symbol}`
+                        }
+                    </span>
+                 </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
+
       {/* Info / Error */}
       {isFindingPair && (
           <div className="text-center text-xs text-muted-foreground">
