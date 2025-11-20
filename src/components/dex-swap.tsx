@@ -32,7 +32,7 @@ import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Token, Pair, fetchTokenPairs } from "@/lib/zilstream";
 
-const WZIL_ADDRESS = "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192";
+const WZIL_ADDRESS = "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192" as `0x${string}`;
 
 interface DexSwapProps {
   initialTokens: Token[];
@@ -349,7 +349,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
   };
 
   const handleSwap = async () => {
-    if (!isConnected) {
+    if (!isConnected || !userAddress) {
       if (openConnectModal) openConnectModal();
       return;
     }
@@ -403,7 +403,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
               args = [
                 {
                   tokenIn: WZIL_ADDRESS,
-                  tokenOut: tokenOut.address,
+                  tokenOut: tokenOut.address as `0x${string}`,
                   fee: feeTier,
                   recipient: userAddress,
                   amountIn: amountInWei,
@@ -417,7 +417,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
               args = [
                 {
                   tokenIn: WZIL_ADDRESS,
-                  tokenOut: tokenOut.address,
+                  tokenOut: tokenOut.address as `0x${string}`,
                   fee: feeTier,
                   recipient: userAddress,
                   amountOut: amountOutWei,
@@ -437,7 +437,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
                 functionName: "exactInputSingle",
                 args: [
                   {
-                    tokenIn: tokenIn.address,
+                    tokenIn: tokenIn.address as `0x${string}`,
                     tokenOut: WZIL_ADDRESS,
                     fee: feeTier,
                     recipient: PLUNDERSWAP_SMART_ROUTER,
@@ -453,7 +453,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
                 functionName: "exactOutputSingle",
                 args: [
                   {
-                    tokenIn: tokenIn.address,
+                    tokenIn: tokenIn.address as `0x${string}`,
                     tokenOut: WZIL_ADDRESS,
                     fee: feeTier,
                     recipient: PLUNDERSWAP_SMART_ROUTER,
@@ -486,8 +486,8 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
               functionName = "exactInputSingle";
               args = [
                 {
-                  tokenIn: tokenIn.address,
-                  tokenOut: tokenOut.address,
+                  tokenIn: tokenIn.address as `0x${string}`,
+                  tokenOut: tokenOut.address as `0x${string}`,
                   fee: feeTier,
                   recipient: userAddress,
                   amountIn: amountInWei,
@@ -499,8 +499,8 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
               functionName = "exactOutputSingle";
               args = [
                 {
-                  tokenIn: tokenIn.address,
-                  tokenOut: tokenOut.address,
+                  tokenIn: tokenIn.address as `0x${string}`,
+                  tokenOut: tokenOut.address as `0x${string}`,
                   fee: feeTier,
                   recipient: userAddress,
                   amountOut: amountOutWei,
@@ -513,7 +513,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
         }
       } else {
         // V2
-        const path = [tokenIn.address, tokenOut.address];
+        const path = [tokenIn.address as `0x${string}`, tokenOut.address as `0x${string}`];
         if (isNativeInput) {
            const calls: `0x${string}`[] = [];
            // Wrap max input amount (for exact output) or exact input amount
@@ -533,29 +533,6 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
                   abi: PLUNDERSWAP_SMART_ROUTER_ABI,
                   functionName: "swapExactTokensForTokens",
                   args: [
-                    0n, // Not used for Router? Wait, ABI says swapExactTokensForTokens(amountIn, amountOutMin, path, to)
-                    // But Router multicall wrapper usually wraps the standard router calls.
-                    // Wait, standard V2 router signature is swapExactTokensForTokens(amountIn, amountOutMin, path, to, deadline).
-                    // But here we are calling the Smart Router (V3 Router mostly) which might have V2 adapters.
-                    // The ABI used in DexSwap for `swapExactTokensForTokens` has 4 args: amountIn, amountOutMin, path, to. (No deadline).
-                    // That matches the `PLUNDERSWAP_SMART_ROUTER_ABI` I updated? No, I updated `PLUNDERSWAP_SMART_ROUTER_ABI`.
-                    
-                    // Wait, for V2 multicall, usually we call methods that pull from the router's own balance if it's a multicall router.
-                    // But let's stick to the ABI signatures we have.
-                    // `swapExactTokensForTokens(amountIn, amountOutMin, path, to)`
-                    // If we pass `0n` as amountIn, does it use balance?
-                    // The previous code used: `args: [0n, minAmountOut, path, ...]` which implies it supports passing 0 to use contract balance?
-                    // Or was that a bug? 
-                    // Previous code: `args: [0n, minAmountOut, path, isNativeOutput ? PLUNDERSWAP_SMART_ROUTER : userAddress]`
-                    // That implies `amountIn` of 0.
-                    
-                    // Let's assume `0` means "use balance of contract".
-                    // But if we just wrapped ETH, the contract holds WETH.
-                    
-                    // If exact output:
-                    // `swapTokensForExactTokens(amountOut, amountInMax, path, to)`
-                    
-                    // Let's use the correct values.
                     ethAmount, // amountIn
                     minAmountOut,
                     path,
@@ -643,8 +620,8 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
       const tx = await writeContractAsync({
         address: PLUNDERSWAP_SMART_ROUTER,
         abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-        functionName,
-        args,
+        functionName: functionName as any,
+        args: args as any,
         value,
       });
 

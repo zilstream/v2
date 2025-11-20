@@ -32,7 +32,7 @@ import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Pair } from "@/lib/zilstream";
 
-const WZIL_ADDRESS = "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192";
+const WZIL_ADDRESS = "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192" as `0x${string}`;
 
 interface SwapWidgetProps {
   pair: Pair;
@@ -377,7 +377,7 @@ export function SwapWidget({
   };
 
   const handleSwap = async () => {
-    if (!isConnected) {
+    if (!isConnected || !userAddress) {
       if (openConnectModal) openConnectModal();
       return;
     }
@@ -424,7 +424,7 @@ export function SwapWidget({
           args = [
             {
               tokenIn: WZIL_ADDRESS,
-              tokenOut: outputToken.address,
+              tokenOut: outputToken.address as `0x${string}`,
               fee: feeTier,
               recipient: userAddress,
               amountIn: amountInWei,
@@ -440,7 +440,7 @@ export function SwapWidget({
             functionName: "exactInputSingle",
             args: [
               {
-                tokenIn: inputToken.address,
+                tokenIn: inputToken.address as `0x${string}`,
                 tokenOut: WZIL_ADDRESS,
                 fee: feeTier,
                 recipient: PLUNDERSWAP_SMART_ROUTER,
@@ -463,8 +463,8 @@ export function SwapWidget({
           functionName = "exactInputSingle";
           args = [
             {
-              tokenIn: inputToken.address,
-              tokenOut: outputToken.address,
+              tokenIn: inputToken.address as `0x${string}`,
+              tokenOut: outputToken.address as `0x${string}`,
               fee: feeTier,
               recipient: userAddress,
               amountIn: amountInWei,
@@ -476,7 +476,7 @@ export function SwapWidget({
         }
       } else {
         // V2 Logic
-        const path = [inputToken.address, outputToken.address];
+        const path = [inputToken.address as `0x${string}`, outputToken.address as `0x${string}`];
 
         if (isNativeInput) {
           // multicall([wrapETH(amount), swapExactTokensForTokens(amountIn: 0, recipient: user/router), refundETH])
@@ -495,7 +495,7 @@ export function SwapWidget({
               abi: PLUNDERSWAP_SMART_ROUTER_ABI,
               functionName: "swapExactTokensForTokens",
               args: [
-                0n,
+                amountInWei,
                 minAmountOut,
                 path,
                 isNativeOutput ? PLUNDERSWAP_SMART_ROUTER : userAddress,
@@ -557,8 +557,8 @@ export function SwapWidget({
       tx = await writeContractAsync({
         address: PLUNDERSWAP_SMART_ROUTER,
         abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-        functionName,
-        args,
+        functionName: functionName as any,
+        args: args as any,
         value,
       });
 
@@ -589,7 +589,7 @@ export function SwapWidget({
   };
 
   const onPrimaryClick = async () => {
-    if (!isConnected) {
+    if (!isConnected || !userAddress) {
       if (openConnectModal) openConnectModal();
       return;
     }
