@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import { Zap, Tag, Settings, ChevronDown } from "lucide-react";
-import { useAccount } from "wagmi";
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useBalance } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { parseUnits, formatUnits } from "viem";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,17 @@ import { cn } from "@/lib/utils";
 import { formatNumber } from "@/lib/format";
 import { TokenIcon } from "@/components/token-icon";
 import type { Pair } from "@/lib/zilstream";
+import { 
+  PLUNDERSWAP_QUOTER_V2, 
+  PLUNDERSWAP_QUOTER_V2_ABI, 
+  PLUNDERSWAP_SMART_ROUTER, 
+  PLUNDERSWAP_SMART_ROUTER_ABI,
+  PLUNDERSWAP_V2_ROUTER,
+  PLUNDERSWAP_V2_ROUTER_ABI,
+  ERC20_ABI 
+} from "@/lib/abis";
+
+const WZIL_ADDRESS = "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192";
 
 interface SwapWidgetProps {
   pair: Pair;
@@ -24,40 +36,77 @@ export function SwapWidget({ pair, token0Decimals, token1Decimals }: SwapWidgetP
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
   const [slippage, setSlippage] = React.useState("0.5");
   const [deadline, setDeadline] = React.useState("20");
+
+  // Identify if it's V2 or V3
+  const isV3 = React.useMemo(() => pair.protocol === "PlunderSwap V3", [pair.protocol]);
+
+  // Fee tier is critical for V3 swaps. Use the pair's fee or fallback to 0.25% (2500)
+  const feeTier = React.useMemo(() => {
+    return pair.fee ? Number(pair.fee) : 2500;
+  }, [pair.fee]);
   
-  const { isConnected } = useAccount();
+  // Quote state
+  const [quote, setQuote] = React.useState<string | null>(null);
+  const [isFetchingQuote, setIsFetchingQuote] = React.useState(false);
+  const [quoteError, setQuoteError] = React.useState<string | null>(null);
+
+  // Swap/Approval state
+  const [isApproving, setIsApproving] = React.useState(false);
+  const [isSwapping, setIsSwapping] = React.useState(false);
+  const [txHash, setTxHash] = React.useState<`0x${string}` | null>(null);
+  const [swapError, setSwapError] = React.useState<string | null>(null);
+  
+  const { isConnected, address: userAddress } = useAccount();
   const { openConnectModal } = useConnectModal();
+  const publicClient = usePublicClient();
+  const { writeContractAsync } = useWriteContract();
+  const { data: txReceipt, isLoading: isWaitingForTx } = useWaitForTransactionReceipt({
+    hash: txHash || undefined,
+  });
 
   // Determine quote token (assuming token1 is quote/native-like for now)
-  const quoteToken = { symbol: pair.token1Symbol, address: pair.token1, decimals: token1Decimals };
-  const baseToken = { symbol: pair.token0Symbol, address: pair.token0, decimals: token0Decimals };
+  const quoteToken = React.useMemo(() => ({ 
+    symbol: pair.token1Symbol, 
+    address: pair.token1, 
+    decimals: token1Decimals 
+  }), [pair.token1Symbol, pair.token1, token1Decimals]);
+
+  const baseToken = React.useMemo(() => ({ 
+    symbol: pair.token0Symbol, 
+    address: pair.token0, 
+    decimals: token0Decimals 
+  }), [pair.token0Symbol, pair.token0, token0Decimals]);
 
   const inputToken = activeTab === "buy" ? quoteToken : baseToken;
   const outputToken = activeTab === "buy" ? baseToken : quoteToken;
 
-  // Calculate estimated output with 0.3% fee (Uniswap V2 style)
-  const estimatedOutput = React.useMemo(() => {
-    if (!amount || Number.isNaN(Number(amount)) || Number(amount) === 0) return null;
-    
-    const val = Number(amount);
-    // Reserves need to be normalized by decimals
-    const reserveIn = activeTab === "buy" 
-        ? Number(pair.reserve1) / 10 ** quoteToken.decimals
-        : Number(pair.reserve0) / 10 ** baseToken.decimals;
-        
-    const reserveOut = activeTab === "buy"
-        ? Number(pair.reserve0) / 10 ** baseToken.decimals
-        : Number(pair.reserve1) / 10 ** quoteToken.decimals;
-    
-    if (!reserveIn || !reserveOut) return null;
+  // Check if input is WZIL (treat as native ZIL)
+  const isNativeInput = inputToken.address.toLowerCase() === WZIL_ADDRESS.toLowerCase();
 
-    // Formula: dy = (y * dx * 997) / (x * 1000 + dx * 997)
-    const amountInWithFee = val * 0.997;
-    const numerator = amountInWithFee * reserveOut;
-    const denominator = reserveIn + amountInWithFee;
+  // Fetch Balance
+  const { data: balanceData, refetch: refetchBalance } = useBalance({
+    address: userAddress,
+    token: isNativeInput ? undefined : (inputToken.address as `0x${string}`),
+    query: {
+        enabled: !!userAddress,
+    }
+  });
+  
+  const balance = balanceData ? balanceData.formatted : "0";
+
+  // Handle Max Balance Click
+  const handleMaxBalance = () => {
+    if (!balanceData) return;
     
-    return numerator / denominator;
-  }, [amount, pair.reserve0, pair.reserve1, activeTab, quoteToken.decimals, baseToken.decimals]);
+    if (isNativeInput) {
+        // Leave 5 ZIL for gas
+        const fiveZil = parseUnits("5", 18);
+        const maxVal = balanceData.value - fiveZil;
+        setAmount(maxVal > 0n ? formatUnits(maxVal, 18) : "0");
+    } else {
+        setAmount(balanceData.formatted);
+    }
+  };
 
   // Calculate presets based on liquidity
   const presets = React.useMemo(() => {
@@ -102,13 +151,252 @@ export function SwapWidget({ pair, token0Decimals, token1Decimals }: SwapWidgetP
     });
   }, [activeTab, pair.liquidityUsd, pair.reserve1, quoteToken.decimals]);
 
-  const handleQuickAction = () => {
-    if (!isConnected && openConnectModal) {
-      openConnectModal();
+  // Fetch Quote Effect
+  React.useEffect(() => {
+    // Reset quote when inputs change
+    setQuote(null);
+    setQuoteError(null);
+  }, [activeTab, inputToken.address, outputToken.address]);
+
+  React.useEffect(() => {
+    if (!amount || Number.isNaN(Number(amount)) || Number(amount) <= 0) {
+      setQuote(null);
+      setQuoteError(null);
       return;
     }
-    // Implement swap logic here
-    console.log(`Quick ${activeTab} ${amount} ${inputToken.symbol}`);
+
+    let cancelled = false;
+    
+    const fetchQuote = async () => {
+      if (!publicClient) return;
+      
+      try {
+        setIsFetchingQuote(true);
+        setQuoteError(null);
+
+        const amountInWei = parseUnits(amount, inputToken.decimals);
+        
+        console.log("Fetching quote with:", {
+          isV3,
+          tokenIn: inputToken.address,
+          tokenOut: outputToken.address,
+          fee: feeTier,
+          amount: amountInWei.toString()
+        });
+
+        let quoteAmount: bigint;
+
+        if (isV3) {
+            // V3 Quote using QuoterV2
+            const result = await publicClient.readContract({
+                address: PLUNDERSWAP_QUOTER_V2,
+                abi: PLUNDERSWAP_QUOTER_V2_ABI,
+                functionName: "quoteExactInputSingle",
+                args: [{
+                    tokenIn: inputToken.address as `0x${string}`,
+                    tokenOut: outputToken.address as `0x${string}`,
+                    amountIn: amountInWei,
+                    fee: feeTier,
+                    sqrtPriceLimitX96: 0n
+                }],
+            });
+            // QuoterV2 returns (amountOut, sqrtPriceX96After, initializedTicksCrossed, gasEstimate)
+            quoteAmount = result[0];
+        } else {
+            // V2 Quote using V2 Router
+            const result = await publicClient.readContract({
+                address: PLUNDERSWAP_V2_ROUTER,
+                abi: PLUNDERSWAP_V2_ROUTER_ABI,
+                functionName: "getAmountsOut",
+                args: [
+                    amountInWei,
+                    [inputToken.address as `0x${string}`, outputToken.address as `0x${string}`]
+                ],
+            });
+            // getAmountsOut returns uint256[] array, last element is output
+            quoteAmount = result[result.length - 1];
+        }
+
+        if (!cancelled) {
+          const formatted = formatUnits(quoteAmount, outputToken.decimals);
+          setQuote(formatted);
+        }
+      } catch (err: any) {
+        if (!cancelled) {
+          console.error("Quote fetch error:", err);
+          setQuote(null);
+          setQuoteError(err?.message?.includes("reverted") ? "Insufficient liquidity" : "Failed to fetch quote");
+        }
+      } finally {
+        if (!cancelled) setIsFetchingQuote(false);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchQuote, 500); // 500ms debounce
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, [amount, activeTab, inputToken, outputToken, publicClient, isV3, feeTier]);
+
+  // Check Allowance
+  const { data: allowance } = useReadContract({
+    address: inputToken.address as `0x${string}`,
+    abi: ERC20_ABI,
+    functionName: "allowance",
+    args: [
+      (userAddress ?? "0x0000000000000000000000000000000000000000") as `0x${string}`,
+      PLUNDERSWAP_SMART_ROUTER,
+    ],
+    query: {
+      enabled: !!userAddress && !!amount,
+    },
+  });
+
+  const parsedAmount = amount && !Number.isNaN(Number(amount)) && Number(amount) > 0
+    ? parseUnits(amount, inputToken.decimals)
+    : 0n;
+
+  const needsApproval = !isNativeInput && parsedAmount > 0n && (allowance ?? 0n) < parsedAmount;
+  const insufficientBalance = parsedAmount > (balanceData?.value ?? 0n);
+
+  // Handle Transaction Success
+  React.useEffect(() => {
+    if (txReceipt?.status === "success") {
+        // Reset amount or show success message
+        setAmount("");
+        setQuote(null);
+        refetchBalance();
+    }
+  }, [txReceipt, refetchBalance]);
+
+  const handleApprove = async () => {
+    if (!isConnected) {
+      if (openConnectModal) openConnectModal();
+      return;
+    }
+
+    try {
+      setSwapError(null);
+      setIsApproving(true);
+
+      const tx = await writeContractAsync({
+        address: inputToken.address as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: "approve",
+        args: [
+          PLUNDERSWAP_SMART_ROUTER,
+          parsedAmount, // Approve exact amount
+        ],
+      });
+
+      setTxHash(tx);
+    } catch (err: any) {
+      setSwapError(err?.shortMessage || err?.message || "Approval failed");
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
+  const handleSwap = async () => {
+    if (!isConnected) {
+      if (openConnectModal) openConnectModal();
+      return;
+    }
+
+    if (!amount || Number(amount) <= 0) {
+      setSwapError("Enter an amount");
+      return;
+    }
+
+    if (!quote) {
+        setSwapError("No quote available");
+        return;
+    }
+
+    try {
+      setSwapError(null);
+      setIsSwapping(true);
+      
+      const amountInWei = parseUnits(amount, inputToken.decimals);
+      const amountOutWei = parseUnits(quote, outputToken.decimals);
+      
+      // Calculate min output with slippage
+      const slippageNum = Number(slippage) || 0.5;
+      const minAmountOut = amountOutWei * BigInt(Math.floor((100 - slippageNum) * 100)) / 10000n;
+      
+      // Deadline
+      const deadlineSeconds = BigInt(Math.floor(Date.now() / 1000) + (Number(deadline) * 60));
+
+      let tx: `0x${string}`;
+
+      if (isV3) {
+         // V3 Swap via SmartRouter (exactInputSingle)
+         tx = await writeContractAsync({
+            address: PLUNDERSWAP_SMART_ROUTER,
+            abi: PLUNDERSWAP_SMART_ROUTER_ABI,
+            functionName: "exactInputSingle",
+            args: [{
+                tokenIn: inputToken.address as `0x${string}`,
+                tokenOut: outputToken.address as `0x${string}`,
+                fee: feeTier,
+                recipient: userAddress as `0x${string}`,
+                amountIn: amountInWei,
+                amountOutMinimum: minAmountOut,
+                sqrtPriceLimitX96: 0n
+            }],
+            value: isNativeInput ? amountInWei : 0n, 
+          });
+      } else {
+          // V2 Swap via SmartRouter (swapExactTokensForTokens)
+          tx = await writeContractAsync({
+            address: PLUNDERSWAP_SMART_ROUTER,
+            abi: PLUNDERSWAP_SMART_ROUTER_ABI,
+            functionName: "swapExactTokensForTokens",
+            args: [
+                amountInWei,
+                minAmountOut,
+                [inputToken.address as `0x${string}`, outputToken.address as `0x${string}`],
+                userAddress as `0x${string}`
+            ],
+            value: isNativeInput ? amountInWei : 0n,
+          });
+      }
+
+      setTxHash(tx);
+    } catch (err: any) {
+      setSwapError(err?.shortMessage || err?.message || "Swap failed");
+    } finally {
+      setIsSwapping(false);
+    }
+  };
+
+  const isBusy = isFetchingQuote || isApproving || isSwapping || isWaitingForTx;
+
+  const getButtonLabel = () => {
+    if (!isConnected) return "Connect Wallet";
+    if (!amount || Number(amount) <= 0) return activeTab === "buy" ? "Buy" : "Sell";
+    if (insufficientBalance) return "Insufficient Balance";
+    if (isFetchingQuote) return "Fetching quote...";
+    if (needsApproval) return isApproving ? `Approving ${inputToken.symbol}...` : `Approve ${inputToken.symbol}`;
+    if (isSwapping || isWaitingForTx) return activeTab === "buy" ? "Buying..." : "Selling...";
+    return activeTab === "buy" ? "Buy" : "Sell";
+  };
+
+  const onPrimaryClick = async () => {
+    if (!isConnected) {
+      if (openConnectModal) openConnectModal();
+      return;
+    }
+    
+    if (!amount || Number(amount) <= 0 || insufficientBalance) return;
+
+    if (needsApproval) {
+      await handleApprove();
+    } else {
+      await handleSwap();
+    }
   };
 
   return (
@@ -164,7 +452,18 @@ export function SwapWidget({ pair, token0Decimals, token1Decimals }: SwapWidgetP
                 variant="outline"
                 size="sm"
                 className="w-full"
-                // onClick={() => setAmount(...)} // needs balance
+                onClick={() => {
+                    if (balanceData) {
+                        const percentage = BigInt(val);
+                        let amount = (balanceData.value * percentage) / 100n;
+                        if (isNativeInput && val === "100") {
+                             // Leave 5 ZIL for gas only on 100%
+                            const fiveZil = parseUnits("5", 18);
+                            amount = amount - fiveZil;
+                        }
+                        setAmount(amount > 0n ? formatUnits(amount, inputToken.decimals) : "0");
+                    }
+                }}
               >
                 {val}%
               </Button>
@@ -172,28 +471,57 @@ export function SwapWidget({ pair, token0Decimals, token1Decimals }: SwapWidgetP
       </div>
 
       {/* Input */}
-      <div className="relative">
-        <div className="absolute left-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
-          <div className="flex items-center gap-1.5 rounded-full bg-muted px-2 py-1">
-            <TokenIcon address={inputToken.address} alt={inputToken.symbol} size={16} />
-            <span className="text-xs font-bold">{inputToken.symbol}</span>
-          </div>
+      <div className="space-y-2">
+        <div className="flex justify-between px-1 text-xs">
+            <span className="font-medium text-muted-foreground">Pay</span>
+            {isConnected && (
+                <button 
+                    type="button"
+                    className="text-muted-foreground hover:text-foreground transition-colors" 
+                    onClick={handleMaxBalance}
+                >
+                    Balance: {formatNumber(Number(balance), 4)}
+                </button>
+            )}
         </div>
-        <Input
-          className="h-12 pl-32 pr-4 text-right font-mono text-lg"
-          placeholder="0.0"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
+        <div className="relative">
+            <div className="absolute left-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
+            <div className="flex items-center gap-1.5 rounded-full bg-muted px-2 py-1">
+                <TokenIcon address={inputToken.address} alt={inputToken.symbol} size={16} />
+                <span className="text-xs font-bold">{inputToken.symbol}</span>
+            </div>
+            </div>
+            <Input
+            className="h-12 pl-32 pr-4 text-right font-mono text-lg"
+            placeholder="0.0"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            />
+        </div>
       </div>
 
-      {estimatedOutput !== null && (
-        <div className="flex items-center justify-end gap-2 px-1 text-xs text-muted-foreground">
-            <span>
-            ≈ {formatNumber(estimatedOutput, 4)} {outputToken.symbol}
-            </span>
+      {/* Quote / Output */}
+      <div className="-mt-2 rounded-lg border bg-muted/50 p-3 text-sm">
+        <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">You will receive</span>
+            <div className="flex items-center gap-2 font-medium">
+                {isFetchingQuote ? (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                    <span>{quote ? `~ ${formatNumber(Number(quote), 4)}` : "-"}</span>
+                )}
+                <div className="flex items-center gap-1">
+                    <TokenIcon address={outputToken.address} alt={outputToken.symbol} size={16} />
+                    <span>{outputToken.symbol}</span>
+                </div>
+            </div>
         </div>
-      )}
+        {quoteError && (
+            <div className="mt-2 text-center text-xs text-rose-500">
+                {quoteError === "Execution reverted" ? "Insufficient liquidity" : "Failed to fetch quote"}
+            </div>
+        )}
+      </div>
 
       {/* Advanced Settings */}
       <div className="border-t pt-2">
@@ -226,7 +554,6 @@ export function SwapWidget({ pair, token0Decimals, token1Decimals }: SwapWidgetP
                                 className="h-7 text-xs"
                                 onClick={() => {
                                     if (val !== "custom") setSlippage(val);
-                                    // If custom, focus input (implemented below)
                                 }}
                             >
                                 {val === "custom" ? "Custom" : `${val}%`}
@@ -265,10 +592,18 @@ export function SwapWidget({ pair, token0Decimals, token1Decimals }: SwapWidgetP
         )}
       </div>
 
+      {/* Error Display */}
+      {swapError && (
+        <div className="rounded-md bg-rose-50 p-2 text-xs text-rose-500 dark:bg-rose-950/50">
+            {swapError}
+        </div>
+      )}
+
       {/* Action Button */}
       <Button
         size="lg"
-        onClick={handleQuickAction}
+        onClick={onPrimaryClick}
+        disabled={isBusy || (!isConnected && !openConnectModal)}
         className={cn(
           "w-full font-semibold shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]",
           activeTab === "buy"
@@ -276,7 +611,7 @@ export function SwapWidget({ pair, token0Decimals, token1Decimals }: SwapWidgetP
             : "bg-rose-500 hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-700"
         )}
       >
-        {!isConnected ? "Connect Wallet" : (activeTab === "buy" ? "Buy" : "Sell")}
+        {getButtonLabel()}
       </Button>
     </div>
   );
