@@ -42,6 +42,11 @@ const items = [
     icon: Coins,
   },
   {
+    title: "Swap",
+    url: "/swap",
+    icon: ArrowLeftRight,
+  },
+  {
     title: "Blocks",
     url: "/blocks",
     icon: Square,
