@@ -22,7 +22,8 @@ export function TradingViewChart({
   pairAddress,
   pairName,
   initialPrice,
-}: TradingViewChartProps) {
+  className,
+}: TradingViewChartProps & { className?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [libLoaded, setLibLoaded] = useState(false);
 
@@ -73,7 +74,7 @@ export function TradingViewChart({
   }, [libLoaded, pairAddress, pairName, initialPrice]);
 
   return (
-    <div className="relative h-[500px] w-full overflow-hidden rounded-xl border bg-card text-card-foreground shadow">
+    <div className={`relative w-full overflow-hidden bg-card text-card-foreground ${className || "h-[500px] rounded-xl border shadow"}`}>
       <Script
         src="/charting_library/charting_library.standalone.js"
         onLoad={() => setLibLoaded(true)}

@@ -201,7 +201,7 @@ async function fetchFromApi<TResponse>(path: string): Promise<TResponse> {
 
       // Wait before retrying (exponential backoff)
       await new Promise((resolve) =>
-        setTimeout(resolve, baseDelay * Math.pow(2, i))
+        setTimeout(resolve, baseDelay * 2 ** i)
       );
     }
   }
