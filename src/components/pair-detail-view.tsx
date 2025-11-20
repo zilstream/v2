@@ -1,6 +1,13 @@
 "use client";
 
-import { ArrowRight, ExternalLink, GripHorizontal } from "lucide-react";
+import {
+  ArrowRight,
+  ExternalLink,
+  GripHorizontal,
+  Info,
+  LineChart,
+  List,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -40,6 +47,7 @@ export function PairDetailView({
   tokens,
 }: PairDetailViewProps) {
   const [pair, setPair] = useState(initialPair);
+  const [activeTab, setActiveTab] = useState<"info" | "chart" | "trades">("info");
 
   usePairSubscription(pair.address, (updatedPair) => {
     setPair(updatedPair);
@@ -107,15 +115,71 @@ export function PairDetailView({
 
   return (
     <div className="flex h-[calc(100vh-64px)] w-full flex-col overflow-hidden md:flex-row">
+      {/* Mobile Tabs */}
+      <div className="flex shrink-0 items-center border-b bg-card md:hidden">
+        <button
+          type="button"
+          onClick={() => setActiveTab("info")}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium border-b-2 transition-colors",
+            activeTab === "info"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground",
+          )}
+        >
+          <Info className="h-4 w-4" />
+          Info
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("chart")}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium border-b-2 transition-colors",
+            activeTab === "chart"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground",
+          )}
+        >
+          <LineChart className="h-4 w-4" />
+          Chart
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("trades")}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium border-b-2 transition-colors",
+            activeTab === "trades"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground",
+          )}
+        >
+          <List className="h-4 w-4" />
+          Trades
+        </button>
+      </div>
+
       {/* Main Content (Chart + Events) */}
       <div
         ref={contentRef}
-        className="flex flex-1 flex-col min-w-0 bg-background relative"
+        className={cn(
+          "flex-1 flex-col min-w-0 bg-background relative",
+          activeTab === "info" ? "hidden md:flex" : "flex",
+        )}
       >
         {/* Chart Section */}
         <div
-          style={{ height: `${chartHeightPercent}%` }}
-          className={cn("w-full min-h-0", isDragging && "pointer-events-none")}
+          style={
+            {
+              "--chart-height": `${chartHeightPercent}%`,
+            } as React.CSSProperties
+          }
+          className={cn(
+            "w-full min-h-0 bg-card",
+            isDragging && "pointer-events-none",
+            activeTab === "chart"
+              ? "h-full"
+              : "hidden md:block md:h-[var(--chart-height)]",
+          )}
         >
           <TradingViewChart
             pairAddress={pair.address}
@@ -127,14 +191,19 @@ export function PairDetailView({
 
         {/* Drag Handle */}
         <div
-          className="flex h-3 shrink-0 cursor-row-resize items-center justify-center border-b border-r bg-muted/40 hover:bg-primary/10 transition-colors"
+          className="hidden md:flex h-3 shrink-0 cursor-row-resize items-center justify-center border-b border-r bg-muted/40 hover:bg-primary/10 transition-colors"
           onMouseDown={startResizing}
         >
           <GripHorizontal className="h-4 w-4 text-muted-foreground/50" />
         </div>
 
         {/* Events Section */}
-        <div className="flex-1 min-h-0 overflow-auto border-r bg-card">
+        <div
+          className={cn(
+            "flex-1 min-h-0 overflow-auto border-r bg-card",
+            activeTab === "trades" ? "block" : "hidden md:block",
+          )}
+        >
           <div className="sticky top-0 z-10 border-b bg-card px-4 py-2">
             <h3 className="font-semibold leading-none tracking-tight">
               Recent Trades
@@ -287,7 +356,12 @@ export function PairDetailView({
       </div>
 
       {/* Sidebar (Info & Stats) */}
-      <div className="w-full shrink-0 overflow-y-auto border-t bg-card md:w-[320px] md:border-l md:border-t-0 lg:w-[360px]">
+      <div
+        className={cn(
+          "w-full shrink-0 overflow-y-auto border-t bg-card md:w-[320px] md:border-l md:border-t-0 lg:w-[360px]",
+          activeTab === "info" ? "block" : "hidden md:block",
+        )}
+      >
         <div className="flex flex-col gap-4 p-4">
           {/* Header Info */}
           <div className="flex flex-col gap-3">
