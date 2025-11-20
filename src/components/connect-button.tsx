@@ -19,8 +19,7 @@ export function ConnectWalletButton() {
           ready &&
           account &&
           chain &&
-          (!authenticationStatus ||
-            authenticationStatus === "authenticated");
+          (!authenticationStatus || authenticationStatus === "authenticated");
 
         return (
           <div
@@ -36,7 +35,11 @@ export function ConnectWalletButton() {
             {(() => {
               if (!connected) {
                 return (
-                  <Button onClick={openConnectModal} variant="outline" size="sm">
+                  <Button
+                    onClick={openConnectModal}
+                    variant="outline"
+                    size="sm"
+                  >
                     Connect Wallet
                   </Button>
                 );
@@ -44,7 +47,11 @@ export function ConnectWalletButton() {
 
               return (
                 <div className="flex items-center gap-2">
-                  <Button onClick={openAccountModal} variant="outline" size="sm">
+                  <Button
+                    onClick={openAccountModal}
+                    variant="outline"
+                    size="sm"
+                  >
                     {account.displayName}
                     {account.displayBalance
                       ? ` (${account.displayBalance})`

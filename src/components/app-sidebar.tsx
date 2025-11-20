@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  ArrowLeftRight,
-  Coins,
-  Home,
-  Square,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowLeftRight, Coins, Home, Square, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -52,6 +46,7 @@ const items = [
   },
 ];
 
+import { SidebarMembershipBanner } from "@/components/sidebar-membership-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export function AppSidebar() {
@@ -110,6 +105,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarMembershipBanner />
         <div className="flex justify-center p-2">
           <ThemeToggle />
         </div>
