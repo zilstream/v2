@@ -111,6 +111,7 @@ interface PairEventResponse {
   amount1_out?: string;
   liquidity?: string;
   amount_usd?: string;
+  maker?: string;
 }
 
 export interface PairEvent {
@@ -131,6 +132,7 @@ export interface PairEvent {
   amount1Out?: string;
   liquidity?: string;
   amountUsd?: string;
+  maker?: string;
 }
 
 export interface TokenListResponse {
@@ -183,7 +185,9 @@ async function fetchFromApi<TResponse>(path: string): Promise<TResponse> {
       if (!res.ok) {
         // Don't retry 4xx errors
         if (res.status >= 400 && res.status < 500) {
-          throw new Error(`ZilStream API request failed with status ${res.status}`);
+          throw new Error(
+            `ZilStream API request failed with status ${res.status}`,
+          );
         }
         // Throw for 5xx errors so they can be retried
         throw new Error(`Server error: ${res.status}`);
@@ -200,9 +204,7 @@ async function fetchFromApi<TResponse>(path: string): Promise<TResponse> {
       }
 
       // Wait before retrying (exponential backoff)
-      await new Promise((resolve) =>
-        setTimeout(resolve, baseDelay * 2 ** i)
-      );
+      await new Promise((resolve) => setTimeout(resolve, baseDelay * 2 ** i));
     }
   }
 
@@ -278,6 +280,7 @@ function mapPairEvent(event: PairEventResponse): PairEvent {
     amount1Out: event.amount1_out,
     liquidity: event.liquidity,
     amountUsd: event.amount_usd,
+    maker: event.maker,
   };
 }
 
