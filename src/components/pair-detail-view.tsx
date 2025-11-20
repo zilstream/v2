@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { ExplorerDropdown } from "@/components/explorer-dropdown";
+import { SwapWidget } from "@/components/swap-widget";
 import { TokenIcon } from "@/components/token-icon";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { Badge } from "@/components/ui/badge";
@@ -486,6 +487,10 @@ export function PairDetailView({
               }
             />
           </div>
+
+          <div className="h-px bg-border" />
+
+          <SwapWidget pair={pair} token0Decimals={token0Decimals} token1Decimals={token1Decimals} />
         </div>
       </div>
     </div>
