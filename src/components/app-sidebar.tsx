@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftRight, Coins, Home, Square, TrendingUp } from "lucide-react";
+import { ArrowLeftRight, Coins, Home, Newspaper, Square, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -46,6 +46,14 @@ const items = [
   },
 ];
 
+const resourcesItems = [
+  {
+    title: "News",
+    url: "/news",
+    icon: Newspaper,
+  },
+];
+
 import { SidebarMembershipBanner } from "@/components/sidebar-membership-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -88,6 +96,26 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
+                    <Link
+                      href={item.url}
+                      className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Resources</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {resourcesItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
                     <Link
