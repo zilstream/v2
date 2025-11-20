@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { ExplorerDropdown } from "@/components/explorer-dropdown";
-import { PairPriceChart } from "@/components/pair-price-chart";
 import { TokenIcon } from "@/components/token-icon";
+import { TradingViewChart } from "@/components/tradingview-chart";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -37,14 +37,13 @@ interface PairDetailViewProps {
   initialPair: Pair;
   events: PairEvent[];
   tokens: Token[];
-  chartData: TokenChartData;
+  chartData?: TokenChartData;
 }
 
 export function PairDetailView({
   initialPair,
   events,
   tokens,
-  chartData,
 }: PairDetailViewProps) {
   const [pair, setPair] = useState(initialPair);
 
@@ -170,9 +169,10 @@ export function PairDetailView({
         </CardContent>
       </Card>
 
-      <PairPriceChart
-        data={chartData}
+      <TradingViewChart
+        pairAddress={pair.address}
         pairName={`${pair.token0Symbol} / ${pair.token1Symbol}`}
+        baseTokenSymbol={pair.token0Symbol}
       />
 
       <Card>
