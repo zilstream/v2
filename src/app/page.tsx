@@ -30,6 +30,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.35),transparent_60%)]" />
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-2xl space-y-3">
+
             <Badge
               variant="secondary"
               className="bg-white/70 text-primary dark:bg-primary/20 dark:text-white dark:border-primary/30"
@@ -58,6 +59,24 @@ export default async function HomePage() {
                 View tokens
               </Link>
             </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Looking for the old ZilStream? Visit the{" "}
+              <Link
+                href="https://legacy.zilstream.com"
+                target="_blank"
+                className="font-medium text-foreground underline decoration-border hover:text-primary hover:decoration-primary"
+              >
+                legacy site here
+              </Link>{" "}
+              (
+              <Link
+                href="/news/sunsetting-zilstream-legacy"
+                className="font-medium text-foreground underline decoration-border hover:text-primary hover:decoration-primary"
+              >
+                sunsetting early next year
+              </Link>
+              ).
+            </p>
           </div>
           <Card className="w-full max-w-sm bg-background/85 backdrop-blur">
             <CardHeader className="pb-3">

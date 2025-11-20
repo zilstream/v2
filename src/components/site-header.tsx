@@ -17,11 +17,6 @@ import {
 } from "@/components/ui/sheet";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export function SiteHeader() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -34,24 +29,7 @@ export function SiteHeader() {
           <Link href="/" className="md:hidden">
             <ZilStreamLogo className="h-8 w-8 text-primary" />
           </Link>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span
-                suppressHydrationWarning
-                className="hidden rounded-full bg-orange-200/70 px-3 py-0.5 text-xs font-medium uppercase tracking-wide text-orange-700 md:block"
-              >
-                Early preview
-              </span>
-            </TooltipTrigger>
-            <TooltipContent
-              side="bottom"
-              sideOffset={10}
-              className="max-w-xs text-left"
-            >
-              ZilStream V2 is currently in very early access. Data may not be
-              correct and many things will change.
-            </TooltipContent>
-          </Tooltip>
+
         </div>
         <div className="hidden flex-1 md:flex md:justify-center">
           <SearchBar />
