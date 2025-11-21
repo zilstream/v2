@@ -31,7 +31,7 @@ export default function NewsPage() {
             <Card className="h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1 flex flex-col">
               <div className="aspect-video w-full bg-muted relative overflow-hidden">
                 {article.image ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-primary/10 p-8">
+                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-950 bg-gradient-to-br from-primary/5 via-zinc-950 to-primary/10 p-8">
                     <Image
                       src={article.image}
                       alt={article.title}
