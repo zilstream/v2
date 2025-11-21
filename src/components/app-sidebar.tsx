@@ -146,7 +146,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMembershipBanner />
-        <div className="flex justify-center p-2">
+        <div className="mx-2 mb-2">
           <ThemeToggle />
         </div>
       </SidebarFooter>

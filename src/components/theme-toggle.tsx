@@ -15,7 +15,7 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="inline-flex h-9 items-center gap-0.5 rounded-md border border-border bg-muted/50 p-1">
+    <div className="flex w-full items-center gap-0.5 rounded-md border border-border bg-muted/50 p-1">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -24,7 +24,7 @@ export function ThemeToggle() {
               size="icon"
               onClick={() => setTheme("light")}
               suppressHydrationWarning
-              className={`h-7 w-7 ${
+              className={`h-7 flex-1 ${
                 theme === "light"
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
@@ -46,7 +46,7 @@ export function ThemeToggle() {
               size="icon"
               onClick={() => setTheme("dark")}
               suppressHydrationWarning
-              className={`h-7 w-7 ${
+              className={`h-7 flex-1 ${
                 theme === "dark"
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
@@ -68,7 +68,7 @@ export function ThemeToggle() {
               size="icon"
               onClick={() => setTheme("system")}
               suppressHydrationWarning
-              className={`h-7 w-7 ${
+              className={`h-7 flex-1 ${
                 theme === "system"
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
