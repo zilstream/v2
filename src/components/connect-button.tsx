@@ -1,6 +1,8 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Wallet } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export function ConnectWalletButton() {
@@ -56,6 +58,16 @@ export function ConnectWalletButton() {
                     {account.displayBalance
                       ? ` (${account.displayBalance})`
                       : ""}
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="icon-sm"
+                    title="View address page"
+                  >
+                    <Link href={`/address/${account.address}`}>
+                      <Wallet />
+                    </Link>
                   </Button>
                 </div>
               );
