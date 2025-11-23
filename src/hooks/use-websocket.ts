@@ -5,7 +5,7 @@ import {
   PublicationContext,
 } from "centrifuge/build/protobuf";
 import { type Pair, mapPair } from "@/lib/zilstream";
-import type { BatchUpdate, PairUpdate } from "@/lib/websocket-types";
+import type { BatchUpdate, PairUpdate, SwapEventData, WebSocketMessage } from "@/lib/websocket-types";
 
 export function useSubscription<T = any>(
   channel: string,
@@ -43,7 +43,17 @@ export function useSubscription<T = any>(
       subscriptionRef.current = sub;
 
       const onPublication = (ctx: PublicationContext) => {
-        onDataRef.current(ctx.data);
+        let data = ctx.data;
+        if (data instanceof Uint8Array) {
+          try {
+            const decoder = new TextDecoder();
+            const str = decoder.decode(data);
+            data = JSON.parse(str);
+          } catch (e) {
+            console.error("Failed to decode/parse WebSocket message", e);
+          }
+        }
+        onDataRef.current(data);
       };
 
       sub.on("publication", onPublication);
@@ -75,15 +85,21 @@ export function useBatchPairsSubscription(onUpdate: (pairs: Pair[]) => void) {
 export function usePairSubscription(
   pairAddress: string,
   onUpdate: (pair: Pair) => void,
+  onEvent?: (event: SwapEventData, eventType: string) => void,
 ) {
   const channel = pairAddress ? `dex.pair.${pairAddress.toLowerCase()}` : "";
 
-  useSubscription<PairUpdate>(
+  useSubscription<WebSocketMessage>(
     channel,
     (data) => {
       if (data.type === "pair.update") {
         const pair = mapPair(data.pair);
         onUpdate(pair);
+      } else if (
+        data.type === "pair.event" &&
+        ["swap", "mint", "burn"].includes(data.event_type)
+      ) {
+        onEvent?.(data.data, data.event_type);
       }
     },
     !!pairAddress,

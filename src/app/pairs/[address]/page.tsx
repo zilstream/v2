@@ -22,6 +22,7 @@ export default async function PairEventsPage({
 
   return (
     <PairDetailView
+      key={pair.address}
       initialPair={pair}
       events={events}
       tokens={tokensResponse.data}

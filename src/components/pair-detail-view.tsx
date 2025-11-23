@@ -14,7 +14,10 @@ import { useEffect, useRef, useState } from "react";
 import { ExplorerDropdown } from "@/components/explorer-dropdown";
 import { SwapWidget } from "@/components/swap-widget";
 import { TokenIcon } from "@/components/token-icon";
-import { TradingViewChart } from "@/components/tradingview-chart";
+import {
+  TradingViewChart,
+  type ChartTrade,
+} from "@/components/tradingview-chart";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -33,6 +36,7 @@ import {
   formatUsd,
 } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import type { SwapEventData } from "@/lib/websocket-types";
 import type { Pair, PairEvent, Token, TokenChartData } from "@/lib/zilstream";
 
 interface PairDetailViewProps {
@@ -44,17 +48,15 @@ interface PairDetailViewProps {
 
 export function PairDetailView({
   initialPair,
-  events,
+  events: initialEvents,
   tokens,
 }: PairDetailViewProps) {
   const [pair, setPair] = useState(initialPair);
+  const [events, setEvents] = useState(initialEvents);
+  const [lastTrade, setLastTrade] = useState<ChartTrade | null>(null);
   const [activeTab, setActiveTab] = useState<"info" | "chart" | "trades">(
     "info",
   );
-
-  usePairSubscription(pair.address, (updatedPair) => {
-    setPair(updatedPair);
-  });
 
   const tokenIndex = new Map(
     tokens.map((token) => [token.address.toLowerCase(), token]),
@@ -63,6 +65,122 @@ export function PairDetailView({
     tokenIndex.get(pair.token0.toLowerCase())?.decimals ?? 12;
   const token1Decimals =
     tokenIndex.get(pair.token1.toLowerCase())?.decimals ?? 12;
+
+  usePairSubscription(
+    pair.address,
+    (updatedPair) => {
+      setPair(updatedPair);
+    },
+    (swapEvent: SwapEventData, eventType: string) => {
+      try {
+        // 1. Calculate amounts based on version/protocol
+        let amount0In = swapEvent.amount0_in;
+        let amount1In = swapEvent.amount1_in;
+        let amount0Out = swapEvent.amount0_out;
+        let amount1Out = swapEvent.amount1_out;
+
+        // Handle Uniswap V3 style events (amount0/amount1)
+        // We use string manipulation to preserve precision for large numbers
+        const rawAmount0 =
+          swapEvent.amount0 !== undefined
+            ? String(swapEvent.amount0)
+            : undefined;
+        const rawAmount1 =
+          swapEvent.amount1 !== undefined
+            ? String(swapEvent.amount1)
+            : undefined;
+
+        if (rawAmount0 && rawAmount1) {
+          // V3 Convention:
+          // Positive = In to pool (User sold)
+          // Negative = Out from pool (User bought)
+          if (rawAmount0.startsWith("-")) {
+            amount0Out = rawAmount0.slice(1);
+            amount0In = undefined;
+          } else {
+            amount0In = rawAmount0;
+            amount0Out = undefined;
+          }
+
+          if (rawAmount1.startsWith("-")) {
+            amount1Out = rawAmount1.slice(1);
+            amount1In = undefined;
+          } else {
+            amount1In = rawAmount1;
+            amount1Out = undefined;
+          }
+        }
+
+        // 2. Update Events List
+        const newEvent: PairEvent = {
+          protocol:
+            swapEvent.protocol === "uniswap_v3"
+              ? "PlunderSwap V3"
+              : "PlunderSwap V2",
+          eventType: eventType,
+          id: swapEvent.id,
+          transactionHash: swapEvent.transaction_hash,
+          logIndex: Number.parseInt(swapEvent.id.split("-")[1] || "0"),
+          blockNumber: 0, // Not available in real-time event
+          timestamp: swapEvent.timestamp,
+          address: pair.address,
+          sender: swapEvent.sender,
+          recipient: swapEvent.recipient,
+          amount0In,
+          amount1In,
+          amount0Out,
+          amount1Out,
+          amountUsd: swapEvent.amount_usd,
+          liquidity: swapEvent.liquidity,
+          maker: swapEvent.sender, // Approximation
+        };
+
+        setEvents((prev) => {
+          // Prevent duplicates
+          if (prev.some((e) => e.id === newEvent.id)) {
+            return prev;
+          }
+          return [newEvent, ...prev].slice(0, 50);
+        });
+
+        // 3. Update Chart (Only for Swaps)
+        if (eventType === "swap") {
+          let amt0 = 0;
+          let amt1 = 0;
+
+          // Use the calculated amounts to avoid re-parsing, but cast to Number for price calc
+          if (amount0In) {
+            amt0 = Number.parseFloat(amount0In);
+          } else if (amount0Out) {
+            amt0 = Number.parseFloat(amount0Out);
+          }
+
+          if (amount1In) {
+            amt1 = Number.parseFloat(amount1In);
+          } else if (amount1Out) {
+            amt1 = Number.parseFloat(amount1Out);
+          }
+
+          const normalizedAmt0 = amt0 / 10 ** token0Decimals;
+          const normalizedAmt1 = amt1 / 10 ** token1Decimals;
+
+          // Price = Token1 / Token0
+          const price =
+            normalizedAmt0 > 0 ? normalizedAmt1 / normalizedAmt0 : 0;
+
+          if (price > 0) {
+            setLastTrade({
+              timestamp: swapEvent.timestamp,
+              price: price,
+              volume: Number.parseFloat(swapEvent.amount_usd || "0"),
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error processing websocket event:", err);
+      }
+    },
+  );
 
   // Calculate initial price for chart scaling
   const initialPrice = (() => {
@@ -189,6 +307,7 @@ export function PairDetailView({
             pairName={`${pair.token0Symbol} / ${pair.token1Symbol}`}
             initialPrice={initialPrice}
             className="h-full border-b border-r"
+            lastTrade={lastTrade}
           />
         </div>
 

@@ -12,10 +12,17 @@ declare global {
   }
 }
 
+export interface ChartTrade {
+  timestamp: number;
+  price: number;
+  volume: number;
+}
+
 interface TradingViewChartProps {
   pairAddress: string;
   pairName: string;
   initialPrice?: string;
+  lastTrade?: ChartTrade | null;
 }
 
 export function TradingViewChart({
@@ -23,9 +30,12 @@ export function TradingViewChart({
   pairName,
   initialPrice,
   className,
+  lastTrade,
 }: TradingViewChartProps & { className?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [libLoaded, setLibLoaded] = useState(false);
+  // biome-ignore lint/suspicious/noExplicitAny: Datafeed instance
+  const datafeedRef = useRef<any>(null);
 
   useEffect(() => {
     // If the script is already loaded (e.g. from navigating back), set state immediately
@@ -36,6 +46,13 @@ export function TradingViewChart({
 
   useEffect(() => {
     if (!libLoaded || !containerRef.current || !window.TradingView) return;
+
+    const datafeed = createDatafeed(pairAddress, {
+      symbol: pairName,
+      name: pairName,
+      price: initialPrice,
+    });
+    datafeedRef.current = datafeed;
 
     const widget = new window.TradingView.widget({
       // Debug
@@ -58,11 +75,7 @@ export function TradingViewChart({
       theme: "Dark", // Assuming dark mode based on project style
 
       // Datafeed
-      datafeed: createDatafeed(pairAddress, {
-        symbol: pairName,
-        name: pairName,
-        price: initialPrice,
-      }),
+      datafeed: datafeed,
 
       // Customization
       overrides: {
@@ -76,9 +89,17 @@ export function TradingViewChart({
     return () => {
       if (widget) {
         widget.remove();
+        datafeedRef.current = null;
       }
     };
   }, [libLoaded, pairAddress, pairName, initialPrice]);
+
+  // Handle realtime updates
+  useEffect(() => {
+    if (lastTrade && datafeedRef.current?.updateLastBar) {
+      datafeedRef.current.updateLastBar(lastTrade);
+    }
+  }, [lastTrade]);
 
   return (
     <div

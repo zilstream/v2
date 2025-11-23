@@ -15,9 +15,24 @@ export function createDatafeed(pairAddress: string, pairInfo: any) {
       {
         name: "Crypto",
         value: "crypto",
+        desc: "Crypto",
       },
     ],
   };
+
+  // Store subscribers
+  const subscribers = new Map<
+    string,
+    {
+      // biome-ignore lint/suspicious/noExplicitAny: TV callback
+      callback: (bar: any) => void;
+      resolution: string;
+    }
+  >();
+
+  // Track last bars per resolution to enable updates
+  // biome-ignore lint/suspicious/noExplicitAny: Bar data
+  const lastBars = new Map<string, any>();
 
   // Helper to calculate pricescale (decimals)
   const getPriceScale = (price: number) => {
@@ -33,6 +48,14 @@ export function createDatafeed(pairAddress: string, pairInfo: any) {
   // We can use the initial price from pairInfo if available
   const initialPrice = pairInfo?.price ? Number.parseFloat(pairInfo.price) : 0;
   const pricescale = initialPrice > 0 ? getPriceScale(initialPrice) : 100000000; // Default to 8 decimals if unknown
+
+  const getIntervalSeconds = (resolution: string) => {
+    if (resolution === "1D") return 86400;
+    if (resolution === "1W") return 604800;
+    const parsed = Number.parseInt(resolution);
+    if (!Number.isNaN(parsed)) return parsed * 60;
+    return 60;
+  };
 
   return {
     // biome-ignore lint/suspicious/noExplicitAny: TV callback
@@ -110,16 +133,28 @@ export function createDatafeed(pairAddress: string, pairInfo: any) {
 
         const bars = [];
         const count = data.t.length;
+        const intervalSeconds = getIntervalSeconds(resolution);
 
         for (let i = 0; i < count; i++) {
+          // Ensure time is aligned to bucket start
+          const rawTime = data.t[i];
+          const alignedTime =
+            Math.floor(rawTime / intervalSeconds) * intervalSeconds * 1000;
+
           bars.push({
-            time: data.t[i] * 1000, // Convert Unix seconds to milliseconds
+            time: alignedTime,
             open: Number.parseFloat(data.o[i]),
             high: Number.parseFloat(data.h[i]),
             low: Number.parseFloat(data.l[i]),
             close: Number.parseFloat(data.c[i]),
             volume: Number.parseFloat(data.v[i]),
           });
+        }
+
+        // Update lastBar for this resolution
+        if (bars.length > 0) {
+          const lastBar = bars[bars.length - 1];
+          lastBars.set(resolution, lastBar);
         }
 
         onHistoryCallback(bars, { noData: false });
@@ -132,18 +167,71 @@ export function createDatafeed(pairAddress: string, pairInfo: any) {
     subscribeBars: (
       // biome-ignore lint/suspicious/noExplicitAny: TV symbol info
       _symbolInfo: any,
-      _resolution: string,
+      resolution: string,
       // biome-ignore lint/suspicious/noExplicitAny: TV callback
-      _onRealtimeCallback: (bar: any) => void,
-      _subscriberUID: string,
+      onRealtimeCallback: (bar: any) => void,
+      subscriberUID: string,
       _onResetCacheNeededCallback: () => void,
     ) => {
-      // Real-time updates not implemented in this version
-      // Could poll the API here if needed
+      subscribers.set(subscriberUID, {
+        callback: onRealtimeCallback,
+        resolution,
+      });
     },
 
-    unsubscribeBars: (_subscriberUID: string) => {
-      // Cleanup if polling was implemented
+    unsubscribeBars: (subscriberUID: string) => {
+      subscribers.delete(subscriberUID);
+    },
+
+    // Custom method to push updates
+    // biome-ignore lint/suspicious/noExplicitAny: Trade data
+    updateLastBar: (trade: any) => {
+      subscribers.forEach(({ callback, resolution }) => {
+        const intervalSeconds = getIntervalSeconds(resolution);
+        let lastBar = lastBars.get(resolution);
+
+        const tradeTime =
+          Math.floor(trade.timestamp / intervalSeconds) * intervalSeconds * 1000;
+        const tradePrice = Number(trade.price);
+        const tradeVolume = Number(trade.volume || trade.amountUSD || 0);
+
+        if (!lastBar) {
+          // Initialize if missing (unlikely if getBars ran)
+          lastBar = {
+            time: tradeTime,
+            open: tradePrice,
+            high: tradePrice,
+            low: tradePrice,
+            close: tradePrice,
+            volume: tradeVolume,
+          };
+        } else if (tradeTime > lastBar.time) {
+          // New bar
+          lastBar = {
+            time: tradeTime,
+            open: lastBar.close,
+            high: tradePrice,
+            low: tradePrice,
+            close: tradePrice,
+            volume: tradeVolume,
+          };
+        } else if (tradeTime === lastBar.time) {
+          // Update existing bar
+          lastBar = {
+            ...lastBar,
+            high: Math.max(lastBar.high, tradePrice),
+            low: Math.min(lastBar.low, tradePrice),
+            close: tradePrice,
+            volume: lastBar.volume + tradeVolume,
+          };
+        } else {
+            // Past trade, ignore
+            return;
+        }
+
+        lastBars.set(resolution, lastBar);
+        callback(lastBar);
+      });
     },
   };
 }
