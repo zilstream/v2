@@ -2,7 +2,7 @@ import { PairDetailView } from "@/components/pair-detail-view";
 import {
   fetchPairByAddress,
   fetchPairEvents,
-  fetchTokens,
+  fetchTokenByAddress,
 } from "@/lib/zilstream";
 
 export default async function PairEventsPage({
@@ -12,10 +12,12 @@ export default async function PairEventsPage({
 }) {
   const { address: pairAddress } = await params;
 
-  const [eventsResponse, pair, tokensResponse] = await Promise.all([
+  const pair = await fetchPairByAddress(pairAddress);
+
+  const [eventsResponse, token0, token1] = await Promise.all([
     fetchPairEvents(pairAddress),
-    fetchPairByAddress(pairAddress),
-    fetchTokens(),
+    fetchTokenByAddress(pair.token0),
+    fetchTokenByAddress(pair.token1),
   ]);
 
   const { data: events } = eventsResponse;
@@ -25,7 +27,7 @@ export default async function PairEventsPage({
       key={pair.address}
       initialPair={pair}
       events={events}
-      tokens={tokensResponse.data}
+      tokens={[token0, token1]}
     />
   );
 }

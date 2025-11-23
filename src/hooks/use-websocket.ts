@@ -5,7 +5,12 @@ import {
   PublicationContext,
 } from "centrifuge/build/protobuf";
 import { type Pair, mapPair } from "@/lib/zilstream";
-import type { BatchUpdate, PairUpdate, SwapEventData, WebSocketMessage } from "@/lib/websocket-types";
+import type {
+  BatchUpdate,
+  PairUpdate,
+  SwapEventData,
+  WebSocketMessage,
+} from "@/lib/websocket-types";
 
 export function useSubscription<T = any>(
   channel: string,

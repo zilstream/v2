@@ -32,7 +32,8 @@ import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Pair } from "@/lib/zilstream";
 
-const WZIL_ADDRESS = "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192" as `0x${string}`;
+const WZIL_ADDRESS =
+  "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192" as `0x${string}`;
 
 interface SwapWidgetProps {
   pair: Pair;
@@ -476,7 +477,10 @@ export function SwapWidget({
         }
       } else {
         // V2 Logic
-        const path = [inputToken.address as `0x${string}`, outputToken.address as `0x${string}`];
+        const path = [
+          inputToken.address as `0x${string}`,
+          outputToken.address as `0x${string}`,
+        ];
 
         if (isNativeInput) {
           // multicall([wrapETH(amount), swapExactTokensForTokens(amountIn: 0, recipient: user/router), refundETH])

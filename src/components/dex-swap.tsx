@@ -32,7 +32,8 @@ import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Token, Pair, fetchTokenPairs } from "@/lib/zilstream";
 
-const WZIL_ADDRESS = "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192" as `0x${string}`;
+const WZIL_ADDRESS =
+  "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192" as `0x${string}`;
 
 interface DexSwapProps {
   initialTokens: Token[];
@@ -44,11 +45,13 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
       initialTokens[0],
   );
   const [tokenOut, setTokenOut] = React.useState<Token | undefined>(
-    initialTokens.find((t) => t.symbol === "USDC" || t.name?.includes("USD Coin")) || 
-    initialTokens.find((t) => t.symbol === "USDT") || 
-    initialTokens[1],
+    initialTokens.find(
+      (t) => t.symbol === "USDC" || t.name?.includes("USD Coin"),
+    ) ||
+      initialTokens.find((t) => t.symbol === "USDT") ||
+      initialTokens[1],
   );
-  
+
   const [pair, setPair] = React.useState<Pair | null>(null);
   const [isFindingPair, setIsFindingPair] = React.useState(false);
 
@@ -89,7 +92,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
       setIsFindingPair(true);
       try {
         // Fetch pairs for tokenIn
-        // Note: calling fetchTokenPairs from client. 
+        // Note: calling fetchTokenPairs from client.
         // Assuming API allows it. If strict CORS or server-only, this might fail.
         // Ideally we'd use a server action or route handler, but trying direct first.
         const response = await fetchTokenPairs(tokenIn.address, 1, 100);
@@ -111,10 +114,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
   }, [tokenIn, tokenOut]);
 
   // Identify Protocol
-  const isV3 = React.useMemo(
-    () => pair?.protocol === "PlunderSwap V3",
-    [pair],
-  );
+  const isV3 = React.useMemo(() => pair?.protocol === "PlunderSwap V3", [pair]);
 
   const feeTier = React.useMemo(() => {
     return pair?.fee ? Number(pair.fee) : 2500;
@@ -160,80 +160,86 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
         setIsFetchingQuote(true);
         setQuoteError(null);
 
-        const decimals = exactField === "in" ? tokenIn.decimals || 18 : tokenOut.decimals || 18;
+        const decimals =
+          exactField === "in"
+            ? tokenIn.decimals || 18
+            : tokenOut.decimals || 18;
         const amountBigInt = parseUnits(amount, decimals);
 
         let quoteAmount: bigint;
 
         if (isV3) {
-            if (exactField === "in") {
-                const result = await publicClient.readContract({
-                    address: PLUNDERSWAP_QUOTER_V2,
-                    abi: PLUNDERSWAP_QUOTER_V2_ABI,
-                    functionName: "quoteExactInputSingle",
-                    args: [
-                      {
-                        tokenIn: tokenIn.address as `0x${string}`,
-                        tokenOut: tokenOut.address as `0x${string}`,
-                        amountIn: amountBigInt,
-                        fee: feeTier,
-                        sqrtPriceLimitX96: 0n,
-                      },
-                    ],
-                  });
-                  quoteAmount = result[0];
-            } else {
-                 const result = await publicClient.readContract({
-                    address: PLUNDERSWAP_QUOTER_V2,
-                    abi: PLUNDERSWAP_QUOTER_V2_ABI,
-                    functionName: "quoteExactOutputSingle",
-                    args: [
-                      {
-                        tokenIn: tokenIn.address as `0x${string}`,
-                        tokenOut: tokenOut.address as `0x${string}`,
-                        amount: amountBigInt,
-                        fee: feeTier,
-                        sqrtPriceLimitX96: 0n,
-                      },
-                    ],
-                  });
-                  quoteAmount = result[0];
-            }
+          if (exactField === "in") {
+            const result = await publicClient.readContract({
+              address: PLUNDERSWAP_QUOTER_V2,
+              abi: PLUNDERSWAP_QUOTER_V2_ABI,
+              functionName: "quoteExactInputSingle",
+              args: [
+                {
+                  tokenIn: tokenIn.address as `0x${string}`,
+                  tokenOut: tokenOut.address as `0x${string}`,
+                  amountIn: amountBigInt,
+                  fee: feeTier,
+                  sqrtPriceLimitX96: 0n,
+                },
+              ],
+            });
+            quoteAmount = result[0];
+          } else {
+            const result = await publicClient.readContract({
+              address: PLUNDERSWAP_QUOTER_V2,
+              abi: PLUNDERSWAP_QUOTER_V2_ABI,
+              functionName: "quoteExactOutputSingle",
+              args: [
+                {
+                  tokenIn: tokenIn.address as `0x${string}`,
+                  tokenOut: tokenOut.address as `0x${string}`,
+                  amount: amountBigInt,
+                  fee: feeTier,
+                  sqrtPriceLimitX96: 0n,
+                },
+              ],
+            });
+            quoteAmount = result[0];
+          }
         } else {
           // V2
           if (exactField === "in") {
-              const result = await publicClient.readContract({
-                address: PLUNDERSWAP_V2_ROUTER,
-                abi: PLUNDERSWAP_V2_ROUTER_ABI,
-                functionName: "getAmountsOut",
-                args: [
-                  amountBigInt,
-                  [
-                    tokenIn.address as `0x${string}`,
-                    tokenOut.address as `0x${string}`,
-                  ],
+            const result = await publicClient.readContract({
+              address: PLUNDERSWAP_V2_ROUTER,
+              abi: PLUNDERSWAP_V2_ROUTER_ABI,
+              functionName: "getAmountsOut",
+              args: [
+                amountBigInt,
+                [
+                  tokenIn.address as `0x${string}`,
+                  tokenOut.address as `0x${string}`,
                 ],
-              });
-              quoteAmount = result[result.length - 1];
+              ],
+            });
+            quoteAmount = result[result.length - 1];
           } else {
-              const result = await publicClient.readContract({
-                address: PLUNDERSWAP_V2_ROUTER,
-                abi: PLUNDERSWAP_V2_ROUTER_ABI,
-                functionName: "getAmountsIn",
-                args: [
-                  amountBigInt,
-                  [
-                    tokenIn.address as `0x${string}`,
-                    tokenOut.address as `0x${string}`,
-                  ],
+            const result = await publicClient.readContract({
+              address: PLUNDERSWAP_V2_ROUTER,
+              abi: PLUNDERSWAP_V2_ROUTER_ABI,
+              functionName: "getAmountsIn",
+              args: [
+                amountBigInt,
+                [
+                  tokenIn.address as `0x${string}`,
+                  tokenOut.address as `0x${string}`,
                 ],
-              });
-              quoteAmount = result[0];
+              ],
+            });
+            quoteAmount = result[0];
           }
         }
 
         if (!cancelled) {
-          const targetDecimals = exactField === "in" ? tokenOut.decimals || 18 : tokenIn.decimals || 18;
+          const targetDecimals =
+            exactField === "in"
+              ? tokenOut.decimals || 18
+              : tokenIn.decimals || 18;
           const formatted = formatUnits(quoteAmount, targetDecimals);
           setQuote(formatted);
         }
@@ -257,7 +263,16 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [amount, exactField, tokenIn, tokenOut, pair, isV3, feeTier, publicClient]);
+  }, [
+    amount,
+    exactField,
+    tokenIn,
+    tokenOut,
+    pair,
+    isV3,
+    feeTier,
+    publicClient,
+  ]);
 
   // Allowance
   const { data: allowance, refetch: refetchAllowance } = useReadContract({
@@ -275,13 +290,19 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
   });
 
   const parsedAmount = React.useMemo(() => {
-      if (!amount || !tokenIn || Number.isNaN(Number(amount)) || Number(amount) <= 0) return 0n;
-      if (exactField === "in") {
-          return parseUnits(amount, tokenIn.decimals || 18);
-      }
-      // If exact output, we need the *input* amount (which is the quote) for approval
-      if (!quote) return 0n;
-      return parseUnits(quote, tokenIn.decimals || 18);
+    if (
+      !amount ||
+      !tokenIn ||
+      Number.isNaN(Number(amount)) ||
+      Number(amount) <= 0
+    )
+      return 0n;
+    if (exactField === "in") {
+      return parseUnits(amount, tokenIn.decimals || 18);
+    }
+    // If exact output, we need the *input* amount (which is the quote) for approval
+    if (!quote) return 0n;
+    return parseUnits(quote, tokenIn.decimals || 18);
   }, [amount, tokenIn, exactField, quote]);
 
   const needsApproval =
@@ -299,10 +320,10 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
       } else if (txType === "swap") {
         const inputVal = exactField === "in" ? amount : quote;
         const outputVal = exactField === "out" ? amount : quote;
-        
+
         const inAmount = formatNumber(Number(inputVal), 4);
         const outAmount = formatNumber(Number(outputVal), 4);
-        
+
         setAmount("");
         setQuote(null);
         refetchBalance();
@@ -320,7 +341,17 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
         );
       }
     }
-  }, [txReceipt, txType, refetchBalance, refetchAllowance, amount, quote, tokenIn, tokenOut, router]);
+  }, [
+    txReceipt,
+    txType,
+    refetchBalance,
+    refetchAllowance,
+    amount,
+    quote,
+    tokenIn,
+    tokenOut,
+    router,
+  ]);
 
   const handleApprove = async () => {
     if (!isConnected || !tokenIn) {
@@ -370,18 +401,22 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
       const amountOutWei = parseUnits(outputVal, tokenOut.decimals || 18);
 
       const slippageNum = Number(slippage) || 0.5;
-      
+
       // Calculate min/max with slippage
       // If exact input: minAmountOut = amountOut * (1 - slippage)
       // If exact output: maxAmountIn = amountIn * (1 + slippage)
-      
+
       let minAmountOut = 0n;
       let maxAmountIn = 0n;
 
       if (exactField === "in") {
-          minAmountOut = (amountOutWei * BigInt(Math.floor((100 - slippageNum) * 100))) / 10000n;
+        minAmountOut =
+          (amountOutWei * BigInt(Math.floor((100 - slippageNum) * 100))) /
+          10000n;
       } else {
-          maxAmountIn = (amountInWei * BigInt(Math.floor((100 + slippageNum) * 100))) / 10000n;
+        maxAmountIn =
+          (amountInWei * BigInt(Math.floor((100 + slippageNum) * 100))) /
+          10000n;
       }
 
       const deadlineMin = Number(deadline) || 20;
@@ -399,78 +434,79 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
       if (isV3) {
         if (isNativeInput) {
           if (exactField === "in") {
-              functionName = "exactInputSingle";
-              args = [
-                {
-                  tokenIn: WZIL_ADDRESS,
-                  tokenOut: tokenOut.address as `0x${string}`,
-                  fee: feeTier,
-                  recipient: userAddress,
-                  amountIn: amountInWei,
-                  amountOutMinimum: minAmountOut,
-                  sqrtPriceLimitX96: 0n,
-                },
-              ];
-              value = amountInWei;
+            functionName = "exactInputSingle";
+            args = [
+              {
+                tokenIn: WZIL_ADDRESS,
+                tokenOut: tokenOut.address as `0x${string}`,
+                fee: feeTier,
+                recipient: userAddress,
+                amountIn: amountInWei,
+                amountOutMinimum: minAmountOut,
+                sqrtPriceLimitX96: 0n,
+              },
+            ];
+            value = amountInWei;
           } else {
-              functionName = "exactOutputSingle";
-              args = [
-                {
-                  tokenIn: WZIL_ADDRESS,
-                  tokenOut: tokenOut.address as `0x${string}`,
-                  fee: feeTier,
-                  recipient: userAddress,
-                  amountOut: amountOutWei,
-                  amountInMaximum: maxAmountIn,
-                  sqrtPriceLimitX96: 0n,
-                },
-              ];
-              value = maxAmountIn; // Need to send max amount for exact output with ETH
+            functionName = "exactOutputSingle";
+            args = [
+              {
+                tokenIn: WZIL_ADDRESS,
+                tokenOut: tokenOut.address as `0x${string}`,
+                fee: feeTier,
+                recipient: userAddress,
+                amountOut: amountOutWei,
+                amountInMaximum: maxAmountIn,
+                sqrtPriceLimitX96: 0n,
+              },
+            ];
+            value = maxAmountIn; // Need to send max amount for exact output with ETH
           }
         } else if (isNativeOutput) {
           // Multicall for output unwrap
           let swapCallData: `0x${string}`;
-          
+
           if (exactField === "in") {
-               swapCallData = encodeFunctionData({
-                abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-                functionName: "exactInputSingle",
-                args: [
-                  {
-                    tokenIn: tokenIn.address as `0x${string}`,
-                    tokenOut: WZIL_ADDRESS,
-                    fee: feeTier,
-                    recipient: PLUNDERSWAP_SMART_ROUTER,
-                    amountIn: amountInWei,
-                    amountOutMinimum: minAmountOut,
-                    sqrtPriceLimitX96: 0n,
-                  },
-                ],
-              });
+            swapCallData = encodeFunctionData({
+              abi: PLUNDERSWAP_SMART_ROUTER_ABI,
+              functionName: "exactInputSingle",
+              args: [
+                {
+                  tokenIn: tokenIn.address as `0x${string}`,
+                  tokenOut: WZIL_ADDRESS,
+                  fee: feeTier,
+                  recipient: PLUNDERSWAP_SMART_ROUTER,
+                  amountIn: amountInWei,
+                  amountOutMinimum: minAmountOut,
+                  sqrtPriceLimitX96: 0n,
+                },
+              ],
+            });
           } else {
-              swapCallData = encodeFunctionData({
-                abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-                functionName: "exactOutputSingle",
-                args: [
-                  {
-                    tokenIn: tokenIn.address as `0x${string}`,
-                    tokenOut: WZIL_ADDRESS,
-                    fee: feeTier,
-                    recipient: PLUNDERSWAP_SMART_ROUTER,
-                    amountOut: amountOutWei,
-                    amountInMaximum: maxAmountIn,
-                    sqrtPriceLimitX96: 0n,
-                  },
-                ],
-              });
+            swapCallData = encodeFunctionData({
+              abi: PLUNDERSWAP_SMART_ROUTER_ABI,
+              functionName: "exactOutputSingle",
+              args: [
+                {
+                  tokenIn: tokenIn.address as `0x${string}`,
+                  tokenOut: WZIL_ADDRESS,
+                  fee: feeTier,
+                  recipient: PLUNDERSWAP_SMART_ROUTER,
+                  amountOut: amountOutWei,
+                  amountInMaximum: maxAmountIn,
+                  sqrtPriceLimitX96: 0n,
+                },
+              ],
+            });
           }
 
           // For exact output, the amount we eventually receive (and unwrap) is exactly amountOutWei
-          // For exact input, it's >= minAmountOut. 
+          // For exact input, it's >= minAmountOut.
           // Standard practice for unwrap is to unwrap exact amount received or min amount expected.
           // But `unwrapWETH9` takes amountMinimum.
           // If exact output, we expect exactly amountOutWei.
-          const unwrapAmount = exactField === "in" ? minAmountOut : amountOutWei;
+          const unwrapAmount =
+            exactField === "in" ? minAmountOut : amountOutWei;
 
           const unwrapData = encodeFunctionData({
             abi: PLUNDERSWAP_SMART_ROUTER_ABI,
@@ -483,84 +519,90 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
         } else {
           // ERC20 -> ERC20
           if (exactField === "in") {
-              functionName = "exactInputSingle";
-              args = [
-                {
-                  tokenIn: tokenIn.address as `0x${string}`,
-                  tokenOut: tokenOut.address as `0x${string}`,
-                  fee: feeTier,
-                  recipient: userAddress,
-                  amountIn: amountInWei,
-                  amountOutMinimum: minAmountOut,
-                  sqrtPriceLimitX96: 0n,
-                },
-              ];
+            functionName = "exactInputSingle";
+            args = [
+              {
+                tokenIn: tokenIn.address as `0x${string}`,
+                tokenOut: tokenOut.address as `0x${string}`,
+                fee: feeTier,
+                recipient: userAddress,
+                amountIn: amountInWei,
+                amountOutMinimum: minAmountOut,
+                sqrtPriceLimitX96: 0n,
+              },
+            ];
           } else {
-              functionName = "exactOutputSingle";
-              args = [
-                {
-                  tokenIn: tokenIn.address as `0x${string}`,
-                  tokenOut: tokenOut.address as `0x${string}`,
-                  fee: feeTier,
-                  recipient: userAddress,
-                  amountOut: amountOutWei,
-                  amountInMaximum: maxAmountIn,
-                  sqrtPriceLimitX96: 0n,
-                },
-              ];
+            functionName = "exactOutputSingle";
+            args = [
+              {
+                tokenIn: tokenIn.address as `0x${string}`,
+                tokenOut: tokenOut.address as `0x${string}`,
+                fee: feeTier,
+                recipient: userAddress,
+                amountOut: amountOutWei,
+                amountInMaximum: maxAmountIn,
+                sqrtPriceLimitX96: 0n,
+              },
+            ];
           }
           value = 0n;
         }
       } else {
         // V2
-        const path = [tokenIn.address as `0x${string}`, tokenOut.address as `0x${string}`];
+        const path = [
+          tokenIn.address as `0x${string}`,
+          tokenOut.address as `0x${string}`,
+        ];
         if (isNativeInput) {
-           const calls: `0x${string}`[] = [];
-           // Wrap max input amount (for exact output) or exact input amount
-           const ethAmount = exactField === "in" ? amountInWei : maxAmountIn;
+          const calls: `0x${string}`[] = [];
+          // Wrap max input amount (for exact output) or exact input amount
+          const ethAmount = exactField === "in" ? amountInWei : maxAmountIn;
 
-           calls.push(
-             encodeFunctionData({
-               abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-               functionName: "wrapETH",
-               args: [ethAmount],
-             }),
-           );
+          calls.push(
+            encodeFunctionData({
+              abi: PLUNDERSWAP_SMART_ROUTER_ABI,
+              functionName: "wrapETH",
+              args: [ethAmount],
+            }),
+          );
 
-           if (exactField === "in") {
-               calls.push(
-                encodeFunctionData({
-                  abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-                  functionName: "swapExactTokensForTokens",
-                  args: [
-                    ethAmount, // amountIn
-                    minAmountOut,
-                    path,
-                    isNativeOutput ? PLUNDERSWAP_SMART_ROUTER : userAddress,
-                  ],
-                }),
-              );
-           } else {
-               calls.push(
-                encodeFunctionData({
-                  abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-                  functionName: "swapTokensForExactTokens",
-                  args: [
-                    amountOutWei,
-                    ethAmount, // amountInMax
-                    path,
-                    isNativeOutput ? PLUNDERSWAP_SMART_ROUTER : userAddress,
-                  ],
-                }),
-              );
-           }
-          
+          if (exactField === "in") {
+            calls.push(
+              encodeFunctionData({
+                abi: PLUNDERSWAP_SMART_ROUTER_ABI,
+                functionName: "swapExactTokensForTokens",
+                args: [
+                  ethAmount, // amountIn
+                  minAmountOut,
+                  path,
+                  isNativeOutput ? PLUNDERSWAP_SMART_ROUTER : userAddress,
+                ],
+              }),
+            );
+          } else {
+            calls.push(
+              encodeFunctionData({
+                abi: PLUNDERSWAP_SMART_ROUTER_ABI,
+                functionName: "swapTokensForExactTokens",
+                args: [
+                  amountOutWei,
+                  ethAmount, // amountInMax
+                  path,
+                  isNativeOutput ? PLUNDERSWAP_SMART_ROUTER : userAddress,
+                ],
+              }),
+            );
+          }
+
           if (isNativeOutput) {
             calls.push(
               encodeFunctionData({
                 abi: PLUNDERSWAP_SMART_ROUTER_ABI,
                 functionName: "unwrapWETH9",
-                args: [exactField === "in" ? minAmountOut : amountOutWei, userAddress],
+                args: [
+                  exactField === "in" ? minAmountOut : amountOutWei,
+                  userAddress,
+                ],
               }),
             );
           }
@@ -575,43 +617,56 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
           args = [deadlineTimestamp, calls];
           value = ethAmount;
         } else if (isNativeOutput) {
-           const calls: `0x${string}`[] = [];
-           
-           if (exactField === "in") {
-               calls.push(
-                 encodeFunctionData({
-                   abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-                   functionName: "swapExactTokensForTokens",
-                   args: [amountInWei, minAmountOut, path, PLUNDERSWAP_SMART_ROUTER],
-                 }),
-               );
-           } else {
-               calls.push(
-                 encodeFunctionData({
-                   abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-                   functionName: "swapTokensForExactTokens",
-                   args: [amountOutWei, maxAmountIn, path, PLUNDERSWAP_SMART_ROUTER],
-                 }),
-               );
-           }
+          const calls: `0x${string}`[] = [];
 
-           calls.push(
-             encodeFunctionData({
-               abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-               functionName: "unwrapWETH9",
-               args: [exactField === "in" ? minAmountOut : amountOutWei, userAddress],
-             }),
-           );
-           functionName = "multicall";
-           args = [deadlineTimestamp, calls];
-           value = 0n;
+          if (exactField === "in") {
+            calls.push(
+              encodeFunctionData({
+                abi: PLUNDERSWAP_SMART_ROUTER_ABI,
+                functionName: "swapExactTokensForTokens",
+                args: [
+                  amountInWei,
+                  minAmountOut,
+                  path,
+                  PLUNDERSWAP_SMART_ROUTER,
+                ],
+              }),
+            );
+          } else {
+            calls.push(
+              encodeFunctionData({
+                abi: PLUNDERSWAP_SMART_ROUTER_ABI,
+                functionName: "swapTokensForExactTokens",
+                args: [
+                  amountOutWei,
+                  maxAmountIn,
+                  path,
+                  PLUNDERSWAP_SMART_ROUTER,
+                ],
+              }),
+            );
+          }
+
+          calls.push(
+            encodeFunctionData({
+              abi: PLUNDERSWAP_SMART_ROUTER_ABI,
+              functionName: "unwrapWETH9",
+              args: [
+                exactField === "in" ? minAmountOut : amountOutWei,
+                userAddress,
+              ],
+            }),
+          );
+          functionName = "multicall";
+          args = [deadlineTimestamp, calls];
+          value = 0n;
         } else {
           if (exactField === "in") {
-              functionName = "swapExactTokensForTokens";
-              args = [amountInWei, minAmountOut, path, userAddress];
+            functionName = "swapExactTokensForTokens";
+            args = [amountInWei, minAmountOut, path, userAddress];
           } else {
-              functionName = "swapTokensForExactTokens";
-              args = [amountOutWei, maxAmountIn, path, userAddress];
+            functionName = "swapTokensForExactTokens";
+            args = [amountOutWei, maxAmountIn, path, userAddress];
           }
           value = 0n;
         }
@@ -653,48 +708,49 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
   };
 
   const getTokenSymbol = (token?: Token) => {
-      if (!token) return "";
-      if (token.address.toLowerCase() === WZIL_ADDRESS.toLowerCase()) return "ZIL";
-      return token.symbol;
+    if (!token) return "";
+    if (token.address.toLowerCase() === WZIL_ADDRESS.toLowerCase())
+      return "ZIL";
+    return token.symbol;
   };
 
   const onInputAmountChange = (val: string) => {
-      setAmount(val);
-      setExactField("in");
+    setAmount(val);
+    setExactField("in");
   };
 
   const onOutputAmountChange = (val: string) => {
-      setAmount(val);
-      setExactField("out");
+    setAmount(val);
+    setExactField("out");
   };
 
   const formatQuote = (val: string | null) => {
-      if (!val) return "";
-      const num = Number(val);
-      if (Number.isNaN(num)) return "";
-      if (num === 0) return "0";
-      
-      if (num < 0.000001) {
-          return num.toString();
-      }
-      
-      if (num < 1) {
-          return parseFloat(num.toFixed(8)).toString();
-      }
-      
-      if (num < 10) {
-          return parseFloat(num.toFixed(4)).toString();
-      }
+    if (!val) return "";
+    const num = Number(val);
+    if (Number.isNaN(num)) return "";
+    if (num === 0) return "0";
 
-      if (num < 10000) {
-          return parseFloat(num.toFixed(2)).toString();
-      }
+    if (num < 0.000001) {
+      return num.toString();
+    }
 
-      if (num < 100000) {
-          return parseFloat(num.toFixed(1)).toString();
-      }
-      
-      return parseFloat(num.toFixed(0)).toString();
+    if (num < 1) {
+      return parseFloat(num.toFixed(8)).toString();
+    }
+
+    if (num < 10) {
+      return parseFloat(num.toFixed(4)).toString();
+    }
+
+    if (num < 10000) {
+      return parseFloat(num.toFixed(2)).toString();
+    }
+
+    if (num < 100000) {
+      return parseFloat(num.toFixed(1)).toString();
+    }
+
+    return parseFloat(num.toFixed(0)).toString();
   };
 
   const inputDisplay = exactField === "in" ? amount : formatQuote(quote);
@@ -705,139 +761,169 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Swap</h2>
         <div className="flex items-center gap-2">
-            <button
-                type="button"
-                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                className="text-muted-foreground hover:text-foreground"
-            >
-                <Settings size={18} />
-            </button>
+          <button
+            type="button"
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <Settings size={18} />
+          </button>
         </div>
       </div>
 
-       {isSettingsOpen && (
-          <div className="mb-4 space-y-3 rounded-lg border p-3 text-sm animate-in slide-in-from-top-2 fade-in-0">
-             <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Slippage Tolerance</span>
-                <Input 
-                    className="h-6 w-16 text-right"
-                    value={slippage}
-                    onChange={e => setSlippage(e.target.value)}
-                />
-             </div>
-             <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Deadline (minutes)</span>
-                <Input 
-                    className="h-6 w-16 text-right"
-                    value={deadline}
-                    onChange={e => setDeadline(e.target.value)}
-                />
-             </div>
+      {isSettingsOpen && (
+        <div className="mb-4 space-y-3 rounded-lg border p-3 text-sm animate-in slide-in-from-top-2 fade-in-0">
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Slippage Tolerance</span>
+            <Input
+              className="h-6 w-16 text-right"
+              value={slippage}
+              onChange={(e) => setSlippage(e.target.value)}
+            />
           </div>
-       )}
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Deadline (minutes)</span>
+            <Input
+              className="h-6 w-16 text-right"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Token In */}
       <div className="space-y-2 rounded-xl bg-muted/40 p-4">
-         <div className="flex justify-between text-xs font-medium text-muted-foreground">
-            <span>Pay</span>
-            {isConnected && (
-                <button onClick={handleMaxBalance} className="hover:text-foreground">
-                    Balance: {formatNumber(Number(balance), 4)}
-                </button>
-            )}
-         </div>
-         <div className="flex items-center gap-3">
-            <TokenSelector 
-                tokens={initialTokens} 
-                selectedToken={tokenIn} 
-                onSelect={setTokenIn}
-                trigger={
-                   <button className="flex items-center gap-2 rounded-full bg-background px-3 py-1.5 font-semibold shadow-sm hover:bg-accent transition-colors">
-                      {tokenIn ? (
-                        <>
-                           <TokenIcon address={tokenIn.address} alt={getTokenSymbol(tokenIn) || "T"} size={24} />
-                           <span>{getTokenSymbol(tokenIn)}</span>
-                        </>
-                      ) : "Select"}
-                      <ArrowDown size={14} className="opacity-50" />
-                   </button>
-                }
+        <div className="flex justify-between text-xs font-medium text-muted-foreground">
+          <span>Pay</span>
+          {isConnected && (
+            <button
+              onClick={handleMaxBalance}
+              className="hover:text-foreground"
+            >
+              Balance: {formatNumber(Number(balance), 4)}
+            </button>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <TokenSelector
+            tokens={initialTokens}
+            selectedToken={tokenIn}
+            onSelect={setTokenIn}
+            trigger={
+              <button className="flex items-center gap-2 rounded-full bg-background px-3 py-1.5 font-semibold shadow-sm hover:bg-accent transition-colors">
+                {tokenIn ? (
+                  <>
+                    <TokenIcon
+                      address={tokenIn.address}
+                      alt={getTokenSymbol(tokenIn) || "T"}
+                      size={24}
+                    />
+                    <span>{getTokenSymbol(tokenIn)}</span>
+                  </>
+                ) : (
+                  "Select"
+                )}
+                <ArrowDown size={14} className="opacity-50" />
+              </button>
+            }
+          />
+          {exactField === "out" && isFetchingQuote ? (
+            <div className="flex-1 flex justify-end">
+              <Loader2
+                className="animate-spin text-muted-foreground"
+                size={24}
+              />
+            </div>
+          ) : (
+            <Input
+              className="h-auto w-full min-w-0 border-0 bg-transparent p-0 text-right text-3xl font-medium shadow-none outline-none focus-visible:ring-0 disabled:opacity-100 placeholder:text-muted-foreground/50 md:text-3xl"
+              placeholder="0.0"
+              value={inputDisplay}
+              onChange={(e) => onInputAmountChange(e.target.value)}
             />
-            {exactField === "out" && isFetchingQuote ? (
-                 <div className="flex-1 flex justify-end">
-                    <Loader2 className="animate-spin text-muted-foreground" size={24} />
-                 </div>
-            ) : (
-                <Input 
-                    className="h-auto w-full min-w-0 border-0 bg-transparent p-0 text-right text-3xl font-medium shadow-none outline-none focus-visible:ring-0 disabled:opacity-100 placeholder:text-muted-foreground/50 md:text-3xl"
-                    placeholder="0.0"
-                    value={inputDisplay}
-                    onChange={e => onInputAmountChange(e.target.value)}
-                />
-            )}
-         </div>
+          )}
+        </div>
       </div>
 
       {/* Switch Button */}
       <div className="relative flex h-4 items-center justify-center">
-          <div className="absolute rounded-full border bg-background p-1.5 shadow-sm cursor-pointer hover:scale-110 transition-transform" onClick={switchTokens}>
-             <ArrowDown size={16} />
-          </div>
+        <div
+          className="absolute rounded-full border bg-background p-1.5 shadow-sm cursor-pointer hover:scale-110 transition-transform"
+          onClick={switchTokens}
+        >
+          <ArrowDown size={16} />
+        </div>
       </div>
 
       {/* Token Out */}
       <div className="space-y-2 rounded-xl bg-muted/40 p-4">
-         <div className="flex justify-between text-xs font-medium text-muted-foreground">
-            <span>Receive</span>
-            <span>{quote ? `≈ ${formatNumber(Number(quote) * Number(tokenOut?.priceUsd || 0), 2)} USD` : ""}</span>
-         </div>
-         <div className="flex items-center gap-3">
-            <TokenSelector 
-                tokens={initialTokens} 
-                selectedToken={tokenOut} 
-                onSelect={setTokenOut}
-                trigger={
-                    <button className="flex items-center gap-2 rounded-full bg-background px-3 py-1.5 font-semibold shadow-sm hover:bg-accent transition-colors">
-                       {tokenOut ? (
-                         <>
-                            <TokenIcon address={tokenOut.address} alt={getTokenSymbol(tokenOut) || "T"} size={24} />
-                            <span>{getTokenSymbol(tokenOut)}</span>
-                         </>
-                       ) : "Select"}
-                       <ArrowDown size={14} className="opacity-50" />
-                    </button>
-                 }
+        <div className="flex justify-between text-xs font-medium text-muted-foreground">
+          <span>Receive</span>
+          <span>
+            {quote
+              ? `≈ ${formatNumber(Number(quote) * Number(tokenOut?.priceUsd || 0), 2)} USD`
+              : ""}
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <TokenSelector
+            tokens={initialTokens}
+            selectedToken={tokenOut}
+            onSelect={setTokenOut}
+            trigger={
+              <button className="flex items-center gap-2 rounded-full bg-background px-3 py-1.5 font-semibold shadow-sm hover:bg-accent transition-colors">
+                {tokenOut ? (
+                  <>
+                    <TokenIcon
+                      address={tokenOut.address}
+                      alt={getTokenSymbol(tokenOut) || "T"}
+                      size={24}
+                    />
+                    <span>{getTokenSymbol(tokenOut)}</span>
+                  </>
+                ) : (
+                  "Select"
+                )}
+                <ArrowDown size={14} className="opacity-50" />
+              </button>
+            }
+          />
+          {exactField === "in" && isFetchingQuote ? (
+            <div className="flex-1 flex justify-end">
+              <Loader2
+                className="animate-spin text-muted-foreground"
+                size={24}
+              />
+            </div>
+          ) : (
+            <Input
+              className="h-auto w-full min-w-0 border-0 bg-transparent p-0 text-right text-3xl font-medium shadow-none outline-none focus-visible:ring-0 disabled:opacity-100 placeholder:text-muted-foreground/50 md:text-3xl"
+              placeholder="0.0"
+              value={outputDisplay}
+              onChange={(e) => onOutputAmountChange(e.target.value)}
             />
-            {exactField === "in" && isFetchingQuote ? (
-                 <div className="flex-1 flex justify-end">
-                    <Loader2 className="animate-spin text-muted-foreground" size={24} />
-                 </div>
-            ) : (
-                <Input 
-                    className="h-auto w-full min-w-0 border-0 bg-transparent p-0 text-right text-3xl font-medium shadow-none outline-none focus-visible:ring-0 disabled:opacity-100 placeholder:text-muted-foreground/50 md:text-3xl"
-                    placeholder="0.0"
-                    value={outputDisplay}
-                    onChange={e => onOutputAmountChange(e.target.value)}
-                />
-            )}
-         </div>
+          )}
+        </div>
       </div>
 
       {/* Price Info */}
       {quote && tokenIn && tokenOut && amount && !isFetchingQuote && (
         <div className="space-y-2 rounded-xl border bg-card p-3 text-sm shadow-sm">
           {(() => {
-            const inputAmount = exactField === "in" ? Number(amount) : Number(quote);
-            const outputAmount = exactField === "in" ? Number(quote) : Number(amount);
-            
+            const inputAmount =
+              exactField === "in" ? Number(amount) : Number(quote);
+            const outputAmount =
+              exactField === "in" ? Number(quote) : Number(amount);
+
             const usdIn = inputAmount * Number(tokenIn.priceUsd || 0);
             const usdOut = outputAmount * Number(tokenOut.priceUsd || 0);
-            
+
             let impactPercentage = 0;
             if (usdIn > 0) {
-               impactPercentage = ((usdIn - usdOut) / usdIn) * 100;
+              impactPercentage = ((usdIn - usdOut) / usdIn) * 100;
             }
-            
+
             // Cap at 0 if negative (due to oracle lag where output is worth more than input)
             // Or should we show negative impact (green)? Usually distinct from positive impact (loss).
             // Let's assume positive impact means loss.
@@ -855,23 +941,24 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
 
             return (
               <div className="space-y-1">
-                 <div className="flex justify-between">
-                    <span className="text-muted-foreground">Price Impact</span>
-                    <span className={cn("font-medium", impactColor)}>
-                       {impactPercentage < 0.01 ? "<0.01%" : `${impactPercentage.toFixed(2)}%`}
-                    </span>
-                 </div>
-                 <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                        {exactField === "in" ? "Min. Received" : "Max. Sold"}
-                    </span>
-                    <span className="font-medium text-foreground">
-                        {exactField === "in" 
-                           ? `${formatNumber(minRec, 4)} ${tokenOut.symbol}`
-                           : `${formatNumber(maxSold, 4)} ${tokenIn.symbol}`
-                        }
-                    </span>
-                 </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Price Impact</span>
+                  <span className={cn("font-medium", impactColor)}>
+                    {impactPercentage < 0.01
+                      ? "<0.01%"
+                      : `${impactPercentage.toFixed(2)}%`}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {exactField === "in" ? "Min. Received" : "Max. Sold"}
+                  </span>
+                  <span className="font-medium text-foreground">
+                    {exactField === "in"
+                      ? `${formatNumber(minRec, 4)} ${tokenOut.symbol}`
+                      : `${formatNumber(maxSold, 4)} ${tokenIn.symbol}`}
+                  </span>
+                </div>
               </div>
             );
           })()}
@@ -880,36 +967,49 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
 
       {/* Info / Error */}
       {isFindingPair && (
-          <div className="text-center text-xs text-muted-foreground">
-              Finding best route...
-          </div>
+        <div className="text-center text-xs text-muted-foreground">
+          Finding best route...
+        </div>
       )}
       {!isFindingPair && !pair && tokenIn && tokenOut && (
-          <div className="rounded-md bg-yellow-50 p-2 text-center text-xs text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400">
-             No direct liquidity pair found between these tokens.
-          </div>
+        <div className="rounded-md bg-yellow-50 p-2 text-center text-xs text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400">
+          No direct liquidity pair found between these tokens.
+        </div>
       )}
       {quoteError && (
         <div className="rounded-md bg-rose-50 p-2 text-center text-xs text-rose-500 dark:bg-rose-950/50">
-            {quoteError}
+          {quoteError}
         </div>
       )}
       {swapError && (
         <div className="rounded-md bg-rose-50 p-2 text-center text-xs text-rose-500 dark:bg-rose-950/50">
-            {swapError}
+          {swapError}
         </div>
       )}
 
-      <Button 
-         size="lg" 
-         className="w-full font-semibold"
-         disabled={!tokenIn || !tokenOut || !amount || isApproving || isSwapping || isWaitingForTx || !pair}
-         onClick={needsApproval ? handleApprove : handleSwap}
+      <Button
+        size="lg"
+        className="w-full font-semibold"
+        disabled={
+          !tokenIn ||
+          !tokenOut ||
+          !amount ||
+          isApproving ||
+          isSwapping ||
+          isWaitingForTx ||
+          !pair
+        }
+        onClick={needsApproval ? handleApprove : handleSwap}
       >
-        {!isConnected ? "Connect Wallet" : 
-         needsApproval ? (isApproving ? "Approving..." : `Approve ${getTokenSymbol(tokenIn)}`) :
-         isSwapping || isWaitingForTx ? "Swapping..." : 
-         "Swap"}
+        {!isConnected
+          ? "Connect Wallet"
+          : needsApproval
+            ? isApproving
+              ? "Approving..."
+              : `Approve ${getTokenSymbol(tokenIn)}`
+            : isSwapping || isWaitingForTx
+              ? "Swapping..."
+              : "Swap"}
       </Button>
     </div>
   );

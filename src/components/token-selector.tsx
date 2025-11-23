@@ -37,25 +37,29 @@ export function TokenSelector({
   const filteredTokens = React.useMemo(() => {
     if (!search) return tokens;
     const lowerSearch = search.toLowerCase();
-    return tokens.filter(
-      (t) => {
-        const symbol = t.address.toLowerCase() === WZIL_ADDRESS.toLowerCase() ? "ZIL" : t.symbol;
-        return symbol?.toLowerCase().includes(lowerSearch) ||
+    return tokens.filter((t) => {
+      const symbol =
+        t.address.toLowerCase() === WZIL_ADDRESS.toLowerCase()
+          ? "ZIL"
+          : t.symbol;
+      return (
+        symbol?.toLowerCase().includes(lowerSearch) ||
         t.name?.toLowerCase().includes(lowerSearch) ||
         t.address.toLowerCase() === lowerSearch
-      }
-    );
+      );
+    });
   }, [tokens, search]);
 
   const getTokenSymbol = (token: Token) => {
-    if (token.address.toLowerCase() === WZIL_ADDRESS.toLowerCase()) return "ZIL";
+    if (token.address.toLowerCase() === WZIL_ADDRESS.toLowerCase())
+      return "ZIL";
     return token.symbol;
   };
 
   const getTokenIcon = (token: Token) => {
-      // TokenIcon component likely handles WZIL address correctly or we can force it if needed,
-      // but usually WZIL address icon is ZIL icon.
-      return token.address;
+    // TokenIcon component likely handles WZIL address correctly or we can force it if needed,
+    // but usually WZIL address icon is ZIL icon.
+    return token.address;
   };
 
   return (
@@ -83,16 +87,16 @@ export function TokenSelector({
           <DialogTitle>Select a Token</DialogTitle>
         </DialogHeader>
         <div className="p-4 pb-0">
-            <div className="relative">
+          <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-                placeholder="Search name or paste address"
-                className="pl-9"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                autoFocus
+              placeholder="Search name or paste address"
+              className="pl-9"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              autoFocus
             />
-            </div>
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto max-h-[400px] p-2">
           <div className="grid gap-1">

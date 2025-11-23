@@ -29,7 +29,6 @@ export function SiteHeader() {
           <Link href="/" className="md:hidden">
             <ZilStreamLogo className="h-8 w-8 text-primary" />
           </Link>
-
         </div>
         <div className="hidden flex-1 md:flex md:justify-center">
           <SearchBar />

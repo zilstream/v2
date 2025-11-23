@@ -169,7 +169,7 @@ export interface Stats {
 }
 
 async function fetchFromApi<TResponse>(path: string): Promise<TResponse> {
-  const maxRetries = 3;
+  const maxRetries = 5;
   const baseDelay = 500;
 
   for (let i = 0; i < maxRetries; i++) {
@@ -195,6 +195,8 @@ async function fetchFromApi<TResponse>(path: string): Promise<TResponse> {
 
       return res.json() as Promise<TResponse>;
     } catch (error) {
+      console.warn(`Attempt ${i + 1} failed for ${path}:`, error);
+
       // If we've exhausted retries, or it's a 4xx error (which we re-threw above), throw it
       if (
         i === maxRetries - 1 ||

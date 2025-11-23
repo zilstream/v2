@@ -154,7 +154,10 @@ export function createDatafeed(pairAddress: string, pairInfo: any) {
         // Update lastBar for this resolution
         if (bars.length > 0) {
           const lastBar = bars[bars.length - 1];
-          lastBars.set(resolution, lastBar);
+          const existingLastBar = lastBars.get(resolution);
+          if (!existingLastBar || lastBar.time >= existingLastBar.time) {
+            lastBars.set(resolution, lastBar);
+          }
         }
 
         onHistoryCallback(bars, { noData: false });
@@ -191,7 +194,9 @@ export function createDatafeed(pairAddress: string, pairInfo: any) {
         let lastBar = lastBars.get(resolution);
 
         const tradeTime =
-          Math.floor(trade.timestamp / intervalSeconds) * intervalSeconds * 1000;
+          Math.floor(trade.timestamp / intervalSeconds) *
+          intervalSeconds *
+          1000;
         const tradePrice = Number(trade.price);
         const tradeVolume = Number(trade.volume || trade.amountUSD || 0);
 
@@ -225,8 +230,8 @@ export function createDatafeed(pairAddress: string, pairInfo: any) {
             volume: lastBar.volume + tradeVolume,
           };
         } else {
-            // Past trade, ignore
-            return;
+          // Past trade, ignore
+          return;
         }
 
         lastBars.set(resolution, lastBar);
