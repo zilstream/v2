@@ -2,6 +2,7 @@
 
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,22 @@ import {
 } from "@/components/ui/tooltip";
 
 export function ThemeToggle() {
+  const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="flex w-full items-center gap-0.5 rounded-md border border-border bg-muted/50 p-1">
+        <div className="h-7 flex-1" />
+        <div className="h-7 flex-1" />
+        <div className="h-7 flex-1" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full items-center gap-0.5 rounded-md border border-border bg-muted/50 p-1">
