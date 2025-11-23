@@ -3,7 +3,9 @@
 import {
   ArrowLeftRight,
   Coins,
+  CreditCard,
   Home,
+  LayoutDashboard,
   Newspaper,
   Square,
   TrendingUp,
@@ -11,6 +13,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAccount } from "wagmi";
 
 import {
   Sidebar,
@@ -21,6 +24,7 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
@@ -71,14 +75,38 @@ import { ThemeToggle } from "@/components/theme-toggle";
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { address, isConnected } = useAccount();
 
   const isItemActive = (itemUrl: string) => {
+    if (itemUrl === "#") return false;
     if (pathname === itemUrl) return true;
     if (itemUrl === "/") return false;
     if (itemUrl === "/blocks" && pathname.startsWith("/block")) return true;
     if (itemUrl === "/txs" && pathname.startsWith("/tx")) return true;
     return pathname.startsWith(itemUrl);
   };
+
+  const portfolioItems = [
+    {
+      title: "Dashboard",
+      url: "#",
+      icon: LayoutDashboard,
+      disabled: true,
+      badge: "Coming Soon",
+    },
+    {
+      title: "Transactions",
+      url: `/address/${address}`,
+      icon: ArrowLeftRight,
+    },
+    {
+      title: "Membership",
+      url: "#",
+      icon: CreditCard,
+      disabled: true,
+      badge: "Coming Soon",
+    },
+  ];
 
   return (
     <Sidebar>
@@ -123,6 +151,44 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isConnected && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Portfolio</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {portfolioItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isItemActive(item.url)}
+                      disabled={item.disabled}
+                      className={item.disabled ? "opacity-50" : ""}
+                    >
+                      <Link
+                        href={item.url}
+                        className={
+                          item.disabled
+                            ? "pointer-events-none"
+                            : "data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
+                        }
+                      >
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                    {item.badge && (
+                      <SidebarMenuBadge className="bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400 text-[10px] h-5 px-2">
+                        {item.badge}
+                      </SidebarMenuBadge>
+                    )}
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
         <SidebarGroup>
           <SidebarGroupLabel>Resources</SidebarGroupLabel>
           <SidebarGroupContent>
