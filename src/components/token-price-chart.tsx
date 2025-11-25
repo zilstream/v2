@@ -16,37 +16,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { formatUsd } from "@/lib/format";
+import { formatPriceUsd, formatUsd } from "@/lib/format";
 
-function formatSmartPrice(value: number | string): string {
-  const num = typeof value === "string" ? Number.parseFloat(value) : value;
 
-  if (!Number.isFinite(num)) return "-";
-
-  let decimals: number;
-  if (num < 0.000001) {
-    decimals = 10;
-  } else if (num < 0.0001) {
-    decimals = 8;
-  } else if (num < 0.01) {
-    decimals = 6;
-  } else if (num < 1) {
-    decimals = 4;
-  } else if (num < 100) {
-    decimals = 2;
-  } else if (num < 10000) {
-    decimals = 0;
-  } else {
-    decimals = 0;
-  }
-
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(num);
-}
 
 interface PricePoint {
   timestamp: string;
@@ -142,7 +114,7 @@ export function TokenPriceChart({ data, symbol }: TokenPriceChartProps) {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => formatUsd(value.toString())}
+              tickFormatter={(value) => formatPriceUsd(value.toString())}
             />
             <ChartTooltip
               content={({ active, payload }) => {
@@ -177,7 +149,7 @@ export function TokenPriceChart({ data, symbol }: TokenPriceChartProps) {
                           className="font-bold"
                           style={{ color: chartColor }}
                         >
-                          {formatSmartPrice(price as number)}
+                          {formatPriceUsd(price as number)}
                         </span>
                       </div>
                     </div>

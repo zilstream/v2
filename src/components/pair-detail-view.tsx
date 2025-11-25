@@ -31,6 +31,7 @@ import { usePairSubscription } from "@/hooks/use-websocket";
 import { PLUNDERSWAP_URL } from "@/lib/constants";
 import {
   formatNumber,
+  formatPriceUsd,
   formatTimestamp,
   formatTokenAmount,
   formatUsd,
@@ -432,7 +433,7 @@ export function PairDetailView({
                         {event.amountUsd ? formatUsd(event.amountUsd) : "-"}
                       </TableCell>
                       <TableCell className="py-2 text-right text-xs">
-                        {price > 0 ? `$${formatNumber(price, 6)}` : "-"}
+                        {price > 0 ? formatPriceUsd(price) : "-"}
                       </TableCell>
                       <TableCell className="py-2 text-right">
                         {(() => {

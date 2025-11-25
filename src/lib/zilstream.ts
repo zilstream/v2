@@ -168,9 +168,32 @@ export interface Stats {
   totalVolumeUsdAll: string;
 }
 
+let agent: any;
+
+async function getAgent() {
+  if (agent) return agent;
+
+  // Only use custom agent in Node.js environment (not browser/edge)
+  if (typeof window === "undefined") {
+    try {
+      const { Agent } = await import("undici");
+      agent = new Agent({
+        connect: {
+          timeout: 60_000,
+          family: 4, // Force IPv4 to avoid ETIMEDOUT issues with IPv6
+        },
+      });
+    } catch {
+      // Ignore if undici is not available
+    }
+  }
+  return agent;
+}
+
 async function fetchFromApi<TResponse>(path: string): Promise<TResponse> {
   const maxRetries = 5;
   const baseDelay = 500;
+  const dispatcher = await getAgent();
 
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -180,6 +203,8 @@ async function fetchFromApi<TResponse>(path: string): Promise<TResponse> {
         },
         // Refresh data roughly once a minute while keeping ISR benefits.
         next: { revalidate: 60 },
+        // @ts-ignore - dispatcher is supported in Node.js fetch (undici)
+        dispatcher,
       });
 
       if (!res.ok) {

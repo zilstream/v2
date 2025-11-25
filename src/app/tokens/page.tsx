@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatNumber, formatUsd } from "@/lib/format";
+import { formatNumber, formatPriceUsd, formatUsd, formatZilPrice } from "@/lib/format";
 import { fetchTokens } from "@/lib/zilstream";
 
 export default async function TokensPage() {
@@ -42,6 +42,7 @@ export default async function TokensPage() {
               <TableRow className="border-border/60">
                 <TableHead className="px-6">Token</TableHead>
                 <TableHead className="text-right">Price</TableHead>
+                <TableHead className="text-right">Price (ZIL)</TableHead>
                 <TableHead className="text-right">24h %</TableHead>
                 <TableHead className="text-right">7d %</TableHead>
                 <TableHead className="text-right">Market Cap</TableHead>
@@ -73,7 +74,10 @@ export default async function TokensPage() {
                     </Link>
                   </TableCell>
                   <TableCell className="text-right">
-                    {token.priceUsd ? formatUsd(token.priceUsd) : "-"}
+                    {token.priceUsd ? formatPriceUsd(token.priceUsd) : "-"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {token.priceEth ? formatZilPrice(token.priceEth) : "-"}
                   </TableCell>
                   <TableCell className="text-right">
                     {token.priceChange24h &&

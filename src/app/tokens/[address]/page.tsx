@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatNumber, formatUsd } from "@/lib/format";
+import { formatNumber, formatPriceUsd, formatUsd, formatZilPrice } from "@/lib/format";
 import {
   fetchTokenByAddress,
   fetchTokenChart,
@@ -80,10 +80,16 @@ export default async function TokenDetailPage({
             <ExplorerDropdown type="address" value={token.address} />
           </div>
         </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatBlock
             label="Price"
-            value={token.priceUsd ? formatUsd(token.priceUsd) : "-"}
+            value={token.priceUsd ? formatPriceUsd(token.priceUsd) : "-"}
+          />
+          <StatBlock
+            label="Price (ZIL)"
+            value={
+              token.priceEth ? `${formatZilPrice(token.priceEth)} ZIL` : "-"
+            }
           />
           <StatBlock
             label="Market Cap"
@@ -186,17 +192,12 @@ export default async function TokenDetailPage({
                 token.totalSupply && token.decimals
                   ? formatNumber(
                       (
-                        Number(token.totalSupply) / Math.pow(10, token.decimals)
+                        Number(token.totalSupply) /
+                        10 ** token.decimals
                       ).toString(),
                       0,
                     )
                   : "-"
-              }
-            />
-            <DetailItem
-              label="Price (ETH)"
-              value={
-                token.priceEth ? `${formatNumber(token.priceEth, 6)} ETH` : "-"
               }
             />
             <DetailItem
@@ -277,7 +278,7 @@ function StatBlock({ label, value }: StatBlockProps) {
   return (
     <div className="rounded-lg border border-border/60 bg-secondary/20 p-4">
       <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="text-lg font-semibold">{value}</p>
+      <div className="text-lg font-semibold">{value}</div>
     </div>
   );
 }
