@@ -45,13 +45,9 @@ export const articles: Article[] = [
         </div>
       </div>
 
-      <h2>What's Under the Hood?</h2>
-      <p>We've rebuilt the stack using modern technologies to ensure performance and reliability:</p>
-      <ul>
-        <li><strong>Next.js & React Server Components:</strong> For lightning-fast page loads and SEO friendly rendering.</li>
-        <li><strong>Vi & Wagmi:</strong> Robust integration with Ethereum-standard wallets and interaction libraries.</li>
-        <li><strong>Tailwind CSS & Shadcn UI:</strong> A beautiful, accessible, and consistent design system.</li>
-      </ul>
+      <h2>Beta Release</h2>
+      <p>Please note that ZilStream V2 is currently in <strong>beta</strong> and is still under active development. You may encounter bugs or incomplete features as we continue to refine the platform.</p>
+      <p>We are working hard to bring you the full suite of tools you expect. Advanced portfolio tracking and management features are currently in the pipeline and will be available in upcoming updates.</p>
 
       <h2>The Road Ahead</h2>
       <p>This is just the beginning. We have an exciting roadmap ahead, including portfolio tracking, advanced alerting, and more developer tools. We're committed to building the best analytics platform for the Zilliqa community.</p>
