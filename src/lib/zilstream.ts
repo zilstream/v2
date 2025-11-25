@@ -71,6 +71,8 @@ export interface PairResponse {
   txn_count: number;
   price_change_24h?: string;
   price_change_7d?: string;
+  price_usd?: string;
+  price_eth?: string;
 }
 
 export interface Pair {
@@ -91,6 +93,8 @@ export interface Pair {
   txnCount: number;
   priceChange24h?: string;
   priceChange7d?: string;
+  priceUsd?: string;
+  priceEth?: string;
 }
 
 interface PairEventResponse {
@@ -285,6 +289,8 @@ export function mapPair(pair: PairResponse): Pair {
     txnCount: pair.txn_count,
     priceChange24h: pair.price_change_24h,
     priceChange7d: pair.price_change_7d,
+    priceUsd: pair.price_usd,
+    priceEth: pair.price_eth,
   };
 }
 

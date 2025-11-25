@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatNumber, formatUsd } from "@/lib/format";
+import { formatNumber, formatPriceUsd, formatUsd } from "@/lib/format";
 import type { Pagination, Pair } from "@/lib/zilstream";
 
 interface PairsTableProps {
@@ -48,7 +48,7 @@ export function PairsTable({
           <TableHeader>
             <TableRow className="border-border/60">
               <TableHead className="px-6">Pair</TableHead>
-              <TableHead>Protocol</TableHead>
+              <TableHead className="text-right">Price (USD)</TableHead>
               <TableHead className="text-right">Liquidity (USD)</TableHead>
               <TableHead className="text-right">Volume (24h USD)</TableHead>
               <TableHead className="text-right">24h %</TableHead>
@@ -82,17 +82,19 @@ export function PairsTable({
                     <span className="font-medium">
                       {pair.token0Symbol} / {pair.token1Symbol}
                     </span>
-                    {pair.fee && (
+                    {pair.fee ? (
                       <Badge variant="secondary" className="text-xs">
                         {(Number.parseInt(pair.fee) / 10000).toFixed(2)}%
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary" className="text-xs">
+                        V2
                       </Badge>
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="capitalize">
-                    {pair.protocol}
-                  </Badge>
+                <TableCell className="text-right">
+                  {pair.priceUsd ? formatPriceUsd(pair.priceUsd) : "-"}
                 </TableCell>
                 <TableCell className="text-right">
                   {formatUsd(pair.liquidityUsd)}

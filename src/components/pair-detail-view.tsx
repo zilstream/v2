@@ -559,6 +559,10 @@ export function PairDetailView({
 
           {/* Stats */}
           <div className="grid grid-cols-2 gap-2">
+            <StatBlock
+              label="Price (USD)"
+              value={pair.priceUsd ? formatPriceUsd(pair.priceUsd) : "-"}
+            />
             <StatBlock label="Liquidity" value={formatUsd(pair.liquidityUsd)} />
             <StatBlock
               label="Volume (24h)"
