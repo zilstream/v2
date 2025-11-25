@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { createDatafeed } from "@/lib/tradingview-datafeed";
 
@@ -34,18 +34,65 @@ export function TradingViewChart({
 }: TradingViewChartProps & { className?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [libLoaded, setLibLoaded] = useState(false);
+  const [containerReady, setContainerReady] = useState(false);
   // biome-ignore lint/suspicious/noExplicitAny: Datafeed instance
   const datafeedRef = useRef<any>(null);
+  // biome-ignore lint/suspicious/noExplicitAny: TradingView widget instance
+  const widgetRef = useRef<any>(null);
 
   useEffect(() => {
-    // If the script is already loaded (e.g. from navigating back), set state immediately
     if (window.TradingView) {
       setLibLoaded(true);
     }
   }, []);
 
+  const checkContainerReady = useCallback(() => {
+    if (!containerRef.current) return false;
+    const { offsetWidth, offsetHeight } = containerRef.current;
+    return offsetWidth > 0 && offsetHeight > 0;
+  }, []);
+
   useEffect(() => {
-    if (!libLoaded || !containerRef.current || !window.TradingView) return;
+    if (!libLoaded || !containerRef.current) return;
+
+    if (checkContainerReady()) {
+      setContainerReady(true);
+      return;
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+          setContainerReady(true);
+          observer.disconnect();
+          break;
+        }
+      }
+    });
+
+    observer.observe(containerRef.current);
+
+    const timeout = setTimeout(() => {
+      if (checkContainerReady()) {
+        setContainerReady(true);
+      }
+      observer.disconnect();
+    }, 500);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeout);
+    };
+  }, [libLoaded, checkContainerReady]);
+
+  useEffect(() => {
+    if (
+      !libLoaded ||
+      !containerReady ||
+      !containerRef.current ||
+      !window.TradingView
+    )
+      return;
 
     const datafeed = createDatafeed(pairAddress, {
       symbol: pairName,
@@ -55,12 +102,9 @@ export function TradingViewChart({
     datafeedRef.current = datafeed;
 
     const widget = new window.TradingView.widget({
-      // Debug
       debug: false,
-
-      // Basic settings
       symbol: pairName,
-      interval: "60", // Default interval
+      interval: "60",
       container: containerRef.current,
       library_path: "/charting_library/",
       locale: "en",
@@ -72,27 +116,26 @@ export function TradingViewChart({
       enabled_features: [],
       fullscreen: false,
       autosize: true,
-      theme: "Dark", // Assuming dark mode based on project style
-
-      // Datafeed
+      theme: "Dark",
       datafeed: datafeed,
-
-      // Customization
       overrides: {
-        "paneProperties.background": "#09090b", // Match typical shadcn card bg
+        "paneProperties.background": "#09090b",
         "paneProperties.vertGridProperties.color": "#27272a",
         "paneProperties.horzGridProperties.color": "#27272a",
         "scalesProperties.textColor": "#a1a1aa",
       },
     });
 
+    widgetRef.current = widget;
+
     return () => {
-      if (widget) {
-        widget.remove();
+      if (widgetRef.current) {
+        widgetRef.current.remove();
+        widgetRef.current = null;
         datafeedRef.current = null;
       }
     };
-  }, [libLoaded, pairAddress, pairName, initialPrice]);
+  }, [libLoaded, containerReady, pairAddress, pairName, initialPrice]);
 
   // Handle realtime updates
   useEffect(() => {
