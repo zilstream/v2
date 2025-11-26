@@ -161,6 +161,8 @@ interface StatsResponse {
     total_liquidity_usd: string;
     total_volume_usd_24h: string;
     total_volume_usd_all: string;
+    zil_price_usd: string;
+    zil_price_change_24h: string;
   };
 }
 
@@ -170,6 +172,8 @@ export interface Stats {
   totalLiquidityUsd: string;
   totalVolumeUsd24h: string;
   totalVolumeUsdAll: string;
+  zilPriceUsd: string;
+  zilPriceChange24h: string;
 }
 
 let agent: any;
@@ -401,6 +405,8 @@ export async function fetchStats(): Promise<Stats> {
     totalLiquidityUsd: response.data.total_liquidity_usd,
     totalVolumeUsd24h: response.data.total_volume_usd_24h,
     totalVolumeUsdAll: response.data.total_volume_usd_all,
+    zilPriceUsd: response.data.zil_price_usd,
+    zilPriceChange24h: response.data.zil_price_change_24h,
   };
 }
 
