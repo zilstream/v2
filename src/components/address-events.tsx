@@ -16,60 +16,21 @@ import {
 } from "@/components/ui/table";
 import { TokenIcon } from "@/components/token-icon";
 import { formatTimestamp, formatTokenAmount, formatUsd } from "@/lib/format";
-
-interface AddressEvent {
-  eventType: string;
-  id: string;
-  transactionHash: string;
-  timestamp: number;
-  address: string;
-  blockNumber: number;
-  protocol: string;
-  amount0In?: string;
-  amount1In?: string;
-  amount0Out?: string;
-  amount1Out?: string;
-  amountUsd: string;
-  token0?: string;
-  token1?: string;
-  token0Symbol?: string;
-  token1Symbol?: string;
-  token0Decimals?: number;
-  token1Decimals?: number;
-}
+import { useAddressEvents } from "@/hooks/use-zilstream-queries";
+import type { AddressEvent } from "@/lib/api-client";
 
 interface AddressEventsProps {
-  initialEvents: AddressEvent[];
-  initialHasMore: boolean;
   address: string;
 }
 
-export function AddressEvents({
-  initialEvents,
-  initialHasMore,
-  address,
-}: AddressEventsProps) {
-  const [events, setEvents] = useState(initialEvents);
+export function AddressEvents({ address }: AddressEventsProps) {
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(initialHasMore);
-  const [loading, setLoading] = useState(false);
+  const { data, isLoading } = useAddressEvents(address, page, 10);
+  const events = data?.data ?? [];
+  const hasMore = data?.pagination?.hasNext ?? false;
 
-  async function loadPage(newPage: number) {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/addresses/${address}/events?page=${newPage}&per_page=10`,
-      );
-      const result = await response.json();
-      const newEvents = result.data || [];
-      setEvents(newEvents);
-      setHasMore(result.pagination?.has_next || newEvents.length === 10);
-      setPage(newPage);
-    } catch (error) {
-      console.error("Failed to fetch events:", error);
-    } finally {
-      setLoading(false);
-    }
+  if (isLoading && events.length === 0) {
+    return null;
   }
 
   if (events.length === 0) {
@@ -115,7 +76,7 @@ export function AddressEvents({
                     : undefined;
 
               return (
-                <TableRow key={event.id} className={eventColor}>
+                <TableRow key={`${event.transactionHash}-${event.logIndex}`} className={eventColor}>
                   <TableCell className="px-6 py-2 text-muted-foreground">
                     {formatTimestamp(event.timestamp)}
                   </TableCell>
@@ -126,29 +87,29 @@ export function AddressEvents({
                   </TableCell>
                   <TableCell className="text-right py-2">
                     <div className="flex items-center justify-end gap-2">
-                      {event.token0 && (
+                      {event.token0Address && (
                         <TokenIcon
-                          address={event.token0}
+                          address={event.token0Address}
                           alt={event.token0Symbol || ""}
                           size={20}
                         />
                       )}
                       {token0Amount
-                        ? formatTokenAmount(token0Amount, event.token0Decimals)
+                        ? formatTokenAmount(token0Amount, 18)
                         : "-"}
                     </div>
                   </TableCell>
                   <TableCell className="text-right py-2">
                     <div className="flex items-center justify-end gap-2">
-                      {event.token1 && (
+                      {event.token1Address && (
                         <TokenIcon
-                          address={event.token1}
+                          address={event.token1Address}
                           alt={event.token1Symbol || ""}
                           size={20}
                         />
                       )}
                       {token1Amount
-                        ? formatTokenAmount(token1Amount, event.token1Decimals)
+                        ? formatTokenAmount(token1Amount, 18)
                         : "-"}
                     </div>
                   </TableCell>
@@ -172,8 +133,8 @@ export function AddressEvents({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => loadPage(page - 1)}
-            disabled={page === 1 || loading}
+            onClick={() => setPage(page - 1)}
+            disabled={page === 1 || isLoading}
           >
             <ChevronLeft className="h-4 w-4" />
             Previous
@@ -182,8 +143,8 @@ export function AddressEvents({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => loadPage(page + 1)}
-            disabled={!hasMore || loading}
+            onClick={() => setPage(page + 1)}
+            disabled={!hasMore || isLoading}
           >
             Next
             <ChevronRight className="h-4 w-4" />

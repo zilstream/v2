@@ -25,7 +25,7 @@ import type { Pagination, Pair } from "@/lib/zilstream";
 
 interface PairsTableProps {
   pairs: Pair[];
-  pagination: Pagination;
+  pagination?: Pagination;
   title?: string;
   onPageChange?: (page: number) => void;
 }
@@ -144,7 +144,7 @@ export function PairsTable({
           </TableBody>
         </Table>
       </CardContent>
-      {onPageChange && (
+      {onPageChange && pagination && (
         <CardFooter className="flex items-center justify-between border-t px-6 py-4">
           <div className="text-sm text-muted-foreground">
             Page {pagination.page}

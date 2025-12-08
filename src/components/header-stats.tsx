@@ -1,24 +1,13 @@
 "use client";
 
 import { BarChart3, TrendingUp } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 
 import { formatPriceUsd, formatUsd } from "@/lib/format";
 import { cn } from "@/lib/utils";
-
-async function fetchStats() {
-  const res = await fetch("/api/stats");
-  if (!res.ok) throw new Error("Failed to fetch stats");
-  return res.json();
-}
+import { useStats } from "@/hooks/use-zilstream-queries";
 
 export function HeaderStats() {
-  const { data } = useQuery({
-    queryKey: ["stats"],
-    queryFn: fetchStats,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
-  });
+  const { data } = useStats();
 
   const liquidity = data ? Number.parseFloat(data.totalLiquidityUsd) : 0;
   const volume = data ? Number.parseFloat(data.totalVolumeUsd24h) : 0;

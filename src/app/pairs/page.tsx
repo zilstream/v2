@@ -1,9 +1,6 @@
 import { PairsPageSection } from "@/components/pairs-page-section";
-import { fetchPairs } from "@/lib/zilstream";
 
-export default async function PairsPage() {
-  const { data: pairs, pagination } = await fetchPairs(1, 50);
-
+export default function PairsPage() {
   return (
     <div className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
       <div className="space-y-1">
@@ -13,7 +10,7 @@ export default async function PairsPage() {
         </p>
       </div>
 
-      <PairsPageSection initialPairs={pairs} initialPagination={pagination} />
+      <PairsPageSection />
     </div>
   );
 }

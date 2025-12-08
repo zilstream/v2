@@ -1,9 +1,6 @@
 import { LiveBlocksSection } from "@/components/live-blocks-section";
-import { fetchBlocks } from "@/lib/zilstream";
 
-export default async function BlocksPage() {
-  const { data: blocks, pagination } = await fetchBlocks();
-
+export default function BlocksPage() {
   return (
     <div className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
       <div className="space-y-1">
@@ -13,10 +10,7 @@ export default async function BlocksPage() {
         </p>
       </div>
 
-      <LiveBlocksSection
-        initialBlocks={blocks}
-        initialPagination={pagination}
-      />
+      <LiveBlocksSection />
     </div>
   );
 }

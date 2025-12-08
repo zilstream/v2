@@ -1,9 +1,6 @@
 import { LiveTransactionsSection } from "@/components/live-transactions-section";
-import { fetchTransactions } from "@/lib/zilstream";
 
-export default async function TransactionsPage() {
-  const { data: transactions, pagination } = await fetchTransactions();
-
+export default function TransactionsPage() {
   return (
     <div className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
       <div className="space-y-1">
@@ -13,10 +10,7 @@ export default async function TransactionsPage() {
         </p>
       </div>
 
-      <LiveTransactionsSection
-        initialTransactions={transactions}
-        initialPagination={pagination}
-      />
+      <LiveTransactionsSection />
     </div>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -20,51 +19,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatNumber, formatTokenAmount, formatTimestamp } from "@/lib/format";
-
-interface Transaction {
-  hash: string;
-  block_number: number;
-  timestamp: number;
-  from_address: string;
-  to_address: string | null;
-  value: string;
-  gas_used: number;
-  status: number;
-}
+import { useAddressTransactions } from "@/hooks/use-zilstream-queries";
+import { useState } from "react";
 
 interface AddressTransactionsProps {
-  initialTransactions: Transaction[];
-  initialHasMore: boolean;
   address: string;
 }
 
-export function AddressTransactions({
-  initialTransactions,
-  initialHasMore,
-  address,
-}: AddressTransactionsProps) {
-  const [transactions, setTransactions] = useState(initialTransactions);
+export function AddressTransactions({ address }: AddressTransactionsProps) {
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(initialHasMore);
-  const [loading, setLoading] = useState(false);
+  const { data, isLoading } = useAddressTransactions(address, page, 25);
+  const transactions = data?.data ?? [];
+  const hasMore = data?.pagination?.hasNext ?? false;
 
-  async function loadPage(newPage: number) {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/addresses/${address}/transactions?page=${newPage}&per_page=25`,
-      );
-      const result = await response.json();
-      const newTransactions = result.data || [];
-      setTransactions(newTransactions);
-      setHasMore(result.pagination?.has_next || newTransactions.length === 25);
-      setPage(newPage);
-    } catch (error) {
-      console.error("Failed to fetch transactions:", error);
-    } finally {
-      setLoading(false);
-    }
+  if (isLoading && transactions.length === 0) {
+    return <AddressTransactionsSkeleton />;
   }
 
   return (
@@ -106,10 +77,10 @@ export function AddressTransactions({
                 </TableCell>
                 <TableCell className="py-2">
                   <Link
-                    href={`/block/${tx.block_number}`}
+                    href={`/block/${tx.blockNumber}`}
                     className="text-primary hover:underline"
                   >
-                    {formatNumber(tx.block_number, 0)}
+                    {formatNumber(tx.blockNumber, 0)}
                   </Link>
                 </TableCell>
                 <TableCell className="py-2">
@@ -118,27 +89,27 @@ export function AddressTransactions({
                   </span>
                 </TableCell>
                 <TableCell className="py-2">
-                  {tx.from_address.toLowerCase() === address.toLowerCase() ? (
+                  {tx.fromAddress.toLowerCase() === address.toLowerCase() ? (
                     <Badge variant="secondary">You</Badge>
                   ) : (
                     <Link
-                      href={`/address/${tx.from_address}`}
+                      href={`/address/${tx.fromAddress}`}
                       className="font-mono text-sm text-primary hover:underline"
                     >
-                      {shortenAddress(tx.from_address)}
+                      {shortenAddress(tx.fromAddress)}
                     </Link>
                   )}
                 </TableCell>
                 <TableCell className="py-2">
-                  {tx.to_address ? (
-                    tx.to_address.toLowerCase() === address.toLowerCase() ? (
+                  {tx.toAddress ? (
+                    tx.toAddress.toLowerCase() === address.toLowerCase() ? (
                       <Badge variant="secondary">You</Badge>
                     ) : (
                       <Link
-                        href={`/address/${tx.to_address}`}
+                        href={`/address/${tx.toAddress}`}
                         className="font-mono text-sm text-primary hover:underline"
                       >
-                        {shortenAddress(tx.to_address)}
+                        {shortenAddress(tx.toAddress)}
                       </Link>
                     )
                   ) : (
@@ -151,7 +122,7 @@ export function AddressTransactions({
                   {formatTokenAmount(tx.value, 18, 4)}
                 </TableCell>
                 <TableCell className="text-right py-2">
-                  {formatNumber(tx.gas_used, 0)}
+                  {formatNumber(tx.gasUsed, 0)}
                 </TableCell>
               </TableRow>
             ))}
@@ -161,8 +132,8 @@ export function AddressTransactions({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => loadPage(page - 1)}
-            disabled={page === 1 || loading}
+            onClick={() => setPage(page - 1)}
+            disabled={page === 1 || isLoading}
           >
             <ChevronLeft className="h-4 w-4" />
             Previous
@@ -171,13 +142,66 @@ export function AddressTransactions({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => loadPage(page + 1)}
-            disabled={!hasMore || loading}
+            onClick={() => setPage(page + 1)}
+            disabled={!hasMore || isLoading}
           >
             Next
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function AddressTransactionsSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Transactions</CardTitle>
+        <CardDescription>All transactions for this address</CardDescription>
+      </CardHeader>
+      <CardContent className="px-0">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-border/60">
+              <TableHead className="px-6 py-2">Transaction Hash</TableHead>
+              <TableHead className="py-2">Block</TableHead>
+              <TableHead className="py-2">Timestamp</TableHead>
+              <TableHead className="py-2">From</TableHead>
+              <TableHead className="py-2">To</TableHead>
+              <TableHead className="text-right py-2">Value (ZIL)</TableHead>
+              <TableHead className="text-right py-2">Gas Used</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <TableRow key={i}>
+                <TableCell className="px-6 py-2">
+                  <Skeleton className="h-4 w-32" />
+                </TableCell>
+                <TableCell className="py-2">
+                  <Skeleton className="h-4 w-16" />
+                </TableCell>
+                <TableCell className="py-2">
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell className="py-2">
+                  <Skeleton className="h-4 w-20" />
+                </TableCell>
+                <TableCell className="py-2">
+                  <Skeleton className="h-4 w-20" />
+                </TableCell>
+                <TableCell className="text-right py-2">
+                  <Skeleton className="ml-auto h-4 w-16" />
+                </TableCell>
+                <TableCell className="text-right py-2">
+                  <Skeleton className="ml-auto h-4 w-12" />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );

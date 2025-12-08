@@ -23,14 +23,16 @@ import type { Pagination, Transaction } from "@/lib/zilstream";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
-  pagination: Pagination;
+  pagination?: Pagination;
   onPageChange?: (page: number) => void;
+  isLoading?: boolean;
 }
 
 export function TransactionsTable({
   transactions,
   pagination,
   onPageChange,
+  isLoading,
 }: TransactionsTableProps) {
   return (
     <Card>
@@ -108,7 +110,7 @@ export function TransactionsTable({
           </TableBody>
         </Table>
       </CardContent>
-      {onPageChange && (
+      {onPageChange && pagination && (
         <CardFooter className="flex items-center justify-between border-t px-6 py-4">
           <div className="text-sm text-muted-foreground">
             Page {pagination.page}

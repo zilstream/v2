@@ -1,22 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PairsTable } from "@/components/pairs-table";
-import type { Pair, Pagination } from "@/lib/zilstream";
+import { PairsTableSkeleton } from "@/components/pairs-table-skeleton";
+import type { Pair } from "@/lib/zilstream";
 import { useBatchPairsSubscription } from "@/hooks/use-websocket";
+import { usePairs } from "@/hooks/use-zilstream-queries";
 
-interface PairsPageSectionProps {
-  initialPairs: Pair[];
-  initialPagination: Pagination;
-}
+export function PairsPageSection() {
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = usePairs(page, 50);
+  const [pairs, setPairs] = useState<Pair[]>([]);
 
-export function PairsPageSection({
-  initialPairs,
-  initialPagination,
-}: PairsPageSectionProps) {
-  const [pairs, setPairs] = useState(initialPairs);
-  const [pagination, setPagination] = useState(initialPagination);
-  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    if (data?.data) {
+      setPairs(data.data);
+    }
+  }, [data?.data]);
 
   useBatchPairsSubscription((updatedPairs) => {
     setPairs((currentPairs) => {
@@ -37,26 +37,20 @@ export function PairsPageSection({
     });
   });
 
-  const handlePageChange = async (newPage: number) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/pairs?page=${newPage}&per_page=50`);
-      const data = await response.json();
-      setPairs(data.data);
-      setPagination(data.pagination);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (error) {
-      console.error("Failed to fetch pairs:", error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  if (isLoading && pairs.length === 0) {
+    return <PairsTableSkeleton title="Pairs" />;
+  }
 
   return (
     <div className={isLoading ? "opacity-50 pointer-events-none" : ""}>
       <PairsTable
         pairs={pairs}
-        pagination={pagination}
+        pagination={data?.pagination}
         onPageChange={handlePageChange}
       />
     </div>

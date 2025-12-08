@@ -22,14 +22,16 @@ import type { Pagination, Block } from "@/lib/zilstream";
 
 interface BlocksTableProps {
   blocks: Block[];
-  pagination: Pagination;
+  pagination?: Pagination;
   onPageChange?: (page: number) => void;
+  isLoading?: boolean;
 }
 
 export function BlocksTable({
   blocks,
   pagination,
   onPageChange,
+  isLoading,
 }: BlocksTableProps) {
   return (
     <Card>
@@ -95,7 +97,7 @@ export function BlocksTable({
           </TableBody>
         </Table>
       </CardContent>
-      {onPageChange && (
+      {onPageChange && pagination && (
         <CardFooter className="flex items-center justify-between border-t px-6 py-4">
           <div className="text-sm text-muted-foreground">
             Page {pagination.page}
