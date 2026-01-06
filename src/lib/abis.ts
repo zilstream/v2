@@ -458,6 +458,175 @@ export const PLUNDERSWAP_V3_POOL_ABI = [
   },
 ] as const;
 
+export const MEMBERSHIP_NFT_ABI = [
+  // View functions
+  {
+    type: "function",
+    name: "pricePerYearZil",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "pricePerYearToken",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "paymentToken",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "address" }],
+  },
+  {
+    type: "function",
+    name: "maxYears",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "membershipExpiry",
+    stateMutability: "view",
+    inputs: [{ name: "tokenId", type: "uint256" }],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "renewWithZil",
+    stateMutability: "payable",
+    inputs: [
+      { name: "tokenId", type: "uint256" },
+      { name: "numYears", type: "uint256" },
+      { name: "maxPrice", type: "uint256" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "renewWithToken",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "tokenId", type: "uint256" },
+      { name: "numYears", type: "uint256" },
+      { name: "maxPrice", type: "uint256" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "isMembershipActive",
+    stateMutability: "view",
+    inputs: [{ name: "tokenId", type: "uint256" }],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "remainingMembership",
+    stateMutability: "view",
+    inputs: [{ name: "tokenId", type: "uint256" }],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "balanceOf",
+    stateMutability: "view",
+    inputs: [{ name: "owner", type: "address" }],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "hasActiveMembership",
+    stateMutability: "view",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "tokensOfOwner",
+    stateMutability: "view",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ type: "uint256[]" }],
+  },
+  {
+    type: "function",
+    name: "getActiveMembership",
+    stateMutability: "view",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [
+      { name: "tokenId", type: "uint256" },
+      { name: "expiry", type: "uint256" },
+    ],
+  },
+  {
+    type: "function",
+    name: "ownerOf",
+    stateMutability: "view",
+    inputs: [{ name: "tokenId", type: "uint256" }],
+    outputs: [{ type: "address" }],
+  },
+  {
+    type: "function",
+    name: "calculatePriceZil",
+    stateMutability: "view",
+    inputs: [{ name: "numYears", type: "uint256" }],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "calculatePriceToken",
+    stateMutability: "view",
+    inputs: [{ name: "numYears", type: "uint256" }],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "getDiscountTiers",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256[]" }],
+  },
+  // Write functions
+  {
+    type: "function",
+    name: "purchaseWithZil",
+    stateMutability: "payable",
+    inputs: [
+      { name: "numYears", type: "uint256" },
+      { name: "maxPrice", type: "uint256" },
+    ],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "purchaseWithToken",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "numYears", type: "uint256" },
+      { name: "maxPrice", type: "uint256" },
+    ],
+    outputs: [{ type: "uint256" }],
+  },
+  // Events
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: "tokenId", type: "uint256" },
+      { indexed: true, name: "buyer", type: "address" },
+      { indexed: false, name: "numYears", type: "uint256" },
+      { indexed: false, name: "expiresAt", type: "uint256" },
+      { indexed: false, name: "paidWithZil", type: "bool" },
+      { indexed: false, name: "amountPaid", type: "uint256" },
+    ],
+    name: "MembershipPurchased",
+    type: "event",
+  },
+] as const;
+
 export const ALL_ABIS = [
   ...ERC20_ABI,
   ...UNISWAP_V2_PAIR_ABI,

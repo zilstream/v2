@@ -29,7 +29,7 @@ contract DeployMembershipNFT is Script {
 
         MembershipNFT nft = new MembershipNFT(
             "ZilStream Membership",
-            "ZILM",
+            "STREAMMEMBER",
             pricePerYearZil,
             pricePerYearToken,
             paymentToken,

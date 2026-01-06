@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SearchIcon } from "lucide-react";
 
 import { HeaderStats } from "@/components/header-stats";
+import { MembershipBadge } from "@/components/membership-badge";
 import { ZilStreamLogo } from "@/components/zilstream-logo";
 import { SearchBar } from "@/components/search-bar";
 import { ConnectWalletButton } from "@/components/connect-button";
@@ -47,6 +48,9 @@ export function SiteHeader() {
             <Suspense fallback={<Skeleton className="h-5 w-64" />}>
               <HeaderStats />
             </Suspense>
+          </div>
+          <div className="ml-1 md:ml-2">
+            <MembershipBadge />
           </div>
           <div className="ml-1 md:ml-2">
             <ConnectWalletButton />

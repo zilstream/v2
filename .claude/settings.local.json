@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(forge install:*)",
+      "Bash(forge build:*)",
+      "Bash(forge test:*)",
+      "Bash(bun run build:*)",
+      "Bash(bunx biome check:*)"
+    ]
+  }
+}

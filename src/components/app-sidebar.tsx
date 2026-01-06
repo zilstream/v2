@@ -101,10 +101,8 @@ export function AppSidebar() {
     },
     {
       title: "Membership",
-      url: "#",
+      url: "/membership",
       icon: CreditCard,
-      disabled: true,
-      badge: "Coming Soon",
     },
   ];
 

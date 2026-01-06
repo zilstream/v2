@@ -215,6 +215,27 @@ contract MembershipNFT is ERC721, Ownable2Step, ReentrancyGuard {
         return false;
     }
 
+    function tokensOfOwner(address account) external view returns (uint256[] memory) {
+        uint256 balance = balanceOf(account);
+        uint256[] memory tokens = new uint256[](balance);
+        for (uint256 i = 0; i < balance; i++) {
+            tokens[i] = _findTokenByIndex(account, i);
+        }
+        return tokens;
+    }
+
+    function getActiveMembership(address account) external view returns (uint256 tokenId, uint256 expiry) {
+        uint256 balance = balanceOf(account);
+        for (uint256 i = 0; i < balance; i++) {
+            uint256 tid = _findTokenByIndex(account, i);
+            uint256 exp = membershipExpiry[tid];
+            if (exp > block.timestamp) {
+                return (tid, exp);
+            }
+        }
+        return (0, 0);
+    }
+
     function _findTokenByIndex(address owner, uint256 index) internal view returns (uint256) {
         uint256 count = 0;
         for (uint256 tokenId = 1; tokenId < _nextTokenId; tokenId++) {
