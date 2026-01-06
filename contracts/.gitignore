@@ -1,0 +1,16 @@
+# Compiler output
+out/
+cache/
+
+# Dependencies
+lib/
+
+# Environment
+.env
+.env.*
+
+# Broadcast logs (contain sensitive deployment info)
+broadcast/
+
+# Coverage
+lcov.info
