@@ -5,6 +5,7 @@ import { WagmiProvider } from "wagmi";
 import { config } from "@/lib/wagmi";
 import { useState } from "react";
 import { WebSocketProvider } from "./websocket-provider";
+import { PriceAlertsProvider } from "./price-alerts-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -21,7 +22,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <WebSocketProvider>{children}</WebSocketProvider>
+        <PriceAlertsProvider>
+          <WebSocketProvider>{children}</WebSocketProvider>
+        </PriceAlertsProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

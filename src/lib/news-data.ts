@@ -47,7 +47,7 @@ export const articles: Article[] = [
           <p class="text-muted-foreground mb-0">Be the first to try new features before they're released to the public. Help shape the future of ZilStream with your feedback.</p>
         </div>
         <div class="p-6 rounded-xl border bg-card text-card-foreground shadow-sm">
-          <h3 class="text-xl font-semibold mb-2 mt-0">🔔 Price Alerts <span class="text-xs text-amber-500">(Coming Soon)</span></h3>
+          <h3 class="text-xl font-semibold mb-2 mt-0">🔔 Price Alerts</h3>
           <p class="text-muted-foreground mb-0">Set custom alerts and get notified when tokens hit your target prices. Never miss a trading opportunity again.</p>
         </div>
       </div>

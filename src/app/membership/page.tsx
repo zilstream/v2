@@ -8,15 +8,23 @@ import {
   LayoutDashboard,
   Sparkles,
   TrendingUp,
+  Wallet,
   Zap,
 } from "lucide-react";
 import * as React from "react";
 import { useAccount, useReadContract } from "wagmi";
 
+import { ConnectWalletButton } from "@/components/connect-button";
 import { MembershipActiveCard } from "@/components/membership/membership-active-card";
 import { MembershipListCard } from "@/components/membership/membership-list-card";
 import { MembershipPurchaseCard } from "@/components/membership/membership-purchase-card";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { MEMBERSHIP_NFT_ABI } from "@/lib/abis";
 import { MEMBERSHIP_NFT_ADDRESS } from "@/lib/constants";
 
@@ -40,7 +48,6 @@ const MEMBER_FEATURES = [
     icon: Bell,
     title: "Price Alerts",
     description: "Get notified when tokens hit your target prices",
-    comingSoon: true,
   },
   {
     icon: TrendingUp,
@@ -94,6 +101,28 @@ export default function MembershipPage() {
     refetchActiveMembership();
   };
 
+  if (!isConnected) {
+    return (
+      <div className="flex w-full flex-col items-center justify-center gap-6 p-6 min-h-[60vh]">
+        <Card className="w-full max-w-xl text-center">
+          <CardHeader>
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+              <Wallet className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <CardTitle>Connect Your Wallet</CardTitle>
+            <CardDescription>
+              Connect your wallet to purchase or manage your ZilStream
+              membership.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ConnectWalletButton />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto max-w-screen-xl px-4 py-12">
       <div className="mb-8 space-y-2 text-center">
@@ -144,14 +173,7 @@ export default function MembershipPage() {
                       <feature.icon className="h-5 w-5 text-primary" />
                     </div>
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-medium">{feature.title}</h3>
-                        {feature.comingSoon && (
-                          <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
-                            Coming soon
-                          </span>
-                        )}
-                      </div>
+                      <h3 className="font-medium">{feature.title}</h3>
                       <p className="text-sm text-muted-foreground">
                         {feature.description}
                       </p>

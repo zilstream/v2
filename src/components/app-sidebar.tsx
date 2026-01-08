@@ -2,6 +2,7 @@
 
 import {
   ArrowLeftRight,
+  Bell,
   Coins,
   CreditCard,
   Download,
@@ -94,6 +95,11 @@ export function AppSidebar() {
       icon: LayoutDashboard,
     },
     {
+      title: "Alerts",
+      url: "/alerts",
+      icon: Bell,
+    },
+    {
       title: "Transactions",
       url: `/address/${address}`,
       icon: ArrowLeftRight,
@@ -154,31 +160,29 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {isConnected && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Portfolio</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {portfolioItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isItemActive(item.url)}
+        <SidebarGroup>
+          <SidebarGroupLabel>Portfolio</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {portfolioItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isItemActive(item.url)}
+                  >
+                    <Link
+                      href={item.url}
+                      className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
                     >
-                      <Link
-                        href={item.url}
-                        className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
-                      >
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
         <SidebarGroup>
           <SidebarGroupLabel>Resources</SidebarGroupLabel>

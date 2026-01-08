@@ -41,7 +41,7 @@ export default function AddressPage({
       query: { enabled: !!connectedAddress && isOwnAddress },
     });
 
-  if (isOwnAddress && !isConnected) {
+  if (pageAddress === "undefined" || (isOwnAddress && !isConnected)) {
     return (
       <div className="flex w-full flex-col items-center justify-center gap-6 p-6 min-h-[60vh]">
         <Card className="w-full max-w-xl text-center">

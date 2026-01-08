@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { CopyAddress } from "@/components/copy-address";
 import { ExplorerDropdown } from "@/components/explorer-dropdown";
+import { PriceAlertButton } from "@/components/price-alert-button";
 import { TokenIcon } from "@/components/token-icon";
 import { TokenPriceChart } from "@/components/token-price-chart";
 import { Badge } from "@/components/ui/badge";
@@ -81,6 +82,7 @@ export default async function TokenDetailPage({
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <PriceAlertButton token={token} />
             <CopyAddress address={token.address} />
             <ExplorerDropdown type="address" value={token.address} />
           </div>

@@ -10,7 +10,8 @@
       "Bash(tree:*)",
       "Bash(bun run biome:*)",
       "Bash(bun run format:*)",
-      "Bash(bunx tsc:*)"
+      "Bash(bunx tsc:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
