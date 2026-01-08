@@ -9,6 +9,8 @@ interface PortfolioSummaryProps {
   breakdown: PortfolioBreakdown;
   nativeBalance?: GetBalanceReturnType;
   zilPriceUsd: number;
+  portfolioChange: number;
+  portfolioChangePercent: number;
 }
 
 export function PortfolioSummary({
@@ -16,6 +18,8 @@ export function PortfolioSummary({
   breakdown,
   nativeBalance,
   zilPriceUsd,
+  portfolioChange,
+  portfolioChangePercent,
 }: PortfolioSummaryProps) {
   const nativeBalanceFormatted = nativeBalance
     ? formatTokenAmount(nativeBalance.value, nativeBalance.decimals, 2)
@@ -38,7 +42,25 @@ export function PortfolioSummary({
         {/* Total Value */}
         <div>
           <p className="text-muted-foreground text-sm">Total Value</p>
-          <p className="text-3xl font-bold">{formatUsd(totalValueUsd)}</p>
+          <div className="flex items-baseline gap-3">
+            <p className="text-3xl font-bold">{formatUsd(totalValueUsd)}</p>
+            {portfolioChange !== 0 && (
+              <div
+                className={`text-sm font-medium ${
+                  portfolioChange >= 0 ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                <span>
+                  {portfolioChange >= 0 ? "+" : ""}
+                  {formatUsd(portfolioChange)}
+                </span>
+                <span className="ml-1">
+                  ({portfolioChangePercent >= 0 ? "+" : ""}
+                  {portfolioChangePercent.toFixed(2)}%)
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Native ZIL Balance */}
@@ -74,7 +96,9 @@ export function PortfolioSummary({
                   <span className="text-sm text-muted-foreground">
                     {category.label}
                   </span>
-                  <span className="font-medium">{formatUsd(category.value)}</span>
+                  <span className="font-medium">
+                    {formatUsd(category.value)}
+                  </span>
                 </div>
               ))}
             </div>

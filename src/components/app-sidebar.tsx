@@ -4,6 +4,7 @@ import {
   ArrowLeftRight,
   Coins,
   CreditCard,
+  Download,
   Home,
   LayoutDashboard,
   Newspaper,
@@ -98,6 +99,11 @@ export function AppSidebar() {
       icon: ArrowLeftRight,
     },
     {
+      title: "Exports",
+      url: "/exports",
+      icon: Download,
+    },
+    {
       title: "Membership",
       url: "/membership",
       icon: CreditCard,
@@ -155,7 +161,10 @@ export function AppSidebar() {
               <SidebarMenu>
                 {portfolioItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isItemActive(item.url)}
+                    >
                       <Link
                         href={item.url}
                         className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"

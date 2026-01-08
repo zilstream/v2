@@ -35,13 +35,18 @@ const connectors = connectorsForWallets(
   [
     {
       groupName: "Recommended",
-      wallets: [metaMaskWallet, rabbyWallet, injectedWallet, walletConnectWallet],
+      wallets: [
+        metaMaskWallet,
+        rabbyWallet,
+        injectedWallet,
+        walletConnectWallet,
+      ],
     },
   ],
   {
     appName: "ZilStream",
     projectId: "9a73085bd2b8459dae2e269e6849eee1",
-  }
+  },
 );
 
 export const config = createConfig({

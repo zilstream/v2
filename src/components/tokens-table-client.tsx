@@ -4,12 +4,7 @@ import Link from "next/link";
 
 import { TokenIcon } from "@/components/token-icon";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -18,7 +13,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatNumber, formatPriceUsd, formatUsd, formatZilPrice } from "@/lib/format";
+import {
+  formatNumber,
+  formatPriceUsd,
+  formatUsd,
+  formatZilPrice,
+} from "@/lib/format";
 import { useTokens } from "@/hooks/use-zilstream-queries";
 
 export function TokensTableClient() {
@@ -87,9 +87,7 @@ export function TokensTableClient() {
                           : "text-red-600"
                       }
                     >
-                      {Number.parseFloat(token.priceChange24h) >= 0
-                        ? "+"
-                        : ""}
+                      {Number.parseFloat(token.priceChange24h) >= 0 ? "+" : ""}
                       {formatNumber(token.priceChange24h, 2)}%
                     </span>
                   ) : (

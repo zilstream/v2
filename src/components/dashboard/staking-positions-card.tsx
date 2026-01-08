@@ -8,6 +8,7 @@ import {
   CardTitle,
   CardAction,
 } from "@/components/ui/card";
+import { TokenIcon } from "@/components/token-icon";
 import {
   Table,
   TableBody,
@@ -37,7 +38,7 @@ export function StakingPositionsCard({
   const liquidTotal = liquidPositions.reduce((sum, p) => sum + p.valueUsd, 0);
   const nonLiquidTotal = nonLiquidPositions.reduce(
     (sum, p) => sum + p.valueUsd,
-    0
+    0,
   );
   const totalValue = liquidTotal + nonLiquidTotal;
 
@@ -83,9 +84,10 @@ export function StakingPositionsCard({
                   <TableRow key={position.validatorAddress}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <ValidatorIcon
-                          iconUrl={position.validatorIcon}
-                          name={position.validatorName}
+                        <TokenIcon
+                          address={position.lstToken.address}
+                          alt={position.lstToken.symbol}
+                          size={24}
                         />
                         <span className="font-medium">
                           {position.validatorName}
@@ -97,7 +99,7 @@ export function StakingPositionsCard({
                         {formatTokenAmount(
                           position.lstToken.balance,
                           position.lstToken.decimals,
-                          4
+                          4,
                         )}{" "}
                         {position.lstToken.symbol}
                       </span>
@@ -169,13 +171,7 @@ export function StakingPositionsCard({
   );
 }
 
-function ValidatorIcon({
-  iconUrl,
-  name,
-}: {
-  iconUrl: string;
-  name: string;
-}) {
+function ValidatorIcon({ iconUrl, name }: { iconUrl: string; name: string }) {
   return (
     <div className="relative h-6 w-6 overflow-hidden rounded-full bg-muted">
       <Image

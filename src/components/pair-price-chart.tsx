@@ -17,8 +17,6 @@ import {
 } from "@/components/ui/chart";
 import { formatPriceUsd, formatUsd } from "@/lib/format";
 
-
-
 interface PricePoint {
   timestamp: string;
   price: string;

@@ -76,7 +76,10 @@ export function AddressEvents({ address }: AddressEventsProps) {
                     : undefined;
 
               return (
-                <TableRow key={`${event.transactionHash}-${event.logIndex}`} className={eventColor}>
+                <TableRow
+                  key={`${event.transactionHash}-${event.logIndex}`}
+                  className={eventColor}
+                >
                   <TableCell className="px-6 py-2 text-muted-foreground">
                     {formatTimestamp(event.timestamp)}
                   </TableCell>
@@ -94,9 +97,7 @@ export function AddressEvents({ address }: AddressEventsProps) {
                           size={20}
                         />
                       )}
-                      {token0Amount
-                        ? formatTokenAmount(token0Amount, 18)
-                        : "-"}
+                      {token0Amount ? formatTokenAmount(token0Amount, 18) : "-"}
                     </div>
                   </TableCell>
                   <TableCell className="text-right py-2">
@@ -108,9 +109,7 @@ export function AddressEvents({ address }: AddressEventsProps) {
                           size={20}
                         />
                       )}
-                      {token1Amount
-                        ? formatTokenAmount(token1Amount, 18)
-                        : "-"}
+                      {token1Amount ? formatTokenAmount(token1Amount, 18) : "-"}
                     </div>
                   </TableCell>
                   <TableCell className="text-right py-2">

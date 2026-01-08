@@ -128,7 +128,11 @@ export function useTransaction(hash: string) {
 }
 
 // Address
-export function useAddressTransactions(address: string, page = 1, perPage = 25) {
+export function useAddressTransactions(
+  address: string,
+  page = 1,
+  perPage = 25,
+) {
   return useQuery({
     queryKey: ["addressTransactions", address, page, perPage],
     queryFn: () => fetchAddressTransactions(address, page, perPage),

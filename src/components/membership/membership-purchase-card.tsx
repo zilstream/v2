@@ -9,7 +9,9 @@ import { formatUnits } from "viem";
 import {
   useAccount,
   useBalance,
+  useChainId,
   useReadContract,
+  useSwitchChain,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
@@ -20,6 +22,7 @@ import { ERC20_ABI, MEMBERSHIP_NFT_ABI } from "@/lib/abis";
 import { MEMBERSHIP_NFT_ADDRESS } from "@/lib/constants";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { zilliqa } from "@/lib/wagmi";
 
 interface MembershipPurchaseCardProps {
   onPurchaseSuccess?: () => void;
@@ -46,6 +49,22 @@ export function MembershipPurchaseCard({
   const { isConnected, address: userAddress } = useAccount();
   const { openConnectModal } = useConnectModal();
   const { writeContractAsync } = useWriteContract();
+  const chainId = useChainId();
+  const { switchChainAsync } = useSwitchChain();
+
+  const ensureCorrectNetwork = async () => {
+    if (chainId === zilliqa.id) return true;
+
+    try {
+      await switchChainAsync({ chainId: zilliqa.id });
+      return true;
+    } catch {
+      setError(
+        `Please switch to Zilliqa network in your wallet. Current network ID: ${chainId}`,
+      );
+      return false;
+    }
+  };
 
   const { data: txReceipt } = useWaitForTransactionReceipt({
     hash: txHash || undefined,
@@ -187,7 +206,14 @@ export function MembershipPurchaseCard({
       setError(null);
       setIsApproving(true);
 
+      const isCorrectNetwork = await ensureCorrectNetwork();
+      if (!isCorrectNetwork) {
+        setIsApproving(false);
+        return;
+      }
+
       const tx = await writeContractAsync({
+        chainId: zilliqa.id,
         address: paymentTokenAddress as `0x${string}`,
         abi: ERC20_ABI,
         functionName: "approve",
@@ -217,6 +243,12 @@ export function MembershipPurchaseCard({
       setError(null);
       setIsPurchasing(true);
 
+      const isCorrectNetwork = await ensureCorrectNetwork();
+      if (!isCorrectNetwork) {
+        setIsPurchasing(false);
+        return;
+      }
+
       // Add 1% buffer for price protection
       const maxPrice = (currentPrice * 101n) / 100n;
 
@@ -224,6 +256,7 @@ export function MembershipPurchaseCard({
 
       if (paymentType === "zil") {
         tx = await writeContractAsync({
+          chainId: zilliqa.id,
           address: MEMBERSHIP_NFT_ADDRESS,
           abi: MEMBERSHIP_NFT_ABI,
           functionName: "purchaseWithZil",
@@ -232,6 +265,7 @@ export function MembershipPurchaseCard({
         });
       } else {
         tx = await writeContractAsync({
+          chainId: zilliqa.id,
           address: MEMBERSHIP_NFT_ADDRESS,
           abi: MEMBERSHIP_NFT_ABI,
           functionName: "purchaseWithToken",
@@ -365,18 +399,24 @@ export function MembershipPurchaseCard({
                 : "..."}
             </span>
           </div>
-          {selectedYears > 1 && (paymentType === "zil" ? pricePerYearZil : pricePerYearToken) && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">You save</span>
-              <span className="font-medium text-emerald-500">
-                {formatNumber(
-                  Number(formatUnits(calculateSavings(selectedYears), paymentType === "zil" ? 18 : 8)),
-                  2,
-                )}{" "}
-                {paymentType === "zil" ? "ZIL" : "STREAM"}
-              </span>
-            </div>
-          )}
+          {selectedYears > 1 &&
+            (paymentType === "zil" ? pricePerYearZil : pricePerYearToken) && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">You save</span>
+                <span className="font-medium text-emerald-500">
+                  {formatNumber(
+                    Number(
+                      formatUnits(
+                        calculateSavings(selectedYears),
+                        paymentType === "zil" ? 18 : 8,
+                      ),
+                    ),
+                    2,
+                  )}{" "}
+                  {paymentType === "zil" ? "ZIL" : "STREAM"}
+                </span>
+              </div>
+            )}
           {isConnected && (
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>Your balance</span>
@@ -414,35 +454,6 @@ export function MembershipPurchaseCard({
           )}
           {getButtonLabel()}
         </Button>
-
-        {/* Benefits */}
-        <div className="space-y-2 border-t pt-4">
-          <p className="text-xs font-medium text-muted-foreground">
-            Membership includes:
-          </p>
-          <ul className="grid gap-1 text-xs text-muted-foreground">
-            <li className="flex items-center gap-2">
-              <Check className="h-3 w-3 text-primary" />
-              Support ZilStream development
-            </li>
-            <li className="flex items-center gap-2">
-              <Check className="h-3 w-3 text-primary" />
-              Exclusive member badge
-            </li>
-            <li className="flex items-center gap-2">
-              <Check className="h-3 w-3 text-primary" />
-              Personal dashboard
-            </li>
-            <li className="flex items-center gap-2">
-              <Check className="h-3 w-3 text-primary" />
-              Early access to new features
-            </li>
-            <li className="flex items-center gap-2">
-              <Check className="h-3 w-3 text-primary" />
-              More features coming soon
-            </li>
-          </ul>
-        </div>
 
         {onCancel && (
           <div className="text-center">

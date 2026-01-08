@@ -8,6 +8,7 @@ export interface TokenBalance {
   balance: bigint;
   priceUsd: number;
   valueUsd: number;
+  priceChange24h: number;
 }
 
 export interface LiquidStakingPosition {

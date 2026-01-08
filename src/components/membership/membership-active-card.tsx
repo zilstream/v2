@@ -16,7 +16,9 @@ import { formatUnits } from "viem";
 import {
   useAccount,
   useBalance,
+  useChainId,
   useReadContract,
+  useSwitchChain,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
@@ -29,12 +31,15 @@ import { ERC20_ABI, MEMBERSHIP_NFT_ABI } from "@/lib/abis";
 import { EXPLORER_URL, MEMBERSHIP_NFT_ADDRESS } from "@/lib/constants";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { zilliqa } from "@/lib/wagmi";
 
 interface MembershipActiveCardProps {
   onGiftClick?: () => void;
 }
 
-export function MembershipActiveCard({ onGiftClick }: MembershipActiveCardProps) {
+export function MembershipActiveCard({
+  onGiftClick,
+}: MembershipActiveCardProps) {
   const [selectedYears, setSelectedYears] = React.useState(1);
   const [paymentType, setPaymentType] = React.useState<"zil" | "token">("zil");
   const [txHash, setTxHash] = React.useState<`0x${string}` | null>(null);
@@ -47,6 +52,22 @@ export function MembershipActiveCard({ onGiftClick }: MembershipActiveCardProps)
   const { isConnected, address: userAddress } = useAccount();
   const { openConnectModal } = useConnectModal();
   const { writeContractAsync } = useWriteContract();
+  const chainId = useChainId();
+  const { switchChainAsync } = useSwitchChain();
+
+  const ensureCorrectNetwork = async () => {
+    if (chainId === zilliqa.id) return true;
+
+    try {
+      await switchChainAsync({ chainId: zilliqa.id });
+      return true;
+    } catch {
+      setError(
+        `Please switch to Zilliqa network in your wallet. Current network ID: ${chainId}`,
+      );
+      return false;
+    }
+  };
 
   const { data: txReceipt } = useWaitForTransactionReceipt({
     hash: txHash || undefined,
@@ -210,7 +231,14 @@ export function MembershipActiveCard({ onGiftClick }: MembershipActiveCardProps)
       setError(null);
       setIsApproving(true);
 
+      const isCorrectNetwork = await ensureCorrectNetwork();
+      if (!isCorrectNetwork) {
+        setIsApproving(false);
+        return;
+      }
+
       const tx = await writeContractAsync({
+        chainId: zilliqa.id,
         address: paymentTokenAddress as `0x${string}`,
         abi: ERC20_ABI,
         functionName: "approve",
@@ -240,12 +268,19 @@ export function MembershipActiveCard({ onGiftClick }: MembershipActiveCardProps)
       setError(null);
       setIsRenewing(true);
 
+      const isCorrectNetwork = await ensureCorrectNetwork();
+      if (!isCorrectNetwork) {
+        setIsRenewing(false);
+        return;
+      }
+
       const maxPrice = (currentPrice * 101n) / 100n;
 
       let tx: `0x${string}`;
 
       if (paymentType === "zil") {
         tx = await writeContractAsync({
+          chainId: zilliqa.id,
           address: MEMBERSHIP_NFT_ADDRESS,
           abi: MEMBERSHIP_NFT_ABI,
           functionName: "renewWithZil",
@@ -254,6 +289,7 @@ export function MembershipActiveCard({ onGiftClick }: MembershipActiveCardProps)
         });
       } else {
         tx = await writeContractAsync({
+          chainId: zilliqa.id,
           address: MEMBERSHIP_NFT_ADDRESS,
           abi: MEMBERSHIP_NFT_ABI,
           functionName: "renewWithToken",
@@ -506,7 +542,9 @@ export function MembershipActiveCard({ onGiftClick }: MembershipActiveCardProps)
                 </span>
               </div>
               {selectedYears > 1 &&
-                (paymentType === "zil" ? pricePerYearZil : pricePerYearToken) && (
+                (paymentType === "zil"
+                  ? pricePerYearZil
+                  : pricePerYearToken) && (
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">You save</span>
                     <span className="font-medium text-emerald-500">

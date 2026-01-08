@@ -24,12 +24,26 @@ interface DashboardOverviewProps {
 export function DashboardOverview({ address }: DashboardOverviewProps) {
   const { data: stats } = useStats();
   const { data: nativeBalance } = useBalance({ address });
-  const { data: tokenBalances, isLoading: isLoadingTokens, error: tokensError } =
-    usePortfolioBalances();
-  const { data: stakingPositions, isLoading: isLoadingStaking, error: stakingError } =
-    useStakingPositions();
-  const { data: lpPositionsV2, isLoading: isLoadingLPV2, error: lpV2Error } = useLiquidityPositions();
-  const { data: lpPositionsV3, isLoading: isLoadingLPV3, error: lpV3Error } = useV3LiquidityPositions();
+  const {
+    data: tokenBalances,
+    isLoading: isLoadingTokens,
+    error: tokensError,
+  } = usePortfolioBalances();
+  const {
+    data: stakingPositions,
+    isLoading: isLoadingStaking,
+    error: stakingError,
+  } = useStakingPositions();
+  const {
+    data: lpPositionsV2,
+    isLoading: isLoadingLPV2,
+    error: lpV2Error,
+  } = useLiquidityPositions();
+  const {
+    data: lpPositionsV3,
+    isLoading: isLoadingLPV3,
+    error: lpV3Error,
+  } = useV3LiquidityPositions();
 
   console.log("[DashboardOverview] State:", {
     address,
@@ -49,10 +63,11 @@ export function DashboardOverview({ address }: DashboardOverviewProps) {
   const { data: recentEvents, isLoading: isLoadingEvents } = useAddressEvents(
     address,
     1,
-    10
+    10,
   );
 
   const zilPriceUsd = Number.parseFloat(stats?.zilPriceUsd || "0");
+  const zilPriceChange24h = Number.parseFloat(stats?.zilPriceChange24h || "0");
 
   // Calculate native ZIL value
   const nativeZilValue = nativeBalance
@@ -77,10 +92,53 @@ export function DashboardOverview({ address }: DashboardOverviewProps) {
     nonLiquidStakingValue +
     lpValue;
 
-  const isLoading = isLoadingTokens || isLoadingStaking || isLoadingLPV2 || isLoadingLPV3;
+  // Calculate portfolio change based on 24h price changes
+  // For each position, previous value = current value / (1 + priceChange/100)
+  const getPreviousValue = (currentValue: number, priceChange: number) => {
+    if (priceChange === 0 || !Number.isFinite(priceChange)) return currentValue;
+    return currentValue / (1 + priceChange / 100);
+  };
+
+  // Native ZIL previous value
+  const nativeZilPreviousValue = getPreviousValue(nativeZilValue, zilPriceChange24h);
+
+  // Token previous values (each token has its own price change)
+  const tokensPreviousValue =
+    tokenBalances?.reduce(
+      (sum, t) => sum + getPreviousValue(t.valueUsd, t.priceChange24h),
+      0
+    ) ?? 0;
+
+  // Staking is ZIL-denominated, so use ZIL's price change
+  const liquidStakingPreviousValue = getPreviousValue(liquidStakingValue, zilPriceChange24h);
+  const nonLiquidStakingPreviousValue = getPreviousValue(nonLiquidStakingValue, zilPriceChange24h);
+
+  // LP positions are complex (impermanent loss, two tokens) - exclude from change calculation
+  // Their previous value equals current value for simplicity
+  const lpPreviousValue = lpValue;
+
+  const totalPreviousValue =
+    nativeZilPreviousValue +
+    tokensPreviousValue +
+    liquidStakingPreviousValue +
+    nonLiquidStakingPreviousValue +
+    lpPreviousValue;
+
+  const portfolioChange = totalValue - totalPreviousValue;
+  const portfolioChangePercent =
+    totalPreviousValue > 0 ? (portfolioChange / totalPreviousValue) * 100 : 0;
+
+  const isLoading =
+    isLoadingTokens || isLoadingStaking || isLoadingLPV2 || isLoadingLPV3;
 
   // Show skeleton only on initial load
-  if (isLoading && !tokenBalances && !stakingPositions && !lpPositionsV2 && !lpPositionsV3) {
+  if (
+    isLoading &&
+    !tokenBalances &&
+    !stakingPositions &&
+    !lpPositionsV2 &&
+    !lpPositionsV3
+  ) {
     return <DashboardSkeleton />;
   }
 
@@ -98,6 +156,8 @@ export function DashboardOverview({ address }: DashboardOverviewProps) {
         }}
         nativeBalance={nativeBalance}
         zilPriceUsd={zilPriceUsd}
+        portfolioChange={portfolioChange}
+        portfolioChangePercent={portfolioChangePercent}
       />
 
       {/* Main content grid */}

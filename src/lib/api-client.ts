@@ -426,7 +426,9 @@ export async function fetchTokenPairs(
   };
 }
 
-export async function fetchTokenChart(address: string): Promise<TokenChartData> {
+export async function fetchTokenChart(
+  address: string,
+): Promise<TokenChartData> {
   const response = await fetchFromApi<{ data: TokenChartData }>(
     `/tokens/${address}/chart/price`,
   );
@@ -467,7 +469,9 @@ export async function fetchBlockByNumber(blockNumber: number): Promise<Block> {
   return mapBlock(response.data);
 }
 
-export async function fetchTransactionByHash(hash: string): Promise<Transaction> {
+export async function fetchTransactionByHash(
+  hash: string,
+): Promise<Transaction> {
   const response = await fetchFromApi<{ data: TransactionResponse }>(
     `/transactions/${hash}`,
   );

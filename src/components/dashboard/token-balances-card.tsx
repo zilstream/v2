@@ -30,7 +30,10 @@ interface TokenBalancesCardProps {
 
 const INITIAL_DISPLAY_COUNT = 5;
 
-export function TokenBalancesCard({ tokens, isLoading }: TokenBalancesCardProps) {
+export function TokenBalancesCard({
+  tokens,
+  isLoading,
+}: TokenBalancesCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const displayTokens = isExpanded
@@ -89,12 +92,16 @@ export function TokenBalancesCard({ tokens, isLoading }: TokenBalancesCardProps)
                       {formatTokenAmount(token.balance, token.decimals, 4)}
                     </TableCell>
                     <TableCell className="text-right">
-                      {token.priceUsd > 0 ? formatPriceUsd(token.priceUsd) : (
+                      {token.priceUsd > 0 ? (
+                        formatPriceUsd(token.priceUsd)
+                      ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
                     </TableCell>
                     <TableCell className="text-right font-medium">
-                      {token.priceUsd > 0 ? formatUsd(token.valueUsd) : (
+                      {token.priceUsd > 0 ? (
+                        formatUsd(token.valueUsd)
+                      ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
                     </TableCell>

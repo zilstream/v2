@@ -14,12 +14,19 @@ export function usePortfolioBalances() {
   return useQuery({
     queryKey: ["portfolioBalances", address],
     queryFn: async (): Promise<TokenBalance[]> => {
-      console.log("[usePortfolioBalances] Starting query for address:", address);
+      console.log(
+        "[usePortfolioBalances] Starting query for address:",
+        address,
+      );
       if (!address) return [];
 
       console.log("[usePortfolioBalances] Fetching tokens from API...");
       const { data: tokens } = await fetchTokens(1, 500);
-      console.log("[usePortfolioBalances] Got", tokens.length, "tokens from API");
+      console.log(
+        "[usePortfolioBalances] Got",
+        tokens.length,
+        "tokens from API",
+      );
 
       const balanceCalls = tokens.map((token) => ({
         address: token.address as Address,
@@ -28,12 +35,18 @@ export function usePortfolioBalances() {
         args: [address],
       }));
 
-      console.log("[usePortfolioBalances] Making multicall for", balanceCalls.length, "tokens");
+      console.log(
+        "[usePortfolioBalances] Making multicall for",
+        balanceCalls.length,
+        "tokens",
+      );
       const results = await publicClient.multicall({
         contracts: balanceCalls,
         allowFailure: true,
       });
-      console.log("[usePortfolioBalances] Multicall complete, processing results");
+      console.log(
+        "[usePortfolioBalances] Multicall complete, processing results",
+      );
 
       const balances = tokens
         .map((token, i) => {
@@ -55,12 +68,17 @@ export function usePortfolioBalances() {
             balance,
             priceUsd,
             valueUsd,
+            priceChange24h: Number.parseFloat(token.priceChange24h || "0"),
           };
         })
         .filter((t): t is TokenBalance => t !== null && t.balance > 0n)
         .sort((a, b) => b.valueUsd - a.valueUsd);
 
-      console.log("[usePortfolioBalances] Found", balances.length, "tokens with balance");
+      console.log(
+        "[usePortfolioBalances] Found",
+        balances.length,
+        "tokens with balance",
+      );
       return balances;
     },
     enabled: isConnected && !!address,

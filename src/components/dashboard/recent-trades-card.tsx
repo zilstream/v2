@@ -46,70 +46,68 @@ export function RecentTradesCard({ events, isLoading }: RecentTradesCardProps) {
             No recent trades found
           </div>
         ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Type</TableHead>
-              <TableHead>Pair</TableHead>
-              <TableHead className="text-right">Value</TableHead>
-              <TableHead className="text-right">Time</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {events.slice(0, 10).map((event) => {
-              const action = getEventAction(event);
-              const badgeColor = getBadgeColor(event);
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Type</TableHead>
+                <TableHead>Pair</TableHead>
+                <TableHead className="text-right">Value</TableHead>
+                <TableHead className="text-right">Time</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {events.slice(0, 10).map((event) => {
+                const action = getEventAction(event);
+                const badgeColor = getBadgeColor(event);
 
-              return (
-                <TableRow
-                  key={`${event.transactionHash}-${event.logIndex}`}
-                >
-                  <TableCell>
-                    <Badge variant="outline" className={badgeColor}>
-                      {action}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Link
-                      href={`/pairs/${event.pairAddress}`}
-                      className="flex items-center gap-1 hover:underline"
-                    >
-                      <div className="flex -space-x-1">
-                        <TokenIcon
-                          address={event.token0Address}
-                          alt={event.token0Symbol || ""}
-                          size={20}
-                        />
-                        <TokenIcon
-                          address={event.token1Address}
-                          alt={event.token1Symbol || ""}
-                          size={20}
-                        />
-                      </div>
-                      <span className="text-sm">
-                        {event.token0Symbol}/{event.token1Symbol}
-                      </span>
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
-                    {formatUsd(event.amountUsd, 2)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Link
-                      href={`/tx/${event.transactionHash}`}
-                      className="flex items-center justify-end gap-1 text-muted-foreground hover:text-foreground"
-                    >
-                      <span className="text-xs">
-                        {formatRelativeTime(event.timestamp)}
-                      </span>
-                      <ExternalLink className="h-3 w-3" />
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                return (
+                  <TableRow key={`${event.transactionHash}-${event.logIndex}`}>
+                    <TableCell>
+                      <Badge variant="outline" className={badgeColor}>
+                        {action}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Link
+                        href={`/pairs/${event.pairAddress}`}
+                        className="flex items-center gap-1 hover:underline"
+                      >
+                        <div className="flex -space-x-1">
+                          <TokenIcon
+                            address={event.token0Address}
+                            alt={event.token0Symbol || ""}
+                            size={20}
+                          />
+                          <TokenIcon
+                            address={event.token1Address}
+                            alt={event.token1Symbol || ""}
+                            size={20}
+                          />
+                        </div>
+                        <span className="text-sm">
+                          {event.token0Symbol}/{event.token1Symbol}
+                        </span>
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-right font-medium">
+                      {formatUsd(event.amountUsd, 2)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Link
+                        href={`/tx/${event.transactionHash}`}
+                        className="flex items-center justify-end gap-1 text-muted-foreground hover:text-foreground"
+                      >
+                        <span className="text-xs">
+                          {formatRelativeTime(event.timestamp)}
+                        </span>
+                        <ExternalLink className="h-3 w-3" />
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         )}
       </CardContent>
     </Card>

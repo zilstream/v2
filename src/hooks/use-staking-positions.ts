@@ -24,12 +24,21 @@ export function useStakingPositions() {
   return useQuery({
     queryKey: ["stakingPositions", address, zilPriceUsd],
     queryFn: async () => {
-      console.log("[useStakingPositions] Starting query for address:", address, "zilPriceUsd:", zilPriceUsd);
+      console.log(
+        "[useStakingPositions] Starting query for address:",
+        address,
+        "zilPriceUsd:",
+        zilPriceUsd,
+      );
       if (!address) {
         return { liquid: [], nonLiquid: [] };
       }
 
-      console.log("[useStakingPositions] Checking", LIQUID_VALIDATORS.length, "liquid validators");
+      console.log(
+        "[useStakingPositions] Checking",
+        LIQUID_VALIDATORS.length,
+        "liquid validators",
+      );
       // Liquid staking: check LST token balances + exchange rates
       const liquidBalanceCalls = LIQUID_VALIDATORS.map((v) => ({
         address: v.lstAddress as Address,
@@ -64,8 +73,8 @@ export function useStakingPositions() {
       }));
 
       console.log("[useStakingPositions] Making multicalls...");
-      const [liquidBalances, liquidPrices, nonLiquidResults] = await Promise.all(
-        [
+      const [liquidBalances, liquidPrices, nonLiquidResults] =
+        await Promise.all([
           publicClient.multicall({
             contracts: liquidBalanceCalls,
             allowFailure: true,
@@ -78,14 +87,16 @@ export function useStakingPositions() {
             contracts: nonLiquidCalls,
             allowFailure: true,
           }),
-        ]
-      );
+        ]);
       console.log("[useStakingPositions] Multicalls complete");
-      console.log("[useStakingPositions] Liquid balances:", liquidBalances.map((r, i) => ({
-        validator: LIQUID_VALIDATORS[i].name,
-        status: r.status,
-        result: r.status === 'success' ? r.result?.toString() : null
-      })));
+      console.log(
+        "[useStakingPositions] Liquid balances:",
+        liquidBalances.map((r, i) => ({
+          validator: LIQUID_VALIDATORS[i].name,
+          status: r.status,
+          result: r.status === "success" ? r.result?.toString() : null,
+        })),
+      );
 
       // Process liquid staking
       const liquidPositions: LiquidStakingPosition[] = LIQUID_VALIDATORS.map(
@@ -121,7 +132,7 @@ export function useStakingPositions() {
             zilEquivalent,
             valueUsd,
           };
-        }
+        },
       ).filter((p): p is LiquidStakingPosition => p !== null);
 
       // Process non-liquid staking

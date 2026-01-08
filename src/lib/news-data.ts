@@ -10,6 +10,63 @@ export interface Article {
 
 export const articles: Article[] = [
   {
+    title: "Introducing ZilStream Membership",
+    slug: "introducing-zilstream-membership",
+    date: "January 8, 2026",
+    category: "Announcement",
+    excerpt:
+      "Support ZilStream and unlock exclusive features with our new membership program. Get access to a personal dashboard, advanced analytics, data exports, and more.",
+    image: "/logo-text-dark.svg",
+    content: `
+      <p class="lead">We're excited to announce the launch of ZilStream Membership — a new way to support the platform while unlocking powerful features to supercharge your Zilliqa experience.</p>
+
+      <h2>Why Membership?</h2>
+      <p>Building and maintaining ZilStream takes significant time and resources. By becoming a member, you directly support the continued development of the platform while gaining access to exclusive tools designed for serious users and traders.</p>
+
+      <h2>Member Benefits</h2>
+
+      <div class="grid md:grid-cols-2 gap-6 my-8 not-prose">
+        <div class="p-6 rounded-xl border bg-card text-card-foreground shadow-sm">
+          <h3 class="text-xl font-semibold mb-2 mt-0">📊 Personal Dashboard</h3>
+          <p class="text-muted-foreground mb-0">Track your portfolio, liquidity positions, staking rewards, and recent trades all in one place. Get a complete overview of your DeFi activity on Zilliqa.</p>
+        </div>
+        <div class="p-6 rounded-xl border bg-card text-card-foreground shadow-sm">
+          <h3 class="text-xl font-semibold mb-2 mt-0">📈 Advanced Analytics</h3>
+          <p class="text-muted-foreground mb-0">Access detailed charts and historical data for all tokens and pairs. Dive deep into market trends with professional-grade tools.</p>
+        </div>
+        <div class="p-6 rounded-xl border bg-card text-card-foreground shadow-sm">
+          <h3 class="text-xl font-semibold mb-2 mt-0">📥 Data Exports</h3>
+          <p class="text-muted-foreground mb-0">Export your transaction history and portfolio data in various formats. Perfect for tax reporting, record-keeping, or your own analysis.</p>
+        </div>
+        <div class="p-6 rounded-xl border bg-card text-card-foreground shadow-sm">
+          <h3 class="text-xl font-semibold mb-2 mt-0">💡 Portfolio Insights</h3>
+          <p class="text-muted-foreground mb-0">See your gains, losses, and portfolio allocation over time. Understand how your holdings are performing at a glance.</p>
+        </div>
+        <div class="p-6 rounded-xl border bg-card text-card-foreground shadow-sm">
+          <h3 class="text-xl font-semibold mb-2 mt-0">⚡ Early Access</h3>
+          <p class="text-muted-foreground mb-0">Be the first to try new features before they're released to the public. Help shape the future of ZilStream with your feedback.</p>
+        </div>
+        <div class="p-6 rounded-xl border bg-card text-card-foreground shadow-sm">
+          <h3 class="text-xl font-semibold mb-2 mt-0">🔔 Price Alerts <span class="text-xs text-amber-500">(Coming Soon)</span></h3>
+          <p class="text-muted-foreground mb-0">Set custom alerts and get notified when tokens hit your target prices. Never miss a trading opportunity again.</p>
+        </div>
+      </div>
+
+      <h2>How It Works</h2>
+      <p>Membership is powered by an on-chain NFT on the Zilliqa network. When you purchase a membership, you receive an NFT that represents your membership status. This means:</p>
+      <ul>
+        <li><strong>True Ownership:</strong> Your membership is a real asset on the blockchain that you control.</li>
+        <li><strong>Transferable:</strong> Gift or transfer your membership to another wallet if you wish.</li>
+        <li><strong>Flexible Duration:</strong> Choose from 1 to 5 years, with discounts for longer commitments.</li>
+        <li><strong>Multiple Payment Options:</strong> Pay with ZIL or STREAM tokens.</li>
+      </ul>
+
+      <h2>Get Started</h2>
+      <p>Ready to become a member? Head over to the <a href="/membership">Membership page</a> to purchase your membership and start enjoying the benefits today.</p>
+      <p>Thank you for supporting ZilStream. Together, we're building the best analytics platform for the Zilliqa ecosystem.</p>
+    `,
+  },
+  {
     title: "Welcome to ZilStream V2",
     slug: "welcome-to-zilstream-v2",
     date: "November 20, 2025",

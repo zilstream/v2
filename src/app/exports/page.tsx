@@ -4,7 +4,7 @@ import { Crown, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useAccount, useReadContract } from "wagmi";
 import { ConnectWalletButton } from "@/components/connect-button";
-import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
+import { ExportsForm } from "@/components/exports/exports-form";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,7 +16,7 @@ import {
 import { MEMBERSHIP_NFT_ABI } from "@/lib/abis";
 import { MEMBERSHIP_NFT_ADDRESS } from "@/lib/constants";
 
-export default function DashboardPage() {
+export default function ExportsPage() {
   const { isConnected, address } = useAccount();
 
   const { data: hasActiveMembership, isLoading: isMembershipLoading } =
@@ -38,8 +38,8 @@ export default function DashboardPage() {
             </div>
             <CardTitle>Connect Your Wallet</CardTitle>
             <CardDescription>
-              Connect your wallet to view your portfolio, token balances,
-              staking positions, and liquidity holdings.
+              Connect your wallet to export your trading history, transactions,
+              and portfolio data.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -68,8 +68,8 @@ export default function DashboardPage() {
             </div>
             <CardTitle className="text-xl">Membership Required</CardTitle>
             <CardDescription className="text-base">
-              The portfolio dashboard is a members-only feature. Get a ZilStream
-              membership to access your complete portfolio overview.
+              Data exports are a members-only feature. Get a ZilStream
+              membership to export your data for tax reporting.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -78,10 +78,10 @@ export default function DashboardPage() {
                 With a membership you get:
               </p>
               <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Export trading history and transactions</li>
                 <li>• Portfolio dashboard with token balances</li>
                 <li>• Staking and liquidity position tracking</li>
                 <li>• Full transaction history and trading activity</li>
-                <li>• Export data for tax reporting</li>
               </ul>
             </div>
             <Button asChild className="w-full" size="lg">
@@ -95,7 +95,7 @@ export default function DashboardPage() {
 
   return (
     <main className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
-      <DashboardOverview address={address} />
+      <ExportsForm address={address} />
     </main>
   );
 }

@@ -611,6 +611,17 @@ export const MEMBERSHIP_NFT_ABI = [
     ],
     outputs: [{ type: "uint256" }],
   },
+  {
+    type: "function",
+    name: "transferFrom",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "from", type: "address" },
+      { name: "to", type: "address" },
+      { name: "tokenId", type: "uint256" },
+    ],
+    outputs: [],
+  },
   // Events
   {
     anonymous: false,

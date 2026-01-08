@@ -41,7 +41,10 @@ export function LiquidityPositionsCard({
   isLoading,
 }: LiquidityPositionsCardProps) {
   const v2Total = positionsV2.reduce((sum, p) => sum + p.valueUsd, 0);
-  const v3Total = positionsV3.reduce((sum, p) => sum + p.valueUsd + p.feesUsd, 0);
+  const v3Total = positionsV3.reduce(
+    (sum, p) => sum + p.valueUsd + p.feesUsd,
+    0,
+  );
   const totalValue = v2Total + v3Total;
 
   const hasV2 = positionsV2.length > 0;
@@ -129,7 +132,7 @@ export function LiquidityPositionsCard({
                           {formatTokenAmount(
                             position.token0Amount,
                             position.token0.decimals,
-                            4
+                            4,
                           )}{" "}
                           {position.token0.symbol}
                         </span>
@@ -137,7 +140,7 @@ export function LiquidityPositionsCard({
                           {formatTokenAmount(
                             position.token1Amount,
                             position.token1.decimals,
-                            4
+                            4,
                           )}{" "}
                           {position.token1.symbol}
                         </span>

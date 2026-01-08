@@ -20,7 +20,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatNumber, formatPriceUsd, formatUsd, formatZilPrice } from "@/lib/format";
+import {
+  formatNumber,
+  formatPriceUsd,
+  formatUsd,
+  formatZilPrice,
+} from "@/lib/format";
 import {
   fetchTokenByAddress,
   fetchTokenChart,

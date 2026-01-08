@@ -70,7 +70,7 @@ function tickToSqrtPriceX96(tick: number): bigint {
 function getAmount0ForLiquidity(
   sqrtRatioAX96: bigint,
   sqrtRatioBX96: bigint,
-  liquidity: bigint
+  liquidity: bigint,
 ): bigint {
   if (sqrtRatioAX96 > sqrtRatioBX96) {
     [sqrtRatioAX96, sqrtRatioBX96] = [sqrtRatioBX96, sqrtRatioAX96];
@@ -85,7 +85,7 @@ function getAmount0ForLiquidity(
 function getAmount1ForLiquidity(
   sqrtRatioAX96: bigint,
   sqrtRatioBX96: bigint,
-  liquidity: bigint
+  liquidity: bigint,
 ): bigint {
   if (sqrtRatioAX96 > sqrtRatioBX96) {
     [sqrtRatioAX96, sqrtRatioBX96] = [sqrtRatioBX96, sqrtRatioAX96];
@@ -97,7 +97,7 @@ function getTokenAmounts(
   liquidity: bigint,
   sqrtPriceX96: bigint,
   tickLower: number,
-  tickUpper: number
+  tickUpper: number,
 ): { amount0: bigint; amount1: bigint } {
   const sqrtRatioAX96 = tickToSqrtPriceX96(tickLower);
   const sqrtRatioBX96 = tickToSqrtPriceX96(tickUpper);
@@ -126,10 +126,15 @@ export function useV3LiquidityPositions() {
   return useQuery({
     queryKey: ["v3LiquidityPositions", address],
     queryFn: async (): Promise<LPPositionV3[]> => {
-      console.log("[useV3LiquidityPositions] Starting query for address:", address);
+      console.log(
+        "[useV3LiquidityPositions] Starting query for address:",
+        address,
+      );
       if (!address) return [];
 
-      console.log("[useV3LiquidityPositions] Checking V3 position NFT count...");
+      console.log(
+        "[useV3LiquidityPositions] Checking V3 position NFT count...",
+      );
       // Get number of positions owned by user
       const balanceResult = await publicClient.readContract({
         address: PLUNDERSWAP_V3_POSITION_MANAGER,
@@ -139,7 +144,11 @@ export function useV3LiquidityPositions() {
       });
 
       const positionCount = Number(balanceResult);
-      console.log("[useV3LiquidityPositions] User has", positionCount, "V3 positions");
+      console.log(
+        "[useV3LiquidityPositions] User has",
+        positionCount,
+        "V3 positions",
+      );
       if (positionCount === 0) return [];
 
       // Get all token IDs
@@ -203,7 +212,7 @@ export function useV3LiquidityPositions() {
           bigint, // feeGrowthInside0LastX128
           bigint, // feeGrowthInside1LastX128
           bigint, // tokensOwed0
-          bigint // tokensOwed1
+          bigint, // tokensOwed1
         ];
 
         const liquidity = data[7];
@@ -289,7 +298,7 @@ export function useV3LiquidityPositions() {
 
       for (const token of apiTokens) {
         tokenPrices[token.address.toLowerCase()] = Number.parseFloat(
-          token.priceUsd || "0"
+          token.priceUsd || "0",
         );
         tokenSymbols[token.address.toLowerCase()] = token.symbol || "???";
       }
@@ -316,18 +325,19 @@ export function useV3LiquidityPositions() {
           number,
           number,
           number,
-          boolean
+          boolean,
         ];
 
         const sqrtPriceX96 = slot0Data[0];
         const currentTick = slot0Data[1];
-        const inRange = currentTick >= pos.tickLower && currentTick < pos.tickUpper;
+        const inRange =
+          currentTick >= pos.tickLower && currentTick < pos.tickUpper;
 
         const { amount0, amount1 } = getTokenAmounts(
           pos.liquidity,
           sqrtPriceX96,
           pos.tickLower,
-          pos.tickUpper
+          pos.tickUpper,
         );
 
         const token0Lower = pos.token0.toLowerCase();
@@ -343,10 +353,10 @@ export function useV3LiquidityPositions() {
         const amount1Formatted = Number(formatUnits(amount1, token1Decimals));
 
         const fees0Formatted = Number(
-          formatUnits(pos.tokensOwed0, token0Decimals)
+          formatUnits(pos.tokensOwed0, token0Decimals),
         );
         const fees1Formatted = Number(
-          formatUnits(pos.tokensOwed1, token1Decimals)
+          formatUnits(pos.tokensOwed1, token1Decimals),
         );
 
         const valueUsd =
