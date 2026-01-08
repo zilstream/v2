@@ -97,6 +97,12 @@ interface PairEventResponse {
   liquidity?: string;
   amount_usd?: string;
   maker?: string;
+  token_in_address?: string;
+  token_in_symbol?: string;
+  token_in_decimals?: number;
+  token_out_address?: string;
+  token_out_symbol?: string;
+  token_out_decimals?: number;
 }
 
 interface BlockResponse {
@@ -511,6 +517,12 @@ interface AddressEventResponse {
   amount1_out: string;
   amount_usd: string;
   maker: string;
+  token_in_address?: string;
+  token_in_symbol?: string;
+  token_in_decimals?: number;
+  token_out_address?: string;
+  token_out_symbol?: string;
+  token_out_decimals?: number;
 }
 
 export interface AddressEvent {
@@ -530,6 +542,12 @@ export interface AddressEvent {
   amount1Out: string;
   amountUsd: string;
   maker: string;
+  tokenInAddress?: string;
+  tokenInSymbol?: string;
+  tokenInDecimals?: number;
+  tokenOutAddress?: string;
+  tokenOutSymbol?: string;
+  tokenOutDecimals?: number;
 }
 
 export interface AddressEventsResponse {
@@ -555,6 +573,12 @@ function mapAddressEvent(event: AddressEventResponse): AddressEvent {
     amount1Out: event.amount1_out,
     amountUsd: event.amount_usd,
     maker: event.maker,
+    tokenInAddress: event.token_in_address,
+    tokenInSymbol: event.token_in_symbol,
+    tokenInDecimals: event.token_in_decimals,
+    tokenOutAddress: event.token_out_address,
+    tokenOutSymbol: event.token_out_symbol,
+    tokenOutDecimals: event.token_out_decimals,
   };
 }
 

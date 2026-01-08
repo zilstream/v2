@@ -29,21 +29,25 @@ export function eventsToKoinly(events: AddressEvent[]): KoinlyTransaction[] {
       let receivedAmount = "";
       let receivedCurrency = "";
 
+      // Use token info from event when available, otherwise fall back to token0/token1 symbols
+      const inDecimals = event.tokenInDecimals ?? 18;
+      const outDecimals = event.tokenOutDecimals ?? 18;
+
       if (amount0In > 0n) {
-        sentAmount = formatAmount(event.amount0In);
-        sentCurrency = event.token0Symbol;
+        sentAmount = formatAmount(event.amount0In, inDecimals);
+        sentCurrency = event.tokenInSymbol ?? event.token0Symbol;
       }
       if (amount1In > 0n) {
-        sentAmount = formatAmount(event.amount1In);
-        sentCurrency = event.token1Symbol;
+        sentAmount = formatAmount(event.amount1In, inDecimals);
+        sentCurrency = event.tokenInSymbol ?? event.token1Symbol;
       }
       if (amount0Out > 0n) {
-        receivedAmount = formatAmount(event.amount0Out);
-        receivedCurrency = event.token0Symbol;
+        receivedAmount = formatAmount(event.amount0Out, outDecimals);
+        receivedCurrency = event.tokenOutSymbol ?? event.token0Symbol;
       }
       if (amount1Out > 0n) {
-        receivedAmount = formatAmount(event.amount1Out);
-        receivedCurrency = event.token1Symbol;
+        receivedAmount = formatAmount(event.amount1Out, outDecimals);
+        receivedCurrency = event.tokenOutSymbol ?? event.token1Symbol;
       }
 
       return {
@@ -63,13 +67,14 @@ export function eventsToKoinly(events: AddressEvent[]): KoinlyTransaction[] {
     }
 
     if (event.eventType === "mint") {
-      const sent0 = amount0In > 0n ? formatAmount(event.amount0In) : "";
-      const sent1 = amount1In > 0n ? formatAmount(event.amount1In) : "";
+      const inDecimals = event.tokenInDecimals ?? 18;
+      const sent0 = amount0In > 0n ? formatAmount(event.amount0In, inDecimals) : "";
+      const sent1 = amount1In > 0n ? formatAmount(event.amount1In, inDecimals) : "";
 
       return {
         Date: formatKoinlyDate(event.timestamp),
         "Sent Amount": sent0 || sent1,
-        "Sent Currency": sent0 ? event.token0Symbol : event.token1Symbol,
+        "Sent Currency": sent0 ? (event.tokenInSymbol ?? event.token0Symbol) : (event.tokenInSymbol ?? event.token1Symbol),
         "Received Amount": "",
         "Received Currency": "",
         "Fee Amount": "",
@@ -83,8 +88,9 @@ export function eventsToKoinly(events: AddressEvent[]): KoinlyTransaction[] {
     }
 
     if (event.eventType === "burn") {
-      const received0 = amount0Out > 0n ? formatAmount(event.amount0Out) : "";
-      const received1 = amount1Out > 0n ? formatAmount(event.amount1Out) : "";
+      const outDecimals = event.tokenOutDecimals ?? 18;
+      const received0 = amount0Out > 0n ? formatAmount(event.amount0Out, outDecimals) : "";
+      const received1 = amount1Out > 0n ? formatAmount(event.amount1Out, outDecimals) : "";
 
       return {
         Date: formatKoinlyDate(event.timestamp),
@@ -92,8 +98,8 @@ export function eventsToKoinly(events: AddressEvent[]): KoinlyTransaction[] {
         "Sent Currency": "",
         "Received Amount": received0 || received1,
         "Received Currency": received0
-          ? event.token0Symbol
-          : event.token1Symbol,
+          ? (event.tokenOutSymbol ?? event.token0Symbol)
+          : (event.tokenOutSymbol ?? event.token1Symbol),
         "Fee Amount": "",
         "Fee Currency": "",
         "Net Worth Amount": event.amountUsd || "",

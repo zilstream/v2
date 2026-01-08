@@ -31,6 +31,12 @@ export interface SwapEventData {
   sqrt_price_x96?: string;
   liquidity?: string;
   tick?: string;
+  token_in_address?: string;
+  token_in_symbol?: string;
+  token_in_decimals?: number;
+  token_out_address?: string;
+  token_out_symbol?: string;
+  token_out_decimals?: number;
 }
 
 export interface PairEventMessage {

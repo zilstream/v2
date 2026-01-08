@@ -61,19 +61,28 @@ export function AddressEvents({ address }: AddressEventsProps) {
               const eventColor = getEventColor(event);
               const badgeColor = getBadgeColor(event);
 
-              const token0Amount =
-                event.amount0In && event.amount0In !== "0"
-                  ? event.amount0In
-                  : event.amount0Out && event.amount0Out !== "0"
-                    ? event.amount0Out
-                    : undefined;
+              const token0IsIn = event.amount0In && event.amount0In !== "0";
+              const token1IsIn = event.amount1In && event.amount1In !== "0";
 
-              const token1Amount =
-                event.amount1In && event.amount1In !== "0"
-                  ? event.amount1In
-                  : event.amount1Out && event.amount1Out !== "0"
-                    ? event.amount1Out
-                    : undefined;
+              const token0Amount = token0IsIn
+                ? event.amount0In
+                : event.amount0Out && event.amount0Out !== "0"
+                  ? event.amount0Out
+                  : undefined;
+
+              const token1Amount = token1IsIn
+                ? event.amount1In
+                : event.amount1Out && event.amount1Out !== "0"
+                  ? event.amount1Out
+                  : undefined;
+
+              // Use decimals from event when available
+              const token0Dec = token0IsIn
+                ? (event.tokenInDecimals ?? 18)
+                : (event.tokenOutDecimals ?? 18);
+              const token1Dec = token1IsIn
+                ? (event.tokenInDecimals ?? 18)
+                : (event.tokenOutDecimals ?? 18);
 
               return (
                 <TableRow
@@ -97,7 +106,7 @@ export function AddressEvents({ address }: AddressEventsProps) {
                           size={20}
                         />
                       )}
-                      {token0Amount ? formatTokenAmount(token0Amount, 18) : "-"}
+                      {token0Amount ? formatTokenAmount(token0Amount, token0Dec) : "-"}
                     </div>
                   </TableCell>
                   <TableCell className="text-right py-2">
@@ -109,7 +118,7 @@ export function AddressEvents({ address }: AddressEventsProps) {
                           size={20}
                         />
                       )}
-                      {token1Amount ? formatTokenAmount(token1Amount, 18) : "-"}
+                      {token1Amount ? formatTokenAmount(token1Amount, token1Dec) : "-"}
                     </div>
                   </TableCell>
                   <TableCell className="text-right py-2">

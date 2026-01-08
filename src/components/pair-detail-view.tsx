@@ -134,6 +134,12 @@ export function PairDetailView({
           amountUsd: swapEvent.amount_usd,
           liquidity: swapEvent.liquidity,
           maker: swapEvent.sender, // Approximation
+          tokenInAddress: swapEvent.token_in_address,
+          tokenInSymbol: swapEvent.token_in_symbol,
+          tokenInDecimals: swapEvent.token_in_decimals,
+          tokenOutAddress: swapEvent.token_out_address,
+          tokenOutSymbol: swapEvent.token_out_symbol,
+          tokenOutDecimals: swapEvent.token_out_decimals,
         };
 
         setEvents((prev) => {
@@ -146,24 +152,25 @@ export function PairDetailView({
 
         // 3. Update Chart (Only for Swaps)
         if (eventType === "swap") {
-          let amt0 = 0;
-          let amt1 = 0;
+          // Use token decimals from event directly
+          const inDecimals = swapEvent.token_in_decimals ?? 18;
+          const outDecimals = swapEvent.token_out_decimals ?? 18;
 
-          // Use the calculated amounts to avoid re-parsing, but cast to Number for price calc
-          if (amount0In) {
-            amt0 = Number.parseFloat(amount0In);
-          } else if (amount0Out) {
-            amt0 = Number.parseFloat(amount0Out);
+          // Parse and normalize amounts - use the non-zero value for each position
+          let normalizedAmt0 = 0;
+          let normalizedAmt1 = 0;
+
+          if (amount0In && amount0In !== "0") {
+            normalizedAmt0 = Number.parseFloat(amount0In) / 10 ** inDecimals;
+          } else if (amount0Out && amount0Out !== "0") {
+            normalizedAmt0 = Number.parseFloat(amount0Out) / 10 ** outDecimals;
           }
 
-          if (amount1In) {
-            amt1 = Number.parseFloat(amount1In);
-          } else if (amount1Out) {
-            amt1 = Number.parseFloat(amount1Out);
+          if (amount1In && amount1In !== "0") {
+            normalizedAmt1 = Number.parseFloat(amount1In) / 10 ** inDecimals;
+          } else if (amount1Out && amount1Out !== "0") {
+            normalizedAmt1 = Number.parseFloat(amount1Out) / 10 ** outDecimals;
           }
-
-          const normalizedAmt0 = amt0 / 10 ** token0Decimals;
-          const normalizedAmt1 = amt1 / 10 ** token1Decimals;
 
           // Price = Token1 / Token0
           const price =
@@ -352,30 +359,39 @@ export function PairDetailView({
               </TableHeader>
               <TableBody>
                 {events.map((event) => {
-                  const token0Amount =
-                    event.amount0In && event.amount0In !== "0"
-                      ? event.amount0In
-                      : event.amount0Out && event.amount0Out !== "0"
-                        ? event.amount0Out
-                        : undefined;
+                  const token0IsIn = event.amount0In && event.amount0In !== "0";
+                  const token1IsIn = event.amount1In && event.amount1In !== "0";
 
-                  const token1Amount =
-                    event.amount1In && event.amount1In !== "0"
-                      ? event.amount1In
-                      : event.amount1Out && event.amount1Out !== "0"
-                        ? event.amount1Out
-                        : undefined;
+                  const token0Amount = token0IsIn
+                    ? event.amount0In
+                    : event.amount0Out && event.amount0Out !== "0"
+                      ? event.amount0Out
+                      : undefined;
+
+                  const token1Amount = token1IsIn
+                    ? event.amount1In
+                    : event.amount1Out && event.amount1Out !== "0"
+                      ? event.amount1Out
+                      : undefined;
 
                   if (!token0Amount && !token1Amount) return null;
 
                   const eventColor = getEventColor(event);
                   const badgeColor = getBadgeColor(event);
 
+                  // Use decimals from event when available
+                  const token0Dec = token0IsIn
+                    ? (event.tokenInDecimals ?? token0Decimals)
+                    : (event.tokenOutDecimals ?? token0Decimals);
+                  const token1Dec = token1IsIn
+                    ? (event.tokenInDecimals ?? token1Decimals)
+                    : (event.tokenOutDecimals ?? token1Decimals);
+
                   const amount0 = token0Amount
-                    ? Number(token0Amount) / 10 ** token0Decimals
+                    ? Number(token0Amount) / 10 ** token0Dec
                     : 0;
                   const amount1 = token1Amount
-                    ? Number(token1Amount) / 10 ** token1Decimals
+                    ? Number(token1Amount) / 10 ** token1Dec
                     : 0;
 
                   // Calculate price for this trade
@@ -413,7 +429,7 @@ export function PairDetailView({
                             size={16}
                           />
                           {token0Amount
-                            ? formatTokenAmount(token0Amount, token0Decimals)
+                            ? formatTokenAmount(token0Amount, token0Dec)
                             : "-"}
                         </div>
                       </TableCell>
@@ -425,7 +441,7 @@ export function PairDetailView({
                             size={16}
                           />
                           {token1Amount
-                            ? formatTokenAmount(token1Amount, token1Decimals)
+                            ? formatTokenAmount(token1Amount, token1Dec)
                             : "-"}
                         </div>
                       </TableCell>
