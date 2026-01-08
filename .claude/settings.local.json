@@ -5,7 +5,8 @@
       "Bash(forge build:*)",
       "Bash(forge test:*)",
       "Bash(bun run build:*)",
-      "Bash(bunx biome check:*)"
+      "Bash(bunx biome check:*)",
+      "Bash(bun run lint)"
     ]
   }
 }

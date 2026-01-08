@@ -560,7 +560,7 @@ export async function fetchAddressEvents(
   perPage = 25,
 ): Promise<AddressEventsResponse> {
   const data = await fetchFromApi<ApiListResponse<AddressEventResponse>>(
-    `/addresses/${address}/swaps?page=${page}&per_page=${perPage}`,
+    `/addresses/${address}/events?page=${page}&per_page=${perPage}`,
     API_V2_BASE_URL,
   );
 

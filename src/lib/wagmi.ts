@@ -6,7 +6,30 @@ import {
   walletConnectWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import { createConfig, http } from "wagmi";
-import { zilliqa } from "viem/chains";
+import { defineChain } from "viem";
+
+export const zilliqa = defineChain({
+  id: 32769,
+  name: "Zilliqa",
+  nativeCurrency: { name: "Zilliqa", symbol: "ZIL", decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ["https://api.zilliqa.com"],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Otterscan",
+      url: "https://otterscan.zilliqa.com",
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: "0x38899efb93d5106d3adb86662c557f237f6ecf57",
+      blockCreated: 3251173,
+    },
+  },
+});
 
 const connectors = connectorsForWallets(
   [

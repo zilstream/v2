@@ -89,10 +89,8 @@ export function AppSidebar() {
   const portfolioItems = [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: LayoutDashboard,
-      disabled: true,
-      badge: "Coming Soon",
     },
     {
       title: "Transactions",
@@ -157,29 +155,15 @@ export function AppSidebar() {
               <SidebarMenu>
                 {portfolioItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isItemActive(item.url)}
-                      disabled={item.disabled}
-                      className={item.disabled ? "opacity-50" : ""}
-                    >
+                    <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
                       <Link
                         href={item.url}
-                        className={
-                          item.disabled
-                            ? "pointer-events-none"
-                            : "data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
-                        }
+                        className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
                       >
                         <item.icon />
                         <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
-                    {item.badge && (
-                      <SidebarMenuBadge className="bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400 text-[10px] h-5 px-2">
-                        {item.badge}
-                      </SidebarMenuBadge>
-                    )}
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
