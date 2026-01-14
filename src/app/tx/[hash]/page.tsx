@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AddressDisplay } from "@/components/address-display";
 import { ExplorerDropdown } from "@/components/explorer-dropdown";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,9 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatNumber, formatTokenAmount, formatTimestamp } from "@/lib/format";
-import { fetchTransactionByHash } from "@/lib/zilstream";
 import { decodeEvent, formatDecodedArg } from "@/lib/event-decoder";
+import { formatNumber, formatTimestamp, formatTokenAmount } from "@/lib/format";
+import { fetchTransactionByHash } from "@/lib/zilstream";
 
 interface TransactionDetailPageProps {
   params: Promise<{
@@ -87,20 +88,40 @@ export default async function TransactionDetailPage({
           <CardDescription>From and to addresses</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <DetailRow label="From" value={tx.fromAddress} />
+          <DetailRow
+            label="From"
+            value={<AddressDisplay address={tx.fromAddress} shorten={false} />}
+          />
           <DetailRow
             label="To"
             value={
-              tx.toAddress ?? (
+              tx.toAddress ? (
+                <AddressDisplay address={tx.toAddress} shorten={false} />
+              ) : (
                 <span className="text-muted-foreground">
                   Contract Creation
-                  {tx.contractAddress && ` (${tx.contractAddress})`}
+                  {tx.contractAddress && (
+                    <>
+                      {" "}
+                      (
+                      <AddressDisplay
+                        address={tx.contractAddress}
+                        shorten={false}
+                      />
+                      )
+                    </>
+                  )}
                 </span>
               )
             }
           />
           {tx.contractAddress && (
-            <DetailRow label="Contract Address" value={tx.contractAddress} />
+            <DetailRow
+              label="Contract Address"
+              value={
+                <AddressDisplay address={tx.contractAddress} shorten={false} />
+              }
+            />
           )}
         </CardContent>
       </Card>
@@ -173,7 +194,12 @@ export default async function TransactionDetailPage({
                       Log Index: {event.logIndex}
                     </span>
                   </div>
-                  <DetailRow label="Address" value={event.address} />
+                  <DetailRow
+                    label="Address"
+                    value={
+                      <AddressDisplay address={event.address} shorten={false} />
+                    }
+                  />
 
                   {decoded ? (
                     <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">

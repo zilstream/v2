@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AddressDisplay } from "@/components/address-display";
+import { ExplorerDropdown } from "@/components/explorer-dropdown";
 import {
   Card,
   CardContent,
@@ -7,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ExplorerDropdown } from "@/components/explorer-dropdown";
 import { formatNumber, formatTimestamp } from "@/lib/format";
 import { fetchBlockByNumber } from "@/lib/zilstream";
 
@@ -146,8 +147,7 @@ export default async function BlockDetailPage({
                           href={`/address/${tx.fromAddress}`}
                           className="font-mono text-primary hover:underline"
                         >
-                          {tx.fromAddress.slice(0, 6)}...
-                          {tx.fromAddress.slice(-4)}
+                          <AddressDisplay address={tx.fromAddress} />
                         </Link>
                       </td>
                       <td className="py-3">
@@ -156,8 +156,7 @@ export default async function BlockDetailPage({
                             href={`/address/${tx.toAddress}`}
                             className="font-mono text-primary hover:underline"
                           >
-                            {tx.toAddress.slice(0, 6)}...
-                            {tx.toAddress.slice(-4)}
+                            <AddressDisplay address={tx.toAddress} />
                           </Link>
                         ) : (
                           <span className="font-mono text-muted-foreground">

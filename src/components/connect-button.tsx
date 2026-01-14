@@ -3,6 +3,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Wallet } from "lucide-react";
 import Link from "next/link";
+import { AddressDisplay } from "@/components/address-display";
 import { Button } from "@/components/ui/button";
 
 export function ConnectWalletButton() {
@@ -54,7 +55,7 @@ export function ConnectWalletButton() {
                     variant="outline"
                     size="sm"
                   >
-                    {account.displayName}
+                    <AddressDisplay address={account.address} />
                     {account.displayBalance
                       ? ` (${account.displayBalance})`
                       : ""}

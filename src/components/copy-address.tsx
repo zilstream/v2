@@ -3,7 +3,7 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 
-import { shortenAddress } from "@/lib/format";
+import { AddressDisplay } from "@/components/address-display";
 
 interface CopyAddressProps {
   address: string;
@@ -29,7 +29,7 @@ export function CopyAddress({ address, chars = 4 }: CopyAddressProps) {
       className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm font-mono transition hover:bg-muted"
       type="button"
     >
-      <span>{shortenAddress(address, chars)}</span>
+      <AddressDisplay address={address} chars={chars} />
       {copied ? (
         <Check className="h-3.5 w-3.5 text-green-600" />
       ) : (

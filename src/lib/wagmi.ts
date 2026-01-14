@@ -1,12 +1,12 @@
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import {
+  injectedWallet,
   metaMaskWallet,
   rabbyWallet,
-  injectedWallet,
   walletConnectWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { createConfig, http } from "wagmi";
 import { defineChain } from "viem";
+import { createConfig, http } from "wagmi";
 
 export const zilliqa = defineChain({
   id: 32769,
@@ -24,6 +24,12 @@ export const zilliqa = defineChain({
     },
   },
   contracts: {
+    ensRegistry: {
+      address: "0x2196b67Ca97bBcA07C01c7Bdf4f35209CC615389",
+    },
+    ensUniversalResolver: {
+      address: "0x5c0c7BFd25efCAE366fE62219fD5558305Ffc46F",
+    },
     multicall3: {
       address: "0x38899efb93d5106d3adb86662c557f237f6ecf57",
       blockCreated: 3251173,

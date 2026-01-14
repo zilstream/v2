@@ -1,7 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { AddressDisplay } from "@/components/address-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -19,10 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
-import { formatNumber, formatTokenAmount, formatTimestamp } from "@/lib/format";
 import { useAddressTransactions } from "@/hooks/use-zilstream-queries";
-import { useState } from "react";
+import { formatNumber, formatTimestamp, formatTokenAmount } from "@/lib/format";
 
 interface AddressTransactionsProps {
   address: string;
@@ -96,7 +97,7 @@ export function AddressTransactions({ address }: AddressTransactionsProps) {
                       href={`/address/${tx.fromAddress}`}
                       className="font-mono text-sm text-primary hover:underline"
                     >
-                      {shortenAddress(tx.fromAddress)}
+                      <AddressDisplay address={tx.fromAddress} />
                     </Link>
                   )}
                 </TableCell>
@@ -109,7 +110,7 @@ export function AddressTransactions({ address }: AddressTransactionsProps) {
                         href={`/address/${tx.toAddress}`}
                         className="font-mono text-sm text-primary hover:underline"
                       >
-                        {shortenAddress(tx.toAddress)}
+                        <AddressDisplay address={tx.toAddress} />
                       </Link>
                     )
                   ) : (
@@ -210,9 +211,4 @@ function AddressTransactionsSkeleton() {
 function shortenHash(hash: string) {
   if (!hash) return "";
   return `${hash.slice(0, 10)}…${hash.slice(-8)}`;
-}
-
-function shortenAddress(address: string) {
-  if (!address) return "";
-  return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }

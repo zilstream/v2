@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AddressDisplay } from "@/components/address-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatNumber, formatTokenAmount, formatTimestamp } from "@/lib/format";
+import { formatNumber, formatTimestamp, formatTokenAmount } from "@/lib/format";
 import type { Pagination, Transaction } from "@/lib/zilstream";
 
 interface TransactionsTableProps {
@@ -85,13 +86,13 @@ export function TransactionsTable({
                 </TableCell>
                 <TableCell>
                   <span className="font-mono text-sm">
-                    {shortenAddress(tx.fromAddress)}
+                    <AddressDisplay address={tx.fromAddress} />
                   </span>
                 </TableCell>
                 <TableCell>
                   <span className="font-mono text-sm">
                     {tx.toAddress ? (
-                      shortenAddress(tx.toAddress)
+                      <AddressDisplay address={tx.toAddress} />
                     ) : (
                       <span className="text-muted-foreground">
                         Contract Creation
@@ -142,9 +143,4 @@ export function TransactionsTable({
 function shortenHash(hash: string) {
   if (!hash) return "";
   return `${hash.slice(0, 10)}…${hash.slice(-8)}`;
-}
-
-function shortenAddress(address: string) {
-  if (!address) return "";
-  return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }

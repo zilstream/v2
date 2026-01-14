@@ -4,6 +4,7 @@ import { Crown, Wallet } from "lucide-react";
 import Link from "next/link";
 import { use } from "react";
 import { useAccount, useReadContract } from "wagmi";
+import { AddressDisplay } from "@/components/address-display";
 import { AddressEvents } from "@/components/address-events";
 import { AddressInfo } from "@/components/address-info";
 import { AddressTransactions } from "@/components/address-transactions";
@@ -115,7 +116,11 @@ export default function AddressPage({
             <h1 className="text-2xl font-semibold">Address</h1>
             <div className="flex items-center gap-2">
               <p className="font-mono text-sm text-muted-foreground break-all">
-                {pageAddress}
+                <AddressDisplay
+                  address={pageAddress}
+                  shorten={false}
+                  showAddress
+                />
               </p>
               <CopyButton text={pageAddress} />
             </div>

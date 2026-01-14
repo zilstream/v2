@@ -10,13 +10,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-
+import { AddressDisplay } from "@/components/address-display";
 import { ExplorerDropdown } from "@/components/explorer-dropdown";
 import { SwapWidget } from "@/components/swap-widget";
 import { TokenIcon } from "@/components/token-icon";
 import {
-  TradingViewChart,
   type ChartTrade,
+  TradingViewChart,
 } from "@/components/tradingview-chart";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -467,7 +467,7 @@ export function PairDetailView({
                               href={`/address/${userAddress}`}
                               title={userAddress}
                             >
-                              {userAddress.slice(0, 4)}…{userAddress.slice(-4)}
+                              <AddressDisplay address={userAddress} chars={2} />
                             </Link>
                           ) : (
                             "-"
@@ -564,7 +564,7 @@ export function PairDetailView({
               <span>Pair Address</span>
               <div className="flex items-center gap-2">
                 <span className="font-mono">
-                  {pair.address.slice(0, 6)}...{pair.address.slice(-4)}
+                  <AddressDisplay address={pair.address} />
                 </span>
                 <ExplorerDropdown type="address" value={pair.address} />
               </div>
