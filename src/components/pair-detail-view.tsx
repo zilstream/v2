@@ -359,31 +359,35 @@ export function PairDetailView({
               </TableHeader>
               <TableBody>
                 {events.map((event) => {
-                  const token0IsIn = event.amount0In && event.amount0In !== "0";
-                  const token1IsIn = event.amount1In && event.amount1In !== "0";
-
-                  const token0Amount = token0IsIn
-                    ? event.amount0In
-                    : event.amount0Out && event.amount0Out !== "0"
+                  // Get the tokenIn and tokenOut amounts from the event
+                  const tokenInAmount =
+                    event.amount0In && event.amount0In !== "0"
+                      ? event.amount0In
+                      : event.amount1In;
+                  const tokenOutAmount =
+                    event.amount0Out && event.amount0Out !== "0"
                       ? event.amount0Out
-                      : undefined;
+                      : event.amount1Out;
 
-                  const token1Amount = token1IsIn
-                    ? event.amount1In
-                    : event.amount1Out && event.amount1Out !== "0"
-                      ? event.amount1Out
-                      : undefined;
-
-                  if (!token0Amount && !token1Amount) return null;
+                  if (!tokenInAmount && !tokenOutAmount) return null;
 
                   const eventColor = getEventColor(event);
                   const badgeColor = getBadgeColor(event);
 
-                  // Use decimals from event when available
-                  const token0Dec = token0IsIn
+                  // Match pair tokens to event tokenIn/tokenOut by address
+                  const pairToken0IsTokenIn =
+                    pair.token0.toLowerCase() === event.tokenInAddress?.toLowerCase();
+                  const pairToken1IsTokenIn =
+                    pair.token1.toLowerCase() === event.tokenInAddress?.toLowerCase();
+
+                  // Assign amounts and decimals based on which pair token matches tokenIn/tokenOut
+                  const token0Amount = pairToken0IsTokenIn ? tokenInAmount : tokenOutAmount;
+                  const token0Dec = pairToken0IsTokenIn
                     ? (event.tokenInDecimals ?? token0Decimals)
                     : (event.tokenOutDecimals ?? token0Decimals);
-                  const token1Dec = token1IsIn
+
+                  const token1Amount = pairToken1IsTokenIn ? tokenInAmount : tokenOutAmount;
+                  const token1Dec = pairToken1IsTokenIn
                     ? (event.tokenInDecimals ?? token1Decimals)
                     : (event.tokenOutDecimals ?? token1Decimals);
 

@@ -61,26 +61,30 @@ export function AddressEvents({ address }: AddressEventsProps) {
               const eventColor = getEventColor(event);
               const badgeColor = getBadgeColor(event);
 
-              const token0IsIn = event.amount0In && event.amount0In !== "0";
-              const token1IsIn = event.amount1In && event.amount1In !== "0";
-
-              const token0Amount = token0IsIn
-                ? event.amount0In
-                : event.amount0Out && event.amount0Out !== "0"
+              // Get the tokenIn and tokenOut amounts from the event
+              const tokenInAmount =
+                event.amount0In && event.amount0In !== "0"
+                  ? event.amount0In
+                  : event.amount1In;
+              const tokenOutAmount =
+                event.amount0Out && event.amount0Out !== "0"
                   ? event.amount0Out
-                  : undefined;
+                  : event.amount1Out;
 
-              const token1Amount = token1IsIn
-                ? event.amount1In
-                : event.amount1Out && event.amount1Out !== "0"
-                  ? event.amount1Out
-                  : undefined;
+              // Match event's token0/token1 to tokenIn/tokenOut by address
+              const token0IsTokenIn =
+                event.token0Address?.toLowerCase() === event.tokenInAddress?.toLowerCase();
+              const token1IsTokenIn =
+                event.token1Address?.toLowerCase() === event.tokenInAddress?.toLowerCase();
 
-              // Use decimals from event when available
-              const token0Dec = token0IsIn
+              // Assign amounts and decimals based on which token matches tokenIn/tokenOut
+              const token0Amount = token0IsTokenIn ? tokenInAmount : tokenOutAmount;
+              const token0Dec = token0IsTokenIn
                 ? (event.tokenInDecimals ?? 18)
                 : (event.tokenOutDecimals ?? 18);
-              const token1Dec = token1IsIn
+
+              const token1Amount = token1IsTokenIn ? tokenInAmount : tokenOutAmount;
+              const token1Dec = token1IsTokenIn
                 ? (event.tokenInDecimals ?? 18)
                 : (event.tokenOutDecimals ?? 18);
 
