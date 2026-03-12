@@ -143,7 +143,7 @@ export const articles: Article[] = [
 
       <hr />
 
-      <p>For even more comprehensive financial data, charts, and market analysis tools beyond just crypto, we recommend visiting <a href="https://www.tradingview.com" target="_blank" rel="noopener noreferrer">TradingView.com</a>. It's the platform that powers our charts and is an essential resource for traders worldwide.</p>
+      <p>For even more comprehensive financial data, charts, and market analysis tools beyond just crypto, we recommend visiting TradingView.com. It's the platform that powers our charts and is an essential resource for traders worldwide. Enhance your analysis with the TradingView platform — access detailed <a href="https://www.tradingview.com/symbols/ETHUSD/" target="_blank" rel="noopener">ETH USD chart</a>, monitor crypto trends, and use robust tools to interpret price dynamics — all in one place.</p>
     `,
   },
   {
