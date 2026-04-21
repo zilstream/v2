@@ -73,17 +73,23 @@ export function AddressEvents({ address }: AddressEventsProps) {
 
               // Match event's token0/token1 to tokenIn/tokenOut by address
               const token0IsTokenIn =
-                event.token0Address?.toLowerCase() === event.tokenInAddress?.toLowerCase();
+                event.token0Address?.toLowerCase() ===
+                event.tokenInAddress?.toLowerCase();
               const token1IsTokenIn =
-                event.token1Address?.toLowerCase() === event.tokenInAddress?.toLowerCase();
+                event.token1Address?.toLowerCase() ===
+                event.tokenInAddress?.toLowerCase();
 
               // Assign amounts and decimals based on which token matches tokenIn/tokenOut
-              const token0Amount = token0IsTokenIn ? tokenInAmount : tokenOutAmount;
+              const token0Amount = token0IsTokenIn
+                ? tokenInAmount
+                : tokenOutAmount;
               const token0Dec = token0IsTokenIn
                 ? (event.tokenInDecimals ?? 18)
                 : (event.tokenOutDecimals ?? 18);
 
-              const token1Amount = token1IsTokenIn ? tokenInAmount : tokenOutAmount;
+              const token1Amount = token1IsTokenIn
+                ? tokenInAmount
+                : tokenOutAmount;
               const token1Dec = token1IsTokenIn
                 ? (event.tokenInDecimals ?? 18)
                 : (event.tokenOutDecimals ?? 18);
@@ -110,7 +116,9 @@ export function AddressEvents({ address }: AddressEventsProps) {
                           size={20}
                         />
                       )}
-                      {token0Amount ? formatTokenAmount(token0Amount, token0Dec) : "-"}
+                      {token0Amount
+                        ? formatTokenAmount(token0Amount, token0Dec)
+                        : "-"}
                     </div>
                   </TableCell>
                   <TableCell className="text-right py-2">
@@ -122,7 +130,9 @@ export function AddressEvents({ address }: AddressEventsProps) {
                           size={20}
                         />
                       )}
-                      {token1Amount ? formatTokenAmount(token1Amount, token1Dec) : "-"}
+                      {token1Amount
+                        ? formatTokenAmount(token1Amount, token1Dec)
+                        : "-"}
                     </div>
                   </TableCell>
                   <TableCell className="text-right py-2">

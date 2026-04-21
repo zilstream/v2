@@ -78,8 +78,9 @@ export default function AlertsPage() {
             </div>
             <CardTitle className="text-xl">Membership Required</CardTitle>
             <CardDescription className="text-base">
-              Price alerts are a members-only feature. Get a ZilStream membership
-              to receive browser notifications when tokens hit your target prices.
+              Price alerts are a members-only feature. Get a ZilStream
+              membership to receive browser notifications when tokens hit your
+              target prices.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

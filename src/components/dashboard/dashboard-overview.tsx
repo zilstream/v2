@@ -100,18 +100,27 @@ export function DashboardOverview({ address }: DashboardOverviewProps) {
   };
 
   // Native ZIL previous value
-  const nativeZilPreviousValue = getPreviousValue(nativeZilValue, zilPriceChange24h);
+  const nativeZilPreviousValue = getPreviousValue(
+    nativeZilValue,
+    zilPriceChange24h,
+  );
 
   // Token previous values (each token has its own price change)
   const tokensPreviousValue =
     tokenBalances?.reduce(
       (sum, t) => sum + getPreviousValue(t.valueUsd, t.priceChange24h),
-      0
+      0,
     ) ?? 0;
 
   // Staking is ZIL-denominated, so use ZIL's price change
-  const liquidStakingPreviousValue = getPreviousValue(liquidStakingValue, zilPriceChange24h);
-  const nonLiquidStakingPreviousValue = getPreviousValue(nonLiquidStakingValue, zilPriceChange24h);
+  const liquidStakingPreviousValue = getPreviousValue(
+    liquidStakingValue,
+    zilPriceChange24h,
+  );
+  const nonLiquidStakingPreviousValue = getPreviousValue(
+    nonLiquidStakingValue,
+    zilPriceChange24h,
+  );
 
   // LP positions are complex (impermanent loss, two tokens) - exclude from change calculation
   // Their previous value equals current value for simplicity

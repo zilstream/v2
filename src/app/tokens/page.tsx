@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { TokensTableClient } from "@/components/tokens-table-client";
 
 export default function TokensPage() {
@@ -10,7 +12,9 @@ export default function TokensPage() {
         </p>
       </div>
 
-      <TokensTableClient />
+      <Suspense>
+        <TokensTableClient />
+      </Suspense>
     </div>
   );
 }

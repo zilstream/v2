@@ -2,21 +2,22 @@
 
 import { useQuery } from "@tanstack/react-query";
 import {
-  fetchStats,
-  fetchPairs,
-  fetchTokens,
-  fetchBlocks,
-  fetchTransactions,
-  fetchTokenByAddress,
-  fetchTokenPairs,
-  fetchTokenChart,
-  fetchPairByAddress,
-  fetchPairEvents,
-  fetchPairChart,
-  fetchBlockByNumber,
-  fetchTransactionByHash,
-  fetchAddressTransactions,
   fetchAddressEvents,
+  fetchAddressTransactions,
+  fetchBlockByNumber,
+  fetchBlocks,
+  fetchPairByAddress,
+  fetchPairChart,
+  fetchPairEvents,
+  fetchPairs,
+  fetchStats,
+  fetchTokenByAddress,
+  fetchTokenChart,
+  fetchTokenPairs,
+  fetchTokens,
+  fetchTransactionByHash,
+  fetchTransactions,
+  type ListQueryOptions,
 } from "@/lib/api-client";
 
 // Stats
@@ -30,10 +31,10 @@ export function useStats() {
 }
 
 // Pairs
-export function usePairs(page = 1, perPage = 50) {
+export function usePairs(page = 1, perPage = 50, options?: ListQueryOptions) {
   return useQuery({
-    queryKey: ["pairs", page, perPage],
-    queryFn: () => fetchPairs(page, perPage),
+    queryKey: ["pairs", page, perPage, options ?? null],
+    queryFn: () => fetchPairs(page, perPage, options),
   });
 }
 
@@ -63,10 +64,10 @@ export function usePairChart(address: string) {
 }
 
 // Tokens
-export function useTokens(page = 1, perPage = 100) {
+export function useTokens(page = 1, perPage = 100, options?: ListQueryOptions) {
   return useQuery({
-    queryKey: ["tokens", page, perPage],
-    queryFn: () => fetchTokens(page, perPage),
+    queryKey: ["tokens", page, perPage, options ?? null],
+    queryFn: () => fetchTokens(page, perPage, options),
   });
 }
 

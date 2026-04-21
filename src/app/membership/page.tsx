@@ -32,7 +32,8 @@ const MEMBER_FEATURES = [
   {
     icon: LayoutDashboard,
     title: "Personal Dashboard",
-    description: "Track your portfolio, positions, and performance in one place",
+    description:
+      "Track your portfolio, positions, and performance in one place",
   },
   {
     icon: BarChart3,
@@ -184,7 +185,11 @@ export default function MembershipPage() {
             </div>
           )}
 
-          <div className={showFeatures ? "" : "mx-auto w-full max-w-lg lg:col-span-2"}>
+          <div
+            className={
+              showFeatures ? "" : "mx-auto w-full max-w-lg lg:col-span-2"
+            }
+          >
             <MembershipPurchaseCard
               onPurchaseSuccess={
                 showGiftPurchase ? handleGiftPurchaseSuccess : refetchMembership
