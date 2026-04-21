@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { PairsPageSection } from "@/components/pairs-page-section";
 
 export default function PairsPage() {
@@ -10,7 +12,9 @@ export default function PairsPage() {
         </p>
       </div>
 
-      <PairsPageSection />
+      <Suspense>
+        <PairsPageSection />
+      </Suspense>
     </div>
   );
 }

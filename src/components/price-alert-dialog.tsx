@@ -103,7 +103,10 @@ export function PriceAlertDialog({
           tokenSymbol: token.symbol ?? "Unknown",
           condition,
           targetPrice: price,
-        } as Omit<ThresholdAlert, "id" | "createdAt" | "triggered" | "triggeredAt">);
+        } as Omit<
+          ThresholdAlert,
+          "id" | "createdAt" | "triggered" | "triggeredAt"
+        >);
       } else {
         const percentage = Number.parseFloat(percentageChange);
         if (Number.isNaN(percentage) || percentage <= 0) {
@@ -117,7 +120,10 @@ export function PriceAlertDialog({
           tokenSymbol: token.symbol ?? "Unknown",
           percentageChange: percentage,
           timeframe,
-        } as Omit<PercentageAlert, "id" | "createdAt" | "triggered" | "triggeredAt">);
+        } as Omit<
+          PercentageAlert,
+          "id" | "createdAt" | "triggered" | "triggeredAt"
+        >);
       }
 
       toast.success("Price alert created");
@@ -195,7 +201,9 @@ export function PriceAlertDialog({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Target Price (USD)</label>
+                <label className="text-sm font-medium">
+                  Target Price (USD)
+                </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     $

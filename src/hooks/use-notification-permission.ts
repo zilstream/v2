@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 export function useNotificationPermission() {
-  const [permission, setPermission] = useState<NotificationPermission>("denied");
+  const [permission, setPermission] =
+    useState<NotificationPermission>("denied");
   const [isSupported, setIsSupported] = useState(false);
 
   useEffect(() => {

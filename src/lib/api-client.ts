@@ -23,17 +23,17 @@ export interface Pagination {
 
 // Re-export types for client use
 export type {
-  Token,
+  Block,
+  BlockListResponse,
   Pair,
   PairEvent,
+  PairEventsResponse,
+  PairListResponse,
   Stats,
-  Block,
-  Transaction,
+  Token,
   TokenChartData,
   TokenListResponse,
-  PairListResponse,
-  PairEventsResponse,
-  BlockListResponse,
+  Transaction,
   TransactionListResponse,
 } from "./zilstream";
 
@@ -163,17 +163,17 @@ interface StatsResponse {
 
 // Import types for return values
 import type {
-  Token,
+  Block,
+  BlockListResponse,
   Pair,
   PairEvent,
+  PairEventsResponse,
+  PairListResponse,
   Stats,
-  Block,
-  Transaction,
+  Token,
   TokenChartData,
   TokenListResponse,
-  PairListResponse,
-  PairEventsResponse,
-  BlockListResponse,
+  Transaction,
   TransactionListResponse,
 } from "./zilstream";
 
@@ -342,12 +342,34 @@ export async function fetchStats(): Promise<Stats> {
   };
 }
 
+export interface ListQueryOptions {
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
+function buildListQuery(
+  page: number,
+  perPage: number,
+  options?: ListQueryOptions,
+): string {
+  const params = new URLSearchParams({
+    page: String(page),
+    per_page: String(perPage),
+  });
+  if (options?.search) params.set("search", options.search);
+  if (options?.sortBy) params.set("sort_by", options.sortBy);
+  if (options?.sortOrder) params.set("sort_order", options.sortOrder);
+  return params.toString();
+}
+
 export async function fetchPairs(
   page = 1,
   perPage = 50,
+  options?: ListQueryOptions,
 ): Promise<PairListResponse> {
   const data = await fetchFromApi<ApiListResponse<PairResponse>>(
-    `/pairs?page=${page}&per_page=${perPage}`,
+    `/pairs?${buildListQuery(page, perPage, options)}`,
   );
 
   const filteredPairs = data.data.filter((pair) => {
@@ -364,20 +386,14 @@ export async function fetchPairs(
 export async function fetchTokens(
   page = 1,
   perPage = 100,
+  options?: ListQueryOptions,
 ): Promise<TokenListResponse> {
   const data = await fetchFromApi<ApiListResponse<TokenResponse>>(
-    `/tokens?page=${page}&per_page=${perPage}`,
+    `/tokens?${buildListQuery(page, perPage, options)}`,
   );
 
-  const tokens = data.data.map(mapToken);
-  tokens.sort((a, b) => {
-    const liqA = Number.parseFloat(a.liquidityUsd || "0");
-    const liqB = Number.parseFloat(b.liquidityUsd || "0");
-    return liqB - liqA;
-  });
-
   return {
-    data: tokens,
+    data: data.data.map(mapToken),
     pagination: mapPagination(data.pagination),
   };
 }

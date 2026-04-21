@@ -376,17 +376,23 @@ export function PairDetailView({
 
                   // Match pair tokens to event tokenIn/tokenOut by address
                   const pairToken0IsTokenIn =
-                    pair.token0.toLowerCase() === event.tokenInAddress?.toLowerCase();
+                    pair.token0.toLowerCase() ===
+                    event.tokenInAddress?.toLowerCase();
                   const pairToken1IsTokenIn =
-                    pair.token1.toLowerCase() === event.tokenInAddress?.toLowerCase();
+                    pair.token1.toLowerCase() ===
+                    event.tokenInAddress?.toLowerCase();
 
                   // Assign amounts and decimals based on which pair token matches tokenIn/tokenOut
-                  const token0Amount = pairToken0IsTokenIn ? tokenInAmount : tokenOutAmount;
+                  const token0Amount = pairToken0IsTokenIn
+                    ? tokenInAmount
+                    : tokenOutAmount;
                   const token0Dec = pairToken0IsTokenIn
                     ? (event.tokenInDecimals ?? token0Decimals)
                     : (event.tokenOutDecimals ?? token0Decimals);
 
-                  const token1Amount = pairToken1IsTokenIn ? tokenInAmount : tokenOutAmount;
+                  const token1Amount = pairToken1IsTokenIn
+                    ? tokenInAmount
+                    : tokenOutAmount;
                   const token1Dec = pairToken1IsTokenIn
                     ? (event.tokenInDecimals ?? token1Decimals)
                     : (event.tokenOutDecimals ?? token1Decimals);

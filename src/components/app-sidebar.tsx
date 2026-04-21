@@ -166,10 +166,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {portfolioItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isItemActive(item.url)}
-                  >
+                  <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
                     <Link
                       href={item.url}
                       className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"

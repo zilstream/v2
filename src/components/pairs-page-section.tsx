@@ -1,15 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
 import { PairsTable } from "@/components/pairs-table";
 import { PairsTableSkeleton } from "@/components/pairs-table-skeleton";
-import type { Pair } from "@/lib/zilstream";
+import { useTableParams } from "@/hooks/use-table-params";
 import { useBatchPairsSubscription } from "@/hooks/use-websocket";
 import { usePairs } from "@/hooks/use-zilstream-queries";
+import type { Pair } from "@/lib/zilstream";
+
+const PAIRS_SORT_DEFAULT = { sortBy: "volume_24h", sortOrder: "desc" } as const;
 
 export function PairsPageSection() {
-  const [page, setPage] = useState(1);
-  const { data, isLoading } = usePairs(page, 50);
+  const { search, sortBy, sortOrder, page, setSearch, toggleSort, setPage } =
+    useTableParams(PAIRS_SORT_DEFAULT);
+  const { data, isLoading } = usePairs(page, 50, {
+    search: search || undefined,
+    sortBy,
+    sortOrder,
+  });
   const [pairs, setPairs] = useState<Pair[]>([]);
 
   useEffect(() => {
@@ -42,7 +51,7 @@ export function PairsPageSection() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (isLoading && pairs.length === 0) {
+  if (isLoading && pairs.length === 0 && !search) {
     return <PairsTableSkeleton title="Pairs" />;
   }
 
@@ -52,6 +61,11 @@ export function PairsPageSection() {
         pairs={pairs}
         pagination={data?.pagination}
         onPageChange={handlePageChange}
+        search={search}
+        onSearchChange={setSearch}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        onSortChange={toggleSort}
       />
     </div>
   );
