@@ -1,11 +1,12 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 import { WagmiProvider } from "wagmi";
 import { config } from "@/lib/wagmi";
-import { useState } from "react";
-import { WebSocketProvider } from "./websocket-provider";
 import { PriceAlertsProvider } from "./price-alerts-provider";
+import { WatchlistProvider } from "./watchlist-provider";
+import { WebSocketProvider } from "./websocket-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -23,7 +24,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <PriceAlertsProvider>
-          <WebSocketProvider>{children}</WebSocketProvider>
+          <WatchlistProvider>
+            <WebSocketProvider>{children}</WebSocketProvider>
+          </WatchlistProvider>
         </PriceAlertsProvider>
       </QueryClientProvider>
     </WagmiProvider>
