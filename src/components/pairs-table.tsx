@@ -1,11 +1,8 @@
-"use client";
-
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 
 import { SortableHeader } from "@/components/sortable-header";
 import { TableSearch } from "@/components/table-search";
 import { TokenIcon } from "@/components/token-icon";
-import { WatchlistButton } from "@/components/watchlist-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { WatchlistButton } from "@/components/watchlist-button";
 import type { SortOrder } from "@/hooks/use-table-params";
 import { formatNumber, formatPriceUsd, formatUsd } from "@/lib/format";
 import type { Pagination, Pair } from "@/lib/zilstream";
@@ -50,7 +48,7 @@ export function PairsTable({
   sortOrder,
   onSortChange,
 }: PairsTableProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const sortProps =
     sortBy && sortOrder && onSortChange
       ? { currentSort: sortBy, currentOrder: sortOrder, onSort: onSortChange }
@@ -113,7 +111,12 @@ export function PairsTable({
                 <TableRow
                   key={pair.address}
                   className="cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => router.push(`/pairs/${pair.address}`)}
+                  onClick={() =>
+                    navigate({
+                      to: "/pairs/$address",
+                      params: { address: pair.address },
+                    })
+                  }
                 >
                   <TableCell className="pl-6 pr-0">
                     <WatchlistButton kind="pair" address={pair.address} />
@@ -139,7 +142,7 @@ export function PairsTable({
                       </span>
                       {pair.fee ? (
                         <Badge variant="secondary" className="text-xs">
-                          {(Number.parseInt(pair.fee) / 10000).toFixed(2)}%
+                          {(Number.parseInt(pair.fee, 10) / 10000).toFixed(2)}%
                         </Badge>
                       ) : (
                         <Badge variant="secondary" className="text-xs">

@@ -1,5 +1,3 @@
-"use client";
-
 import { TokensTable } from "@/components/tokens-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -64,8 +62,8 @@ function TokensTableSkeleton() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Array.from({ length: 10 }).map((_, i) => (
-              <TableRow key={i}>
+            {Array.from({ length: 10 }, (_, i) => `row-${i}`).map((key) => (
+              <TableRow key={key}>
                 <TableCell className="pl-6 pr-0">
                   <Skeleton className="h-8 w-8 rounded" />
                 </TableCell>

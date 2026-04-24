@@ -1,18 +1,17 @@
+import type {
+  PublicationContext,
+  Subscription,
+} from "centrifuge/build/protobuf";
 import { useEffect, useRef } from "react";
 import { useWebSocketContext } from "@/components/websocket-provider";
-import {
-  type Subscription,
-  PublicationContext,
-} from "centrifuge/build/protobuf";
-import { type Pair, mapPair } from "@/lib/zilstream";
 import type {
   BatchUpdate,
-  PairUpdate,
   SwapEventData,
   WebSocketMessage,
 } from "@/lib/websocket-types";
+import { mapPair, type Pair } from "@/lib/zilstream";
 
-export function useSubscription<T = any>(
+export function useSubscription<T = unknown>(
   channel: string,
   onData: (data: T) => void,
   enabled: boolean = true,

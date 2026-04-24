@@ -1,7 +1,5 @@
-"use client";
-
-import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -40,8 +38,8 @@ export function PairsTableSkeleton({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Array.from({ length: rows }).map((_, i) => (
-              <TableRow key={i}>
+            {Array.from({ length: rows }, (_, i) => `row-${i}`).map((key) => (
+              <TableRow key={key}>
                 <TableCell className="pl-6 pr-0">
                   <Skeleton className="h-8 w-8 rounded" />
                 </TableCell>

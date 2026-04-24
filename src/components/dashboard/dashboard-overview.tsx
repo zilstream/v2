@@ -1,21 +1,17 @@
-"use client";
-
 import type { Address } from "viem";
-import { useBalance } from "wagmi";
 import { formatEther } from "viem";
-
+import { useBalance } from "wagmi";
+import { useLiquidityPositions } from "@/hooks/use-liquidity-positions";
 import { usePortfolioBalances } from "@/hooks/use-portfolio-balances";
 import { useStakingPositions } from "@/hooks/use-staking-positions";
-import { useLiquidityPositions } from "@/hooks/use-liquidity-positions";
 import { useV3LiquidityPositions } from "@/hooks/use-v3-liquidity-positions";
 import { useAddressEvents, useStats } from "@/hooks/use-zilstream-queries";
-
-import { PortfolioSummary } from "./portfolio-summary";
-import { TokenBalancesCard } from "./token-balances-card";
-import { RecentTradesCard } from "./recent-trades-card";
-import { LiquidityPositionsCard } from "./liquidity-positions-card";
-import { StakingPositionsCard } from "./staking-positions-card";
 import { DashboardSkeleton } from "./dashboard-skeleton";
+import { LiquidityPositionsCard } from "./liquidity-positions-card";
+import { PortfolioSummary } from "./portfolio-summary";
+import { RecentTradesCard } from "./recent-trades-card";
+import { StakingPositionsCard } from "./staking-positions-card";
+import { TokenBalancesCard } from "./token-balances-card";
 
 interface DashboardOverviewProps {
   address: Address;

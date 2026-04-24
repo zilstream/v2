@@ -1,16 +1,14 @@
-"use client";
-
 import { useQuery } from "@tanstack/react-query";
+import { type Address, formatUnits } from "viem";
 import { useAccount } from "wagmi";
-import { formatUnits, type Address } from "viem";
 import { useStats } from "@/hooks/use-zilstream-queries";
-import { liquidDelegatorAbi } from "@/lib/stakingAbi";
 import { ERC20_ABI } from "@/lib/abis";
 import { publicClient } from "@/lib/public-client";
 import {
   LIQUID_VALIDATORS,
   NON_LIQUID_VALIDATORS,
 } from "@/lib/staking-validators";
+import { liquidDelegatorAbi } from "@/lib/stakingAbi";
 import type {
   LiquidStakingPosition,
   NonLiquidStakingPosition,

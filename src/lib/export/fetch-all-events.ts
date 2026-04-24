@@ -1,7 +1,7 @@
 import {
+  type AddressEvent,
   fetchAddressEvents,
   fetchAddressTransactions,
-  type AddressEvent,
   type Transaction,
 } from "@/lib/api-client";
 import type { DateRange, ExportProgress } from "./types";

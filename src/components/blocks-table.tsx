@@ -1,6 +1,4 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatNumber, formatTimestamp } from "@/lib/format";
-import type { Pagination, Block } from "@/lib/zilstream";
+import type { Block, Pagination } from "@/lib/zilstream";
 
 interface BlocksTableProps {
   blocks: Block[];
@@ -31,7 +29,6 @@ export function BlocksTable({
   blocks,
   pagination,
   onPageChange,
-  isLoading,
 }: BlocksTableProps) {
   return (
     <Card>
@@ -56,7 +53,8 @@ export function BlocksTable({
                 <TableCell className="px-6">
                   <div className="flex flex-col">
                     <Link
-                      href={`/block/${block.number}`}
+                      to="/block/$number"
+                      params={{ number: String(block.number) }}
                       className="font-medium text-primary hover:underline"
                     >
                       {formatNumber(block.number, 0)}

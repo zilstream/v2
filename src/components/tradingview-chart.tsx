@@ -1,6 +1,3 @@
-"use client";
-
-import Script from "next/script";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { createDatafeed } from "@/lib/tradingview-datafeed";
@@ -43,7 +40,17 @@ export function TradingViewChart({
   useEffect(() => {
     if (window.TradingView) {
       setLibLoaded(true);
+      return;
     }
+
+    const script = document.createElement("script");
+    script.src = "/charting_library/charting_library.standalone.js";
+    script.onload = () => setLibLoaded(true);
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
   }, []);
 
   const checkContainerReady = useCallback(() => {
@@ -148,10 +155,6 @@ export function TradingViewChart({
     <div
       className={`relative w-full overflow-hidden bg-card text-card-foreground ${className || "h-[500px] rounded-xl border shadow"}`}
     >
-      <Script
-        src="/charting_library/charting_library.standalone.js"
-        onLoad={() => setLibLoaded(true)}
-      />
       <div ref={containerRef} className="h-full w-full" />
     </div>
   );

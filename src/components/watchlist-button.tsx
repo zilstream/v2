@@ -1,5 +1,3 @@
-"use client";
-
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWatchlistContext } from "@/components/watchlist-provider";

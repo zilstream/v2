@@ -1,7 +1,5 @@
-"use client";
-
+import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { AddressDisplay } from "@/components/address-display";
 import { Badge } from "@/components/ui/badge";
@@ -64,7 +62,8 @@ export function AddressTransactions({ address }: AddressTransactionsProps) {
                 <TableCell className="px-6 py-2">
                   <div className="flex items-center gap-2">
                     <Link
-                      href={`/tx/${tx.hash}`}
+                      to="/tx/$hash"
+                      params={{ hash: tx.hash }}
                       className="font-medium text-primary hover:underline font-mono text-sm"
                     >
                       {shortenHash(tx.hash)}
@@ -78,7 +77,8 @@ export function AddressTransactions({ address }: AddressTransactionsProps) {
                 </TableCell>
                 <TableCell className="py-2">
                   <Link
-                    href={`/block/${tx.blockNumber}`}
+                    to="/block/$number"
+                    params={{ number: String(tx.blockNumber) }}
                     className="text-primary hover:underline"
                   >
                     {formatNumber(tx.blockNumber, 0)}
@@ -94,7 +94,8 @@ export function AddressTransactions({ address }: AddressTransactionsProps) {
                     <Badge variant="secondary">You</Badge>
                   ) : (
                     <Link
-                      href={`/address/${tx.fromAddress}`}
+                      to="/address/$address"
+                      params={{ address: tx.fromAddress }}
                       className="font-mono text-sm text-primary hover:underline"
                     >
                       <AddressDisplay address={tx.fromAddress} />
@@ -107,7 +108,8 @@ export function AddressTransactions({ address }: AddressTransactionsProps) {
                       <Badge variant="secondary">You</Badge>
                     ) : (
                       <Link
-                        href={`/address/${tx.toAddress}`}
+                        to="/address/$address"
+                        params={{ address: tx.toAddress }}
                         className="font-mono text-sm text-primary hover:underline"
                       >
                         <AddressDisplay address={tx.toAddress} />
@@ -176,8 +178,8 @@ function AddressTransactionsSkeleton() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <TableRow key={i}>
+            {Array.from({ length: 5 }, (_, i) => `row-${i}`).map((key) => (
+              <TableRow key={key}>
                 <TableCell className="px-6 py-2">
                   <Skeleton className="h-4 w-32" />
                 </TableCell>

@@ -1,10 +1,7 @@
-"use client";
-
 import { BarChart3, TrendingUp } from "lucide-react";
-
+import { useStats } from "@/hooks/use-zilstream-queries";
 import { formatPriceUsd, formatUsd } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { useStats } from "@/hooks/use-zilstream-queries";
 
 export function HeaderStats() {
   const { data } = useStats();

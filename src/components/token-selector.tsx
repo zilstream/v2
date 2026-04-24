@@ -1,11 +1,8 @@
-"use client";
-
 import { Search } from "lucide-react";
 import * as React from "react";
 
 import { TokenIcon } from "@/components/token-icon";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -13,8 +10,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { Token } from "@/lib/zilstream";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import type { Token } from "@/lib/zilstream";
 
 interface TokenSelectorProps {
   tokens: Token[];
@@ -56,7 +54,7 @@ export function TokenSelector({
     return token.symbol;
   };
 
-  const getTokenIcon = (token: Token) => {
+  const _getTokenIcon = (token: Token) => {
     // TokenIcon component likely handles WZIL address correctly or we can force it if needed,
     // but usually WZIL address icon is ZIL icon.
     return token.address;
@@ -102,6 +100,7 @@ export function TokenSelector({
           <div className="grid gap-1">
             {filteredTokens.map((token) => (
               <button
+                type="button"
                 key={token.address}
                 className={cn(
                   "flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-muted transition-colors",

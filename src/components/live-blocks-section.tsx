@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { BlocksTable } from "@/components/blocks-table";
 import { useBlocks } from "@/hooks/use-zilstream-queries";

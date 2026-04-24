@@ -1,5 +1,3 @@
-"use client";
-
 import { useMemo } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
@@ -11,12 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  ChartConfig,
+  type ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart";
-import { formatPriceUsd, formatUsd } from "@/lib/format";
+import { formatPriceUsd } from "@/lib/format";
 
 interface PricePoint {
   timestamp: string;

@@ -1,6 +1,4 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 import { SortableHeader } from "@/components/sortable-header";
 import { TableSearch } from "@/components/table-search";
@@ -139,7 +137,8 @@ export function TokensTable({
                   </TableCell>
                   <TableCell>
                     <Link
-                      href={`/tokens/${token.address}`}
+                      to="/tokens/$address"
+                      params={{ address: token.address }}
                       className="flex items-center gap-3 transition hover:opacity-80"
                     >
                       <TokenIcon

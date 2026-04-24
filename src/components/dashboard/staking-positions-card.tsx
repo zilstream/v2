@@ -1,14 +1,12 @@
-"use client";
-
-import Image from "next/image";
+import { TokenIcon } from "@/components/token-icon";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
-  CardAction,
 } from "@/components/ui/card";
-import { TokenIcon } from "@/components/token-icon";
 import {
   Table,
   TableBody,
@@ -17,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { formatTokenAmount, formatUsd } from "@/lib/format";
 import type {
   LiquidStakingPosition,
@@ -33,7 +30,6 @@ interface StakingPositionsCardProps {
 export function StakingPositionsCard({
   liquidPositions,
   nonLiquidPositions,
-  isLoading,
 }: StakingPositionsCardProps) {
   const liquidTotal = liquidPositions.reduce((sum, p) => sum + p.valueUsd, 0);
   const nonLiquidTotal = nonLiquidPositions.reduce(
@@ -174,11 +170,10 @@ export function StakingPositionsCard({
 function ValidatorIcon({ iconUrl, name }: { iconUrl: string; name: string }) {
   return (
     <div className="relative h-6 w-6 overflow-hidden rounded-full bg-muted">
-      <Image
+      <img
         src={iconUrl}
         alt={name}
-        fill
-        className="object-cover"
+        className="absolute inset-0 w-full h-full object-cover"
         onError={(e) => {
           e.currentTarget.style.display = "none";
         }}

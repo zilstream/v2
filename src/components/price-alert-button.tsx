@@ -1,9 +1,9 @@
-"use client";
-
+import { Link } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
+import { PriceAlertDialog } from "@/components/price-alert-dialog";
+import { usePriceAlertsContext } from "@/components/price-alerts-provider";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -11,8 +11,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { PriceAlertDialog } from "@/components/price-alert-dialog";
-import { usePriceAlertsContext } from "@/components/price-alerts-provider";
 import { MEMBERSHIP_NFT_ABI } from "@/lib/abis";
 import { MEMBERSHIP_NFT_ADDRESS } from "@/lib/constants";
 
@@ -49,7 +47,7 @@ export function PriceAlertButton({ token }: PriceAlertButtonProps) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Button variant="outline" size="icon" asChild>
-              <Link href="/membership">
+              <Link to="/membership">
                 <Bell className="h-4 w-4" />
               </Link>
             </Button>

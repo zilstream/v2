@@ -1,10 +1,8 @@
-"use client";
-
 import { useQuery } from "@tanstack/react-query";
+import { type Address, formatUnits } from "viem";
 import { useAccount } from "wagmi";
-import { formatUnits, type Address } from "viem";
-import { fetchTokens } from "@/lib/api-client";
 import { ERC20_ABI } from "@/lib/abis";
+import { fetchTokens } from "@/lib/api-client";
 import { publicClient } from "@/lib/public-client";
 import type { TokenBalance } from "@/lib/types/dashboard";
 

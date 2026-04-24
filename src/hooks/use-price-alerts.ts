@@ -1,10 +1,8 @@
-"use client";
-
 import { useCallback, useEffect, useState } from "react";
 import {
-  type PriceAlert,
   generateAlertId,
   loadAlerts,
+  type PriceAlert,
   saveAlerts,
 } from "@/lib/price-alerts";
 

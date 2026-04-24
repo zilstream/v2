@@ -1,4 +1,4 @@
-import { decodeEventLog, type Abi } from "viem";
+import { type Abi, decodeEventLog } from "viem";
 import { ALL_ABIS } from "./abis";
 
 export interface DecodedEvent {
@@ -42,7 +42,7 @@ export function decodeEvent(event: EventLog): DecodedEvent | null {
       args: (decoded.args ?? {}) as unknown as Record<string, unknown>,
       eventName: decoded.eventName,
     };
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }

@@ -1,6 +1,4 @@
-"use client";
-
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo } from "react";
 
 export type SortOrder = "asc" | "desc";
@@ -21,9 +19,11 @@ export interface TableParams {
 }
 
 export function useTableParams(defaults: TableParamsDefaults): TableParams {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
+  const pathname = useLocation({ select: (s) => s.pathname });
+  const searchParams = useLocation({
+    select: (s) => new URLSearchParams(s.searchStr),
+  });
 
   const search = searchParams.get("q") ?? "";
   const sortBy = searchParams.get("sort") ?? defaults.sortBy;
@@ -46,11 +46,12 @@ export function useTableParams(defaults: TableParamsDefaults): TableParams {
         }
       }
       const query = next.toString();
-      router.replace(query ? `${pathname}?${query}` : pathname, {
-        scroll: false,
+      navigate({
+        to: query ? `${pathname}?${query}` : pathname,
+        replace: true,
       });
     },
-    [pathname, router, searchParams],
+    [pathname, navigate, searchParams],
   );
 
   const setSearch = useCallback(

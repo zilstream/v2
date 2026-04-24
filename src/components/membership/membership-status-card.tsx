@@ -1,7 +1,4 @@
-"use client";
-
 import { Crown, ExternalLink } from "lucide-react";
-import Link from "next/link";
 import { useAccount, useReadContract } from "wagmi";
 
 import { Badge } from "@/components/ui/badge";
@@ -54,14 +51,14 @@ export function MembershipStatusCard() {
             </p>
           </div>
         </div>
-        <Link
+        <a
           href={`${EXPLORER_URL}/address/${MEMBERSHIP_NFT_ADDRESS}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-muted-foreground transition-colors hover:text-foreground"
         >
           <ExternalLink className="h-4 w-4" />
-        </Link>
+        </a>
       </div>
     </Card>
   );

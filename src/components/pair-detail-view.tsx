@@ -1,5 +1,4 @@
-"use client";
-
+import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   ExternalLink,
@@ -8,7 +7,6 @@ import {
   LineChart,
   List,
 } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AddressDisplay } from "@/components/address-display";
 import { ExplorerDropdown } from "@/components/explorer-dropdown";
@@ -121,7 +119,7 @@ export function PairDetailView({
           eventType: eventType,
           id: swapEvent.id,
           transactionHash: swapEvent.transaction_hash,
-          logIndex: Number.parseInt(swapEvent.id.split("-")[1] || "0"),
+          logIndex: Number.parseInt(swapEvent.id.split("-")[1] || "0", 10),
           blockNumber: 0, // Not available in real-time event
           timestamp: swapEvent.timestamp,
           address: pair.address,
@@ -320,12 +318,15 @@ export function PairDetailView({
         </div>
 
         {/* Drag Handle */}
-        <div
+        <button
+          type="button"
+          aria-label="Resize chart"
+          tabIndex={-1}
           className="hidden md:flex h-3 shrink-0 cursor-row-resize items-center justify-center border-b border-r bg-muted/40 hover:bg-primary/10 transition-colors"
           onMouseDown={startResizing}
         >
           <GripHorizontal className="h-4 w-4 text-muted-foreground/50" />
-        </div>
+        </button>
 
         {/* Events Section */}
         <div
@@ -474,7 +475,8 @@ export function PairDetailView({
                           return userAddress ? (
                             <Link
                               className="font-mono text-xs text-muted-foreground hover:text-foreground underline-offset-4 hover:underline"
-                              href={`/address/${userAddress}`}
+                              to="/address/$address"
+                              params={{ address: userAddress }}
                               title={userAddress}
                             >
                               <AddressDisplay address={userAddress} chars={2} />
@@ -487,7 +489,8 @@ export function PairDetailView({
                       <TableCell className="py-2 pr-4 text-right">
                         <div className="flex items-center justify-end">
                           <Link
-                            href={`/tx/${event.transactionHash}`}
+                            to="/tx/$hash"
+                            params={{ hash: event.transactionHash }}
                             className="text-muted-foreground hover:text-foreground"
                             title="View Transaction"
                           >
@@ -545,25 +548,27 @@ export function PairDetailView({
               <Badge variant="secondary" className="capitalize">
                 {pair.protocol}
               </Badge>
-              <Link
+              <a
                 href={`${PLUNDERSWAP_URL}/swap?inputCurrency=${pair.token0}&outputCurrency=${pair.token1}`}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex h-5 items-center gap-1.5 rounded-md bg-primary px-2 text-[10px] font-medium text-primary-foreground shadow hover:bg-primary/90"
               >
                 Swap <ExternalLink className="h-3 w-3" />
-              </Link>
+              </a>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs">
               <Link
-                href={`/tokens/${pair.token0}`}
+                to="/tokens/$address"
+                params={{ address: pair.token0 }}
                 className="inline-flex items-center justify-center gap-1 rounded-md border px-2 py-1.5 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
               >
                 {pair.token0Symbol}
               </Link>
               <Link
-                href={`/tokens/${pair.token1}`}
+                to="/tokens/$address"
+                params={{ address: pair.token1 }}
                 className="inline-flex items-center justify-center gap-1 rounded-md border px-2 py-1.5 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
               >
                 {pair.token1Symbol}

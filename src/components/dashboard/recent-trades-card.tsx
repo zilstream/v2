@@ -1,14 +1,13 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
+import { TokenIcon } from "@/components/token-icon";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
-  CardAction,
 } from "@/components/ui/card";
 import {
   Table,
@@ -18,16 +17,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TokenIcon } from "@/components/token-icon";
-import { formatTimestamp, formatTokenAmount, formatUsd } from "@/lib/format";
 import type { AddressEvent } from "@/lib/api-client";
+import { formatUsd } from "@/lib/format";
 
 interface RecentTradesCardProps {
   events: AddressEvent[];
   isLoading?: boolean;
 }
 
-export function RecentTradesCard({ events, isLoading }: RecentTradesCardProps) {
+export function RecentTradesCard({ events }: RecentTradesCardProps) {
   const isEmpty = events.length === 0;
 
   return (
@@ -69,7 +67,8 @@ export function RecentTradesCard({ events, isLoading }: RecentTradesCardProps) {
                     </TableCell>
                     <TableCell>
                       <Link
-                        href={`/pairs/${event.pairAddress}`}
+                        to="/pairs/$address"
+                        params={{ address: event.pairAddress }}
                         className="flex items-center gap-1 hover:underline"
                       >
                         <div className="flex -space-x-1">
@@ -94,7 +93,8 @@ export function RecentTradesCard({ events, isLoading }: RecentTradesCardProps) {
                     </TableCell>
                     <TableCell className="text-right">
                       <Link
-                        href={`/tx/${event.transactionHash}`}
+                        to="/tx/$hash"
+                        params={{ hash: event.transactionHash }}
                         className="flex items-center justify-end gap-1 text-muted-foreground hover:text-foreground"
                       >
                         <span className="text-xs">

@@ -1,5 +1,3 @@
-"use client";
-
 import { format } from "date-fns";
 import { CalendarIcon, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,8 +7,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import type { DateRange } from "@/lib/export/types";
+import { cn } from "@/lib/utils";
 
 const currentYear = new Date().getFullYear();
 
@@ -47,9 +45,9 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <label className="text-sm font-medium text-muted-foreground">
+        <p className="text-sm font-medium text-muted-foreground">
           Quick select tax year
-        </label>
+        </p>
         <div className="flex gap-2">
           {TAX_YEAR_PRESETS.map((preset) => {
             const isSelected = isPresetSelected(preset);
@@ -78,9 +76,9 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-muted-foreground">
+        <p className="text-sm font-medium text-muted-foreground">
           {hasPresetMatch ? "Selected range" : "Custom range"}
-        </label>
+        </p>
         <div className="flex flex-wrap items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>

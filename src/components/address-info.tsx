@@ -1,12 +1,10 @@
-"use client";
-
-import { useBalance } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
-import { formatEther, type Address } from "viem";
-import { formatNumber } from "@/lib/format";
-import { config } from "@/lib/wagmi";
+import { type Address, formatEther } from "viem";
+import { useBalance } from "wagmi";
 import { getTransactionCount } from "wagmi/actions";
 import { Card } from "@/components/ui/card";
+import { formatNumber } from "@/lib/format";
+import { config } from "@/lib/wagmi";
 
 interface AddressInfoProps {
   address: string;

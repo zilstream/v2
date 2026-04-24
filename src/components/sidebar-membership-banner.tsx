@@ -1,7 +1,5 @@
-"use client";
-
+import { Link } from "@tanstack/react-router";
 import { Crown } from "lucide-react";
-import Link from "next/link";
 import { useAccount, useReadContract } from "wagmi";
 
 import { Button } from "@/components/ui/button";
@@ -38,7 +36,7 @@ export function SidebarMembershipBanner() {
             variant="outline"
             className="h-7 w-full border-primary/30 text-xs font-medium shadow-none hover:bg-primary/10"
           >
-            <Link href="/membership">View Membership</Link>
+            <Link to="/membership">View Membership</Link>
           </Button>
         </div>
       </Card>
@@ -60,7 +58,7 @@ export function SidebarMembershipBanner() {
           size="sm"
           className="h-7 w-full bg-primary text-xs font-medium text-primary-foreground shadow-none hover:bg-primary/90"
         >
-          <Link href="/membership">Get Membership</Link>
+          <Link to="/membership">Get Membership</Link>
         </Button>
       </div>
     </Card>
