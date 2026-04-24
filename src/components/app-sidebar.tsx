@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Newspaper,
   Square,
+  Star,
   TrendingUp,
 } from "lucide-react";
 import Image from "next/image";
@@ -51,6 +52,11 @@ const items = [
     title: "Swap",
     url: "/swap",
     icon: ArrowLeftRight,
+  },
+  {
+    title: "Watchlist",
+    url: "/watchlist",
+    icon: Star,
   },
   {
     title: "Blocks",

@@ -29,7 +29,8 @@ export function PairsTableSkeleton({
         <Table>
           <TableHeader>
             <TableRow className="border-border/60">
-              <TableHead className="px-6">Pair</TableHead>
+              <TableHead className="w-12 pl-6 pr-0" />
+              <TableHead>Pair</TableHead>
               <TableHead className="text-right">Price (USD)</TableHead>
               <TableHead className="text-right">Liquidity (USD)</TableHead>
               <TableHead className="text-right">Volume (24h USD)</TableHead>
@@ -41,7 +42,10 @@ export function PairsTableSkeleton({
           <TableBody>
             {Array.from({ length: rows }).map((_, i) => (
               <TableRow key={i}>
-                <TableCell className="px-6">
+                <TableCell className="pl-6 pr-0">
+                  <Skeleton className="h-8 w-8 rounded" />
+                </TableCell>
+                <TableCell>
                   <div className="flex items-center gap-2">
                     <div className="flex shrink-0 -space-x-1.5">
                       <Skeleton className="h-6 w-6 rounded-full" />

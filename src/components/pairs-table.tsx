@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { SortableHeader } from "@/components/sortable-header";
 import { TableSearch } from "@/components/table-search";
 import { TokenIcon } from "@/components/token-icon";
+import { WatchlistButton } from "@/components/watchlist-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -71,7 +72,8 @@ export function PairsTable({
         <Table>
           <TableHeader>
             <TableRow className="border-border/60">
-              <TableHead className="px-6">Pair</TableHead>
+              <TableHead className="w-12 pl-6 pr-0" />
+              <TableHead>Pair</TableHead>
               <TableHead className="text-right">Price (USD)</TableHead>
               {sortProps ? (
                 <SortableHeader
@@ -100,7 +102,7 @@ export function PairsTable({
             {pairs.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={7}
+                  colSpan={8}
                   className="h-24 text-center text-muted-foreground"
                 >
                   No pairs found.
@@ -113,7 +115,10 @@ export function PairsTable({
                   className="cursor-pointer hover:bg-muted/50 transition-colors"
                   onClick={() => router.push(`/pairs/${pair.address}`)}
                 >
-                  <TableCell className="px-6">
+                  <TableCell className="pl-6 pr-0">
+                    <WatchlistButton kind="pair" address={pair.address} />
+                  </TableCell>
+                  <TableCell>
                     <div className="flex items-center gap-2">
                       <div className="flex shrink-0 -space-x-1.5">
                         <TokenIcon
