@@ -1,15 +1,12 @@
-"use client";
-
-import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-
-import { cn } from "@/lib/utils";
+import * as React from "react";
 import {
-  SidebarContext,
   SIDEBAR_WIDTH,
   SIDEBAR_WIDTH_ICON,
+  SidebarContext,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 const Dialog = DialogPrimitive.Root;
 
@@ -40,7 +37,7 @@ const DialogContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const sidebarContext = React.useContext(SidebarContext);
   const isMobile = sidebarContext?.isMobile;
-  const isOpen = sidebarContext?.open;
+  const _isOpen = sidebarContext?.open;
   const state = sidebarContext?.state;
 
   // Calculate offset style if sidebar is present
@@ -141,13 +138,13 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 export {
   Dialog,
-  DialogPortal,
-  DialogOverlay,
   DialogClose,
-  DialogTrigger,
   DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
 };

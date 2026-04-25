@@ -52,7 +52,7 @@ export function createDatafeed(pairAddress: string, pairInfo: any) {
   const getIntervalSeconds = (resolution: string) => {
     if (resolution === "1D") return 86400;
     if (resolution === "1W") return 604800;
-    const parsed = Number.parseInt(resolution);
+    const parsed = Number.parseInt(resolution, 10);
     if (!Number.isNaN(parsed)) return parsed * 60;
     return 60;
   };

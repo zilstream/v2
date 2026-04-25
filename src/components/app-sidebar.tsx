@@ -1,5 +1,4 @@
-"use client";
-
+import { Link, useLocation } from "@tanstack/react-router";
 import {
   ArrowLeftRight,
   Bell,
@@ -13,11 +12,10 @@ import {
   Star,
   TrendingUp,
 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
 
+import { SidebarMembershipBanner } from "@/components/sidebar-membership-banner";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   Sidebar,
   SidebarContent,
@@ -27,119 +25,63 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-const items = [
-  {
-    title: "Home",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Pairs",
-    url: "/pairs",
-    icon: TrendingUp,
-  },
-  {
-    title: "Tokens",
-    url: "/tokens",
-    icon: Coins,
-  },
-  {
-    title: "Swap",
-    url: "/swap",
-    icon: ArrowLeftRight,
-  },
-  {
-    title: "Watchlist",
-    url: "/watchlist",
-    icon: Star,
-  },
-  {
-    title: "Blocks",
-    url: "/blocks",
-    icon: Square,
-  },
-  {
-    title: "Transactions",
-    url: "/txs",
-    icon: ArrowLeftRight,
-  },
-];
+const navigationItems = [
+  { title: "Home", to: "/", icon: Home },
+  { title: "Pairs", to: "/pairs", icon: TrendingUp },
+  { title: "Tokens", to: "/tokens", icon: Coins },
+  { title: "Swap", to: "/swap", icon: ArrowLeftRight },
+  { title: "Watchlist", to: "/watchlist", icon: Star },
+  { title: "Blocks", to: "/blocks", icon: Square },
+  { title: "Transactions", to: "/txs", icon: ArrowLeftRight },
+] as const;
+
+const portfolioStaticItems = [
+  { title: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
+  { title: "Alerts", to: "/alerts", icon: Bell },
+] as const;
+
+const portfolioFooterItems = [
+  { title: "Exports", to: "/exports", icon: Download },
+  { title: "Membership", to: "/membership", icon: CreditCard },
+] as const;
 
 const resourcesItems = [
-  {
-    title: "News",
-    url: "/news",
-    icon: Newspaper,
-  },
-];
-
-import { SidebarMembershipBanner } from "@/components/sidebar-membership-banner";
-import { ThemeToggle } from "@/components/theme-toggle";
+  { title: "News", to: "/news", icon: Newspaper },
+] as const;
 
 export function AppSidebar() {
-  const pathname = usePathname();
-  const { address, isConnected } = useAccount();
+  const pathname = useLocation({ select: (s) => s.pathname });
+  const { address } = useAccount();
 
-  const isItemActive = (itemUrl: string) => {
-    if (itemUrl === "#") return false;
-    if (pathname === itemUrl) return true;
-    if (itemUrl === "/") return false;
-    if (itemUrl === "/blocks" && pathname.startsWith("/block")) return true;
-    if (itemUrl === "/txs" && pathname.startsWith("/tx")) return true;
-    return pathname.startsWith(itemUrl);
+  const isActive = (itemPath: string) => {
+    if (pathname === itemPath) return true;
+    if (itemPath === "/") return false;
+    if (itemPath === "/blocks" && pathname.startsWith("/block")) return true;
+    if (itemPath === "/txs" && pathname.startsWith("/tx")) return true;
+    if (itemPath.startsWith("/address")) return pathname.startsWith("/address");
+    return pathname.startsWith(itemPath);
   };
-
-  const portfolioItems = [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Alerts",
-      url: "/alerts",
-      icon: Bell,
-    },
-    {
-      title: "Transactions",
-      url: `/address/${address}`,
-      icon: ArrowLeftRight,
-    },
-    {
-      title: "Exports",
-      url: "/exports",
-      icon: Download,
-    },
-    {
-      title: "Membership",
-      url: "/membership",
-      icon: CreditCard,
-    },
-  ];
 
   return (
     <Sidebar>
       <SidebarHeader>
-        <Link href="/" className="flex items-center gap-2 px-2 py-4">
-          <Image
+        <Link to="/" className="flex items-center gap-2 px-2 py-4">
+          <img
             src="/logo-text.svg"
             alt="ZilStream"
             width={140}
             height={28}
-            priority
             className="block h-7 w-auto dark:hidden"
           />
-          <Image
+          <img
             src="/logo-text-dark.svg"
             alt="ZilStream"
             width={140}
             height={28}
-            priority
             className="hidden h-7 w-auto dark:block"
           />
         </Link>
@@ -149,11 +91,11 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
+                  <SidebarMenuButton asChild isActive={isActive(item.to)}>
                     <Link
-                      href={item.url}
+                      to={item.to}
                       className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
                     >
                       <item.icon />
@@ -170,11 +112,38 @@ export function AppSidebar() {
           <SidebarGroupLabel>Portfolio</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {portfolioItems.map((item) => (
+              {portfolioStaticItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
+                  <SidebarMenuButton asChild isActive={isActive(item.to)}>
                     <Link
-                      href={item.url}
+                      to={item.to}
+                      className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+              {address && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={isActive("/address")}>
+                    <Link
+                      to="/address/$address"
+                      params={{ address }}
+                      className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
+                    >
+                      <ArrowLeftRight />
+                      <span>Transactions</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+              {portfolioFooterItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isActive(item.to)}>
+                    <Link
+                      to={item.to}
                       className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
                     >
                       <item.icon />
@@ -193,9 +162,9 @@ export function AppSidebar() {
             <SidebarMenu>
               {resourcesItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isItemActive(item.url)}>
+                  <SidebarMenuButton asChild isActive={isActive(item.to)}>
                     <Link
-                      href={item.url}
+                      to={item.to}
                       className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
                     >
                       <item.icon />

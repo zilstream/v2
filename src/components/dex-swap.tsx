@@ -1,8 +1,6 @@
-"use client";
-
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { ArrowDown, ArrowLeftRight, Settings, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
+import { ArrowDown, Loader2, Settings } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 import { encodeFunctionData, formatUnits, parseUnits } from "viem";
@@ -23,14 +21,14 @@ import {
   ERC20_ABI,
   PLUNDERSWAP_QUOTER_V2,
   PLUNDERSWAP_QUOTER_V2_ABI,
-  PLUNDERSWAP_V2_ROUTER,
-  PLUNDERSWAP_V2_ROUTER_ABI,
   PLUNDERSWAP_SMART_ROUTER,
   PLUNDERSWAP_SMART_ROUTER_ABI,
+  PLUNDERSWAP_V2_ROUTER,
+  PLUNDERSWAP_V2_ROUTER_ABI,
 } from "@/lib/abis";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { Token, Pair, fetchTokenPairs } from "@/lib/zilstream";
+import { fetchTokenPairs, type Pair, type Token } from "@/lib/zilstream";
 
 const WZIL_ADDRESS =
   "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192" as `0x${string}`;
@@ -60,7 +58,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
   const [slippage, setSlippage] = React.useState("0.5");
   const [deadline, setDeadline] = React.useState("20");
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const [quote, setQuote] = React.useState<string | null>(null);
   const [isFetchingQuote, setIsFetchingQuote] = React.useState(false);
@@ -243,12 +241,18 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
           const formatted = formatUnits(quoteAmount, targetDecimals);
           setQuote(formatted);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!cancelled) {
           console.error("Quote fetch error:", err);
+          const message =
+            err instanceof Error
+              ? err.message
+              : typeof err === "string"
+                ? err
+                : "";
           setQuote(null);
           setQuoteError(
-            err?.message?.includes("reverted")
+            message.includes("reverted")
               ? "Insufficient liquidity"
               : "Failed to fetch quote",
           );
@@ -307,7 +311,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
 
   const needsApproval =
     !isNativeInput && parsedAmount > 0n && (allowance ?? 0n) < parsedAmount;
-  const insufficientBalance = parsedAmount > (balanceData?.value ?? 0n);
+  const _insufficientBalance = parsedAmount > (balanceData?.value ?? 0n);
 
   // TX Success Handling
   React.useEffect(() => {
@@ -335,7 +339,11 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
           {
             action: {
               label: "View Transaction",
-              onClick: () => router.push(`/tx/${txReceipt.transactionHash}`),
+              onClick: () =>
+                navigate({
+                  to: "/tx/$hash",
+                  params: { hash: txReceipt.transactionHash },
+                }),
             },
           },
         );
@@ -350,7 +358,8 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
     quote,
     tokenIn,
     tokenOut,
-    router,
+    navigate,
+    exactField,
   ]);
 
   const handleApprove = async () => {
@@ -372,8 +381,14 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
 
       setTxHash(tx);
       setTxType("approve");
-    } catch (err: any) {
-      setSwapError(err?.shortMessage || err?.message || "Approval failed");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : typeof err === "string" ? err : "";
+      const shortMessage =
+        typeof err === "object" && err !== null && "shortMessage" in err
+          ? String((err as { shortMessage?: unknown }).shortMessage ?? "")
+          : "";
+      setSwapError(shortMessage || message || "Approval failed");
     } finally {
       setIsApproving(false);
     }
@@ -425,7 +440,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
       );
 
       let functionName = "";
-      let args: any[] = [];
+      let args: readonly unknown[] = [];
       let value = 0n;
 
       const isNativeOutput =
@@ -675,15 +690,21 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
       const tx = await writeContractAsync({
         address: PLUNDERSWAP_SMART_ROUTER,
         abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-        functionName: functionName as any,
-        args: args as any,
+        functionName: functionName as never,
+        args: args as never,
         value,
       });
 
       setTxHash(tx);
       setTxType("swap");
-    } catch (err: any) {
-      setSwapError(err?.shortMessage || err?.message || "Swap failed");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : typeof err === "string" ? err : "";
+      const shortMessage =
+        typeof err === "object" && err !== null && "shortMessage" in err
+          ? String((err as { shortMessage?: unknown }).shortMessage ?? "")
+          : "";
+      setSwapError(shortMessage || message || "Swap failed");
     } finally {
       setIsSwapping(false);
     }
@@ -798,6 +819,7 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
           <span>Pay</span>
           {isConnected && (
             <button
+              type="button"
               onClick={handleMaxBalance}
               className="hover:text-foreground"
             >
@@ -811,7 +833,10 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
             selectedToken={tokenIn}
             onSelect={setTokenIn}
             trigger={
-              <button className="flex items-center gap-2 rounded-full bg-background px-3 py-1.5 font-semibold shadow-sm hover:bg-accent transition-colors">
+              <button
+                type="button"
+                className="flex items-center gap-2 rounded-full bg-background px-3 py-1.5 font-semibold shadow-sm hover:bg-accent transition-colors"
+              >
                 {tokenIn ? (
                   <>
                     <TokenIcon
@@ -848,12 +873,14 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
 
       {/* Switch Button */}
       <div className="relative flex h-4 items-center justify-center">
-        <div
+        <button
+          type="button"
+          aria-label="Switch tokens"
           className="absolute rounded-full border bg-background p-1.5 shadow-sm cursor-pointer hover:scale-110 transition-transform"
           onClick={switchTokens}
         >
           <ArrowDown size={16} />
-        </div>
+        </button>
       </div>
 
       {/* Token Out */}
@@ -872,7 +899,10 @@ export function DexSwap({ initialTokens }: DexSwapProps) {
             selectedToken={tokenOut}
             onSelect={setTokenOut}
             trigger={
-              <button className="flex items-center gap-2 rounded-full bg-background px-3 py-1.5 font-semibold shadow-sm hover:bg-accent transition-colors">
+              <button
+                type="button"
+                className="flex items-center gap-2 rounded-full bg-background px-3 py-1.5 font-semibold shadow-sm hover:bg-accent transition-colors"
+              >
                 {tokenOut ? (
                   <>
                     <TokenIcon

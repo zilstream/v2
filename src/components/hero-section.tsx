@@ -1,7 +1,5 @@
-"use client";
-
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, BarChart3 } from "lucide-react";
-import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -12,8 +10,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatNumber, formatUsd } from "@/lib/format";
 import { useStats } from "@/hooks/use-zilstream-queries";
+import { formatNumber, formatUsd } from "@/lib/format";
 
 export function HeroSection() {
   const { data: stats, isLoading } = useStats();
@@ -44,30 +42,32 @@ export function HeroSection() {
           <div className="flex flex-wrap gap-2">
             <Link
               className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90"
-              href="/pairs"
+              to="/pairs"
             >
               Explore markets
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:bg-muted"
-              href="/tokens"
+              to="/tokens"
             >
               View tokens
             </Link>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Looking for the old ZilStream? Visit the{" "}
-            <Link
+            <a
               href="https://legacy.zilstream.com"
               target="_blank"
               className="font-medium text-foreground underline decoration-border hover:text-primary hover:decoration-primary"
+              rel="noopener"
             >
               legacy site here
-            </Link>{" "}
+            </a>{" "}
             (
             <Link
-              href="/news/sunsetting-zilstream-legacy"
+              to="/news/$slug"
+              params={{ slug: "sunsetting-zilstream-legacy" }}
               className="font-medium text-foreground underline decoration-border hover:text-primary hover:decoration-primary"
             >
               sunsetting early next year

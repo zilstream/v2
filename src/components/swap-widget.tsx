@@ -1,8 +1,6 @@
-"use client";
-
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useNavigate } from "@tanstack/react-router";
 import { ChevronDown, Settings, Tag, Zap } from "lucide-react";
-import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
 import { encodeFunctionData, formatUnits, parseUnits } from "viem";
@@ -21,12 +19,10 @@ import {
   ERC20_ABI,
   PLUNDERSWAP_QUOTER_V2,
   PLUNDERSWAP_QUOTER_V2_ABI,
-  PLUNDERSWAP_V2_ROUTER,
-  PLUNDERSWAP_V2_ROUTER_ABI,
   PLUNDERSWAP_SMART_ROUTER,
   PLUNDERSWAP_SMART_ROUTER_ABI,
-  PLUNDER_PROXY_ADDRESS,
-  PLUNDER_PROXY_ABI,
+  PLUNDERSWAP_V2_ROUTER,
+  PLUNDERSWAP_V2_ROUTER_ABI,
 } from "@/lib/abis";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -51,7 +47,9 @@ export function SwapWidget({
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
   const [slippage, setSlippage] = React.useState("0.5");
   const [deadline, setDeadline] = React.useState("20");
-  const router = useRouter();
+  const slippageId = React.useId();
+  const deadlineId = React.useId();
+  const navigate = useNavigate();
 
   // Identify if it's V2 or V3
   const isV3 = React.useMemo(
@@ -186,7 +184,7 @@ export function SwapWidget({
     // Reset quote when inputs change
     setQuote(null);
     setQuoteError(null);
-  }, [activeTab, inputToken.address, outputToken.address]);
+  }, []);
 
   React.useEffect(() => {
     if (!amount || Number.isNaN(Number(amount)) || Number(amount) <= 0) {
@@ -256,12 +254,18 @@ export function SwapWidget({
           const formatted = formatUnits(quoteAmount, outputToken.decimals);
           setQuote(formatted);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!cancelled) {
           console.error("Quote fetch error:", err);
+          const message =
+            err instanceof Error
+              ? err.message
+              : typeof err === "string"
+                ? err
+                : "";
           setQuote(null);
           setQuoteError(
-            err?.message?.includes("reverted")
+            message.includes("reverted")
               ? "Insufficient liquidity"
               : "Failed to fetch quote",
           );
@@ -277,7 +281,7 @@ export function SwapWidget({
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [amount, activeTab, inputToken, outputToken, publicClient, isV3, feeTier]);
+  }, [amount, inputToken, outputToken, publicClient, isV3, feeTier]);
 
   // Check Allowance
   const { data: allowance, refetch: refetchAllowance } = useReadContract({
@@ -330,7 +334,11 @@ export function SwapWidget({
           {
             action: {
               label: "View Transaction",
-              onClick: () => router.push(`/tx/${txReceipt.transactionHash}`),
+              onClick: () =>
+                navigate({
+                  to: "/tx/$hash",
+                  params: { hash: txReceipt.transactionHash },
+                }),
             },
           },
         );
@@ -345,7 +353,7 @@ export function SwapWidget({
     quote,
     inputToken.symbol,
     outputToken.symbol,
-    router,
+    navigate,
   ]);
 
   const handleApprove = async () => {
@@ -370,8 +378,14 @@ export function SwapWidget({
 
       setTxHash(tx);
       setTxType("approve");
-    } catch (err: any) {
-      setSwapError(err?.shortMessage || err?.message || "Approval failed");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : typeof err === "string" ? err : "";
+      const shortMessage =
+        typeof err === "object" && err !== null && "shortMessage" in err
+          ? String((err as { shortMessage?: unknown }).shortMessage ?? "")
+          : "";
+      setSwapError(shortMessage || message || "Approval failed");
     } finally {
       setIsApproving(false);
     }
@@ -410,8 +424,7 @@ export function SwapWidget({
         Math.floor(Date.now() / 1000) + deadlineMin * 60,
       );
 
-      let tx: `0x${string}`;
-      let args: any[] = [];
+      let args: readonly unknown[] = [];
       let functionName = "";
       let value = 0n;
 
@@ -558,18 +571,24 @@ export function SwapWidget({
         }
       }
 
-      tx = await writeContractAsync({
+      const tx = await writeContractAsync({
         address: PLUNDERSWAP_SMART_ROUTER,
         abi: PLUNDERSWAP_SMART_ROUTER_ABI,
-        functionName: functionName as any,
-        args: args as any,
+        functionName: functionName as never,
+        args: args as never,
         value,
       });
 
       setTxHash(tx);
       setTxType("swap");
-    } catch (err: any) {
-      setSwapError(err?.shortMessage || err?.message || "Swap failed");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : typeof err === "string" ? err : "";
+      const shortMessage =
+        typeof err === "object" && err !== null && "shortMessage" in err
+          ? String((err as { shortMessage?: unknown }).shortMessage ?? "")
+          : "";
+      setSwapError(shortMessage || message || "Swap failed");
     } finally {
       setIsSwapping(false);
     }
@@ -778,7 +797,7 @@ export function SwapWidget({
           <div className="mt-3 space-y-3 animate-in slide-in-from-top-2 fade-in-0">
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-medium">
+                <label htmlFor={slippageId} className="text-xs font-medium">
                   Slippage Tolerance
                 </label>
                 <span className="text-xs text-muted-foreground">
@@ -809,6 +828,7 @@ export function SwapWidget({
               {!["0.1", "0.5", "1.0"].includes(slippage) && (
                 <div className="flex items-center gap-2 rounded-md border bg-background px-3 py-1">
                   <Input
+                    id={slippageId}
                     className="h-6 border-0 bg-transparent p-0 text-right text-xs focus-visible:ring-0"
                     value={slippage}
                     onChange={(e) => setSlippage(e.target.value)}
@@ -821,7 +841,7 @@ export function SwapWidget({
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-medium">
+                <label htmlFor={deadlineId} className="text-xs font-medium">
                   Transaction Deadline
                 </label>
                 <span className="text-xs text-muted-foreground">
@@ -830,6 +850,7 @@ export function SwapWidget({
               </div>
               <div className="flex items-center gap-2">
                 <Input
+                  id={deadlineId}
                   className="h-8 text-sm"
                   value={deadline}
                   onChange={(e) => setDeadline(e.target.value)}

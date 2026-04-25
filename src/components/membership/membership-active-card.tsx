@@ -1,5 +1,3 @@
-"use client";
-
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import {
   CalendarClock,
@@ -9,7 +7,6 @@ import {
   Loader2,
   Sparkles,
 } from "lucide-react";
-import Link from "next/link";
 import * as React from "react";
 import { toast } from "sonner";
 import { formatUnits } from "viem";
@@ -348,14 +345,14 @@ export function MembershipActiveCard({
     <Card className="w-full max-w-lg overflow-hidden">
       <div className="relative bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-8">
         <div className="absolute right-4 top-4">
-          <Link
+          <a
             href={`${EXPLORER_URL}/address/${MEMBERSHIP_NFT_ADDRESS}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
             <ExternalLink className="h-4 w-4" />
-          </Link>
+          </a>
         </div>
 
         <div className="flex flex-col items-center gap-4 text-center">

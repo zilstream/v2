@@ -1,8 +1,6 @@
-"use client";
-
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useNavigate } from "@tanstack/react-router";
 import { Check, Loader2, Sparkles } from "lucide-react";
-import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
 import { formatUnits } from "viem";
@@ -45,7 +43,7 @@ export function MembershipPurchaseCard({
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  const router = useRouter();
+  const navigate = useNavigate();
   const { isConnected, address: userAddress } = useAccount();
   const { openConnectModal } = useConnectModal();
   const { writeContractAsync } = useWriteContract();
@@ -186,7 +184,11 @@ export function MembershipPurchaseCard({
         toast.success("Membership purchased successfully!", {
           action: {
             label: "View Transaction",
-            onClick: () => router.push(`/tx/${txReceipt.transactionHash}`),
+            onClick: () =>
+              navigate({
+                to: "/tx/$hash",
+                params: { hash: txReceipt.transactionHash },
+              }),
           },
         });
         setTxHash(null);
@@ -194,7 +196,7 @@ export function MembershipPurchaseCard({
         onPurchaseSuccess?.();
       }
     }
-  }, [txReceipt, txType, refetchAllowance, router, onPurchaseSuccess]);
+  }, [txReceipt, txType, refetchAllowance, navigate, onPurchaseSuccess]);
 
   const handleApprove = async () => {
     if (!isConnected || !paymentTokenAddress || !currentPrice) {

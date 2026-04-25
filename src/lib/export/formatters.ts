@@ -133,7 +133,7 @@ export function exportDataToJSON(data: ExportData): string {
 
 export function exportDataToExcel(
   data: ExportData,
-  dateRange: DateRange,
+  _dateRange: DateRange,
 ): Blob {
   const workbook = XLSX.utils.book_new();
 

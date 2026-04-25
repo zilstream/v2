@@ -1,5 +1,3 @@
-"use client";
-
 import { useQueries } from "@tanstack/react-query";
 import {
   createContext,
@@ -9,14 +7,14 @@ import {
   useMemo,
   useRef,
 } from "react";
+import { useNotificationPermission } from "@/hooks/use-notification-permission";
+import { usePriceAlerts } from "@/hooks/use-price-alerts";
 import { fetchTokenByAddress } from "@/lib/api-client";
 import {
-  type PriceAlert,
   evaluateAlert,
+  type PriceAlert,
   showPriceAlertNotification,
 } from "@/lib/price-alerts";
-import { usePriceAlerts } from "@/hooks/use-price-alerts";
-import { useNotificationPermission } from "@/hooks/use-notification-permission";
 
 interface PriceAlertsContextValue {
   alerts: PriceAlert[];

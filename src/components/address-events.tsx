@@ -1,8 +1,7 @@
-"use client";
-
+import { Link } from "@tanstack/react-router";
+import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { useState } from "react";
-import Link from "next/link";
-import { ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
+import { TokenIcon } from "@/components/token-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +13,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TokenIcon } from "@/components/token-icon";
-import { formatTimestamp, formatTokenAmount, formatUsd } from "@/lib/format";
 import { useAddressEvents } from "@/hooks/use-zilstream-queries";
 import type { AddressEvent } from "@/lib/api-client";
+import { formatTimestamp, formatTokenAmount, formatUsd } from "@/lib/format";
 
 interface AddressEventsProps {
   address: string;
@@ -141,7 +139,8 @@ export function AddressEvents({ address }: AddressEventsProps) {
                   <TableCell className="text-right py-2">
                     <Link
                       className="inline-flex items-center justify-end text-muted-foreground"
-                      href={`/tx/${event.transactionHash}`}
+                      to="/tx/$hash"
+                      params={{ hash: event.transactionHash }}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Link>

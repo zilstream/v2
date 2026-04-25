@@ -1,14 +1,5 @@
-"use client";
-
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  useRef,
-} from "react";
-import { Centrifuge, type Subscription } from "centrifuge/build/protobuf";
+import { Centrifuge } from "centrifuge/build/protobuf";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 interface WebSocketContextType {
   centrifuge: Centrifuge | null;

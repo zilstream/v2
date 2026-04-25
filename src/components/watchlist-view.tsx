@@ -1,8 +1,6 @@
-"use client";
-
 import { useQueries } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
-import Link from "next/link";
 import { useMemo } from "react";
 
 import { PairsTable } from "@/components/pairs-table";
@@ -107,10 +105,10 @@ function WatchlistEmpty() {
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-2 pb-6 sm:flex-row sm:justify-center">
         <Button asChild>
-          <Link href="/tokens">Browse Tokens</Link>
+          <Link to="/tokens">Browse Tokens</Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/pairs">Browse Pairs</Link>
+          <Link to="/pairs">Browse Pairs</Link>
         </Button>
       </CardContent>
     </Card>

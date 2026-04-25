@@ -1,14 +1,10 @@
-"use client";
-
-import { Suspense, useState } from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { SearchIcon } from "lucide-react";
-
+import { Suspense, useState } from "react";
+import { ConnectWalletButton } from "@/components/connect-button";
 import { HeaderStats } from "@/components/header-stats";
 import { MembershipBadge } from "@/components/membership-badge";
-import { ZilStreamLogo } from "@/components/zilstream-logo";
 import { SearchBar } from "@/components/search-bar";
-import { ConnectWalletButton } from "@/components/connect-button";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -18,6 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ZilStreamLogo } from "@/components/zilstream-logo";
 
 export function SiteHeader() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -27,7 +24,7 @@ export function SiteHeader() {
       <div className="flex h-16 w-full items-center justify-between gap-2 px-3 md:gap-6 md:px-6">
         <div className="flex items-center gap-2 md:gap-4">
           <SidebarTrigger />
-          <Link href="/" className="md:hidden">
+          <Link to="/" className="md:hidden">
             <ZilStreamLogo className="h-8 w-8 text-primary" />
           </Link>
         </div>

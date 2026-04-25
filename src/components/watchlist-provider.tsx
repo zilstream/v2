@@ -1,5 +1,3 @@
-"use client";
-
 import { createContext, useContext, useMemo } from "react";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import type { WatchlistKind } from "@/lib/watchlist";

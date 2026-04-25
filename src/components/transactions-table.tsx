@@ -1,6 +1,4 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { AddressDisplay } from "@/components/address-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,7 +31,6 @@ export function TransactionsTable({
   transactions,
   pagination,
   onPageChange,
-  isLoading,
 }: TransactionsTableProps) {
   return (
     <Card>
@@ -59,7 +56,8 @@ export function TransactionsTable({
                 <TableCell className="px-6">
                   <div className="flex items-center gap-2">
                     <Link
-                      href={`/tx/${tx.hash}`}
+                      to="/tx/$hash"
+                      params={{ hash: tx.hash }}
                       className="font-medium text-primary hover:underline font-mono text-sm"
                     >
                       {shortenHash(tx.hash)}
@@ -73,7 +71,8 @@ export function TransactionsTable({
                 </TableCell>
                 <TableCell>
                   <Link
-                    href={`/block/${tx.blockNumber}`}
+                    to="/block/$number"
+                    params={{ number: String(tx.blockNumber) }}
                     className="text-primary hover:underline"
                   >
                     {formatNumber(tx.blockNumber, 0)}

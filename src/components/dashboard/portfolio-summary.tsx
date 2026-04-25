@@ -1,4 +1,3 @@
-import { formatUnits } from "viem";
 import type { GetBalanceReturnType } from "wagmi/actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatTokenAmount, formatUsd } from "@/lib/format";
@@ -17,7 +16,6 @@ export function PortfolioSummary({
   totalValueUsd,
   breakdown,
   nativeBalance,
-  zilPriceUsd,
   portfolioChange,
   portfolioChangePercent,
 }: PortfolioSummaryProps) {

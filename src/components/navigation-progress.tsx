@@ -1,19 +1,19 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
 import { NProgress } from "@tanem/react-nprogress";
+import { useLocation } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
 export function NavigationProgress() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const _pathname = useLocation({ select: (s) => s.pathname });
+  const _searchParams = useLocation({
+    select: (s) => new URLSearchParams(s.searchStr),
+  });
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     setIsAnimating(true);
     const timer = setTimeout(() => setIsAnimating(false), 200);
     return () => clearTimeout(timer);
-  }, [pathname, searchParams]);
+  }, []);
 
   return (
     <NProgress isAnimating={isAnimating}>

@@ -13,12 +13,14 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
-
-# production
+# tanstack / vite
+.output/
+.nitro/
+dist/
 /build
+
+# generated route tree
+src/routeTree.gen.ts
 
 # misc
 .DS_Store
@@ -38,8 +40,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
 # cloudflare
-.open-next/
 .wrangler/
+cloudflare-env.d.ts

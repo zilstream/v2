@@ -1,5 +1,3 @@
-"use client";
-
 import { AlertTriangle, Gift, Loader2, Send } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";

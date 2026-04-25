@@ -1,7 +1,5 @@
-"use client";
-
+import { Link } from "@tanstack/react-router";
 import { Crown } from "lucide-react";
-import Link from "next/link";
 import { useAccount, useReadContract } from "wagmi";
 
 import { Button } from "@/components/ui/button";
@@ -32,7 +30,7 @@ export function MembershipBadge() {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href="/membership">
+            <Link to="/membership">
               <Button
                 variant="ghost"
                 size="icon-sm"
@@ -54,7 +52,7 @@ export function MembershipBadge() {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Link href="/membership">
+          <Link to="/membership">
             <Button
               variant="ghost"
               size="icon-sm"

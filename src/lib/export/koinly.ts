@@ -4,7 +4,7 @@ import type { AddressEvent } from "@/lib/api-client";
 import type { KoinlyTransaction } from "./types";
 
 function formatKoinlyDate(timestamp: number): string {
-  return format(new Date(timestamp * 1000), "yyyy-MM-dd HH:mm:ss") + " UTC";
+  return `${format(new Date(timestamp * 1000), "yyyy-MM-dd HH:mm:ss")} UTC`;
 }
 
 function formatAmount(value: string | undefined, decimals = 18): string {

@@ -1,13 +1,11 @@
-"use client";
-
+import { useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Input } from "@/components/ui/input";
 
 export function SearchBar() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
@@ -18,12 +16,12 @@ export function SearchBar() {
 
     if (searchValue.startsWith("0x")) {
       if (searchValue.length === 66) {
-        router.push(`/tx/${searchValue}`);
+        navigate({ to: "/tx/$hash", params: { hash: searchValue } });
       } else if (searchValue.length === 42) {
-        router.push(`/address/${searchValue}`);
+        navigate({ to: "/address/$address", params: { address: searchValue } });
       }
     } else if (/^\d+$/.test(searchValue)) {
-      router.push(`/block/${searchValue}`);
+      navigate({ to: "/block/$number", params: { number: searchValue } });
     }
 
     setQuery("");

@@ -1,13 +1,14 @@
-"use client";
-
+import { Link } from "@tanstack/react-router";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import Link from "next/link";
+import { TokenIcon } from "@/components/token-icon";
+import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
-  CardAction,
 } from "@/components/ui/card";
 import {
   Table,
@@ -17,11 +18,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { TokenIcon } from "@/components/token-icon";
-import { formatTokenAmount, formatPriceUsd, formatUsd } from "@/lib/format";
+import { formatPriceUsd, formatTokenAmount, formatUsd } from "@/lib/format";
 import type { TokenBalance } from "@/lib/types/dashboard";
-import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface TokenBalancesCardProps {
   tokens: TokenBalance[];
@@ -30,10 +28,7 @@ interface TokenBalancesCardProps {
 
 const INITIAL_DISPLAY_COUNT = 5;
 
-export function TokenBalancesCard({
-  tokens,
-  isLoading,
-}: TokenBalancesCardProps) {
+export function TokenBalancesCard({ tokens }: TokenBalancesCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const displayTokens = isExpanded
@@ -77,7 +72,8 @@ export function TokenBalancesCard({
                   <TableRow key={token.address}>
                     <TableCell>
                       <Link
-                        href={`/tokens/${token.address}`}
+                        to="/tokens/$address"
+                        params={{ address: token.address }}
                         className="flex items-center gap-2 hover:underline"
                       >
                         <TokenIcon

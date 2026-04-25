@@ -1,8 +1,6 @@
-"use client";
-
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Link } from "@tanstack/react-router";
 import { Wallet } from "lucide-react";
-import Link from "next/link";
 import { AddressDisplay } from "@/components/address-display";
 import { Button } from "@/components/ui/button";
 
@@ -66,7 +64,10 @@ export function ConnectWalletButton() {
                     size="icon-sm"
                     title="View address page"
                   >
-                    <Link href={`/address/${account.address}`}>
+                    <Link
+                      to="/address/$address"
+                      params={{ address: account.address }}
+                    >
                       <Wallet />
                     </Link>
                   </Button>

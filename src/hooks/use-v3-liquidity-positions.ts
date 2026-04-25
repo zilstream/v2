@@ -1,17 +1,15 @@
-"use client";
-
 import { useQuery } from "@tanstack/react-query";
+import { type Address, formatUnits } from "viem";
 import { useAccount } from "wagmi";
-import { formatUnits, type Address } from "viem";
-import { fetchTokens } from "@/lib/api-client";
 import {
-  PLUNDERSWAP_V3_POSITION_MANAGER,
+  ERC20_ABI,
   PLUNDERSWAP_V3_FACTORY,
-  V3_POSITION_MANAGER_ABI,
+  PLUNDERSWAP_V3_POSITION_MANAGER,
   V3_FACTORY_ABI,
   V3_POOL_SLOT0_ABI,
-  ERC20_ABI,
+  V3_POSITION_MANAGER_ABI,
 } from "@/lib/abis";
+import { fetchTokens } from "@/lib/api-client";
 import { publicClient } from "@/lib/public-client";
 import type { LPPositionV3 } from "@/lib/types/dashboard";
 

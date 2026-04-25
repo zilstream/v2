@@ -1,12 +1,12 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
+import { TokenIcon } from "@/components/token-icon";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
-  CardAction,
 } from "@/components/ui/card";
 import {
   Table,
@@ -16,9 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { TokenIcon } from "@/components/token-icon";
-import { formatTokenAmount, formatUsd, formatNumber } from "@/lib/format";
+import { formatNumber, formatTokenAmount, formatUsd } from "@/lib/format";
 import type { LPPositionV2, LPPositionV3 } from "@/lib/types/dashboard";
 
 interface LiquidityPositionsCardProps {
@@ -38,7 +36,6 @@ function formatFeeTier(fee: number): string {
 export function LiquidityPositionsCard({
   positionsV2,
   positionsV3,
-  isLoading,
 }: LiquidityPositionsCardProps) {
   const v2Total = positionsV2.reduce((sum, p) => sum + p.valueUsd, 0);
   const v3Total = positionsV3.reduce(
@@ -188,7 +185,8 @@ export function LiquidityPositionsCard({
                   <TableRow key={position.pairAddress}>
                     <TableCell>
                       <Link
-                        href={`/pairs/${position.pairAddress}`}
+                        to="/pairs/$address"
+                        params={{ address: position.pairAddress }}
                         className="flex items-center gap-2 hover:underline"
                       >
                         <div className="flex -space-x-1">

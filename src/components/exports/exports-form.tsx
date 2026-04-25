@@ -1,9 +1,7 @@
-"use client";
-
+import { Download, FileJson, FileSpreadsheet, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { Download, FileSpreadsheet, FileJson, Loader2 } from "lucide-react";
-import { formatUnits } from "viem";
 import { toast } from "sonner";
+import { formatUnits } from "viem";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,33 +11,33 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
-import { DateRangePicker } from "./date-range-picker";
 import { usePortfolioBalances } from "@/hooks/use-portfolio-balances";
 import {
   fetchAllEventsInRange,
   fetchAllTransactionsInRange,
 } from "@/lib/export/fetch-all-events";
 import {
-  eventsToCSV,
-  transactionsToCSV,
-  portfolioToCSV,
-  exportDataToJSON,
-  exportDataToExcel,
+  downloadBlob,
   downloadCSV,
   downloadJSON,
-  downloadBlob,
+  eventsToCSV,
+  exportDataToExcel,
+  exportDataToJSON,
   generateFilename,
+  portfolioToCSV,
+  transactionsToCSV,
 } from "@/lib/export/formatters";
 import { eventsToKoinly, koinlyToCSV } from "@/lib/export/koinly";
 import type {
-  ExportFormat,
   DataType,
   DateRange,
   ExportData,
+  ExportFormat,
   ExportProgress,
   PortfolioSnapshot,
 } from "@/lib/export/types";
+import { cn } from "@/lib/utils";
+import { DateRangePicker } from "./date-range-picker";
 
 interface ExportsFormProps {
   address: string;
@@ -207,11 +205,11 @@ export function ExportsForm({ address }: ExportsFormProps) {
         case "csv": {
           const parts: string[] = [];
           if (exportData.events?.length) {
-            parts.push("# Trading Events\n" + eventsToCSV(exportData.events));
+            parts.push(`# Trading Events\n${eventsToCSV(exportData.events)}`);
           }
           if (exportData.transactions?.length) {
             parts.push(
-              "# Transactions\n" + transactionsToCSV(exportData.transactions),
+              `# Transactions\n${transactionsToCSV(exportData.transactions)}`,
             );
           }
           if (exportData.portfolio) {

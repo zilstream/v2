@@ -1,7 +1,7 @@
-"use client";
-
-import { useState } from "react";
+import { useId, useState } from "react";
 import { toast } from "sonner";
+import { usePriceAlertsContext } from "@/components/price-alerts-provider";
+import { TokenIcon } from "@/components/token-icon";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,15 +19,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TokenIcon } from "@/components/token-icon";
-import { usePriceAlertsContext } from "@/components/price-alerts-provider";
+import { formatPriceUsd } from "@/lib/format";
 import type {
   AlertCondition,
   AlertTimeframe,
   PercentageAlert,
   ThresholdAlert,
 } from "@/lib/price-alerts";
-import { formatPriceUsd } from "@/lib/format";
 
 interface PriceAlertDialogProps {
   open: boolean;
@@ -60,10 +58,11 @@ export function PriceAlertDialog({
   const [percentageChange, setPercentageChange] = useState("");
   const [timeframe, setTimeframe] = useState<AlertTimeframe>("24h");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const currentPrice = token.priceUsd
-    ? Number.parseFloat(token.priceUsd)
-    : undefined;
+  const alertTypeId = useId();
+  const conditionId = useId();
+  const targetPriceId = useId();
+  const percentageId = useId();
+  const timeframeId = useId();
 
   const handleSubmit = async () => {
     if (!isNotificationSupported) {
@@ -157,9 +156,9 @@ export function PriceAlertDialog({
           <DialogDescription>
             Get notified when {token.symbol ?? "this token"} reaches your target
             price.
-            {currentPrice !== undefined && (
+            {token.priceUsd !== undefined && (
               <span className="block mt-1">
-                Current price: {formatPriceUsd(token.priceUsd!)}
+                Current price: {formatPriceUsd(token.priceUsd)}
               </span>
             )}
           </DialogDescription>
@@ -167,12 +166,14 @@ export function PriceAlertDialog({
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Alert Type</label>
+            <label htmlFor={alertTypeId} className="text-sm font-medium">
+              Alert Type
+            </label>
             <Select
               value={alertType}
               onValueChange={(value: AlertType) => setAlertType(value)}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger id={alertTypeId} className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -185,12 +186,14 @@ export function PriceAlertDialog({
           {alertType === "threshold" ? (
             <>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Condition</label>
+                <label htmlFor={conditionId} className="text-sm font-medium">
+                  Condition
+                </label>
                 <Select
                   value={condition}
                   onValueChange={(value: AlertCondition) => setCondition(value)}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id={conditionId} className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -201,7 +204,7 @@ export function PriceAlertDialog({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">
+                <label htmlFor={targetPriceId} className="text-sm font-medium">
                   Target Price (USD)
                 </label>
                 <div className="relative">
@@ -209,6 +212,7 @@ export function PriceAlertDialog({
                     $
                   </span>
                   <Input
+                    id={targetPriceId}
                     type="number"
                     step="any"
                     min="0"
@@ -223,9 +227,12 @@ export function PriceAlertDialog({
           ) : (
             <>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Percentage Change</label>
+                <label htmlFor={percentageId} className="text-sm font-medium">
+                  Percentage Change
+                </label>
                 <div className="relative">
                   <Input
+                    id={percentageId}
                     type="number"
                     step="any"
                     min="0"
@@ -244,12 +251,14 @@ export function PriceAlertDialog({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Timeframe</label>
+                <label htmlFor={timeframeId} className="text-sm font-medium">
+                  Timeframe
+                </label>
                 <Select
                   value={timeframe}
                   onValueChange={(value: AlertTimeframe) => setTimeframe(value)}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id={timeframeId} className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

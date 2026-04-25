@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { TransactionsTable } from "@/components/transactions-table";
 import { useTransactions } from "@/hooks/use-zilstream-queries";

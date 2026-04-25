@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { PairsTable } from "@/components/pairs-table";
 import { PairsTableSkeleton } from "@/components/pairs-table-skeleton";
