@@ -1,82 +1,27 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Link } from "@tanstack/react-router";
-import { Wallet } from "lucide-react";
-import { AddressDisplay } from "@/components/address-display";
+import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
+import { useWalletReady } from "@/components/wallet-ready-context";
+
+const ConnectWalletButtonInner = lazy(() =>
+  import("./connect-button-inner").then((m) => ({
+    default: m.ConnectWalletButtonInner,
+  })),
+);
+
+function ConnectPlaceholder() {
+  return (
+    <Button variant="outline" size="sm" disabled>
+      Connect Wallet
+    </Button>
+  );
+}
 
 export function ConnectWalletButton() {
+  const ready = useWalletReady();
+  if (!ready) return <ConnectPlaceholder />;
   return (
-    <ConnectButton.Custom>
-      {({
-        account,
-        chain,
-        openAccountModal,
-        openConnectModal,
-        authenticationStatus,
-        mounted,
-      }) => {
-        const ready = mounted && authenticationStatus !== "loading";
-        const connected =
-          ready &&
-          account &&
-          chain &&
-          (!authenticationStatus || authenticationStatus === "authenticated");
-
-        return (
-          <div
-            {...(!ready && {
-              "aria-hidden": true,
-              style: {
-                opacity: 0,
-                pointerEvents: "none",
-                userSelect: "none",
-              },
-            })}
-          >
-            {(() => {
-              if (!connected) {
-                return (
-                  <Button
-                    onClick={openConnectModal}
-                    variant="outline"
-                    size="sm"
-                  >
-                    Connect Wallet
-                  </Button>
-                );
-              }
-
-              return (
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={openAccountModal}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <AddressDisplay address={account.address} />
-                    {account.displayBalance
-                      ? ` (${account.displayBalance})`
-                      : ""}
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="icon-sm"
-                    title="View address page"
-                  >
-                    <Link
-                      to="/address/$address"
-                      params={{ address: account.address }}
-                    >
-                      <Wallet />
-                    </Link>
-                  </Button>
-                </div>
-              );
-            })()}
-          </div>
-        );
-      }}
-    </ConnectButton.Custom>
+    <Suspense fallback={<ConnectPlaceholder />}>
+      <ConnectWalletButtonInner />
+    </Suspense>
   );
 }

@@ -8,9 +8,9 @@ import {
 } from "@tanstack/react-router";
 import { Suspense } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
+import { DeferredWallet } from "@/components/deferred-wallet";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { Providers } from "@/components/providers";
-import { RainbowKitProvider } from "@/components/rainbow-provider";
 import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -47,14 +47,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="bg-background text-foreground antialiased">
-        <Providers>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <RainbowKitProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Providers>
+            <DeferredWallet>
               <Suspense fallback={null}>
                 <NavigationProgress />
               </Suspense>
@@ -66,9 +66,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 </main>
                 <Toaster />
               </SidebarProvider>
-            </RainbowKitProvider>
-          </ThemeProvider>
-        </Providers>
+            </DeferredWallet>
+          </Providers>
+        </ThemeProvider>
         <Scripts />
       </body>
     </html>

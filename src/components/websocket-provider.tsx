@@ -1,4 +1,4 @@
-import { Centrifuge } from "centrifuge/build/protobuf";
+import type { Centrifuge } from "centrifuge/build/protobuf";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 interface WebSocketContextType {
@@ -12,6 +12,7 @@ const WebSocketContext = createContext<WebSocketContextType>({
 });
 
 const WS_INFO_URL = "https://api-v2.zilstream.com/ws/info";
+const WS_TOKEN_URL = "https://api-v2.zilstream.com/ws/token";
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const [centrifuge, setCentrifuge] = useState<Centrifuge | null>(null);
@@ -19,39 +20,33 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const centrifugeRef = useRef<Centrifuge | null>(null);
 
   useEffect(() => {
-    let mounted = true;
+    let cancelled = false;
 
     const connect = async () => {
       try {
-        // 1. Get Info
-        const infoRes = await fetch(WS_INFO_URL);
+        const [infoRes, tokenRes] = await Promise.all([
+          fetch(WS_INFO_URL),
+          fetch(WS_TOKEN_URL, { method: "POST" }),
+        ]);
         if (!infoRes.ok) throw new Error("Failed to get WS info");
-        const response = await infoRes.json();
+        if (!tokenRes.ok) throw new Error("Failed to get WS token");
 
-        // Extract URL from response structure: { data: { url: "...", ... } }
-        const url = response.data?.url;
+        const [infoJson, tokenJson] = await Promise.all([
+          infoRes.json(),
+          tokenRes.json(),
+        ]);
+        const url = infoJson.data?.url;
+        const token = tokenJson.data?.token;
 
         if (!url) throw new Error("No WebSocket URL in response");
-
-        // 2. Get Token (Required for connection)
-        const tokenRes = await fetch("https://api-v2.zilstream.com/ws/token", {
-          method: "POST",
-        });
-        if (!tokenRes.ok) throw new Error("Failed to get WS token");
-        const tokenData = await tokenRes.json();
-        const token = tokenData.data?.token;
-
         if (!token) throw new Error("No WebSocket token in response");
 
-        if (!mounted) return;
+        if (cancelled) return;
 
-        // 3. Initialize Centrifuge
-        // Note: Using protobuf import requires the server to support it.
-        // Most Centrifugo v2+ servers support protobuf.
-        const c = new Centrifuge(url, {
-          token: token,
-          debug: true, // Keep debug enabled for now to see logs
-        });
+        const { Centrifuge } = await import("centrifuge/build/protobuf");
+        if (cancelled) return;
+
+        const c = new Centrifuge(url, { token, debug: true });
 
         c.on("connected", (ctx) => {
           console.log("WebSocket connected", ctx);
@@ -75,10 +70,39 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    connect();
+    const ric = (
+      globalThis as {
+        requestIdleCallback?: (
+          cb: () => void,
+          opts?: { timeout: number },
+        ) => number;
+        cancelIdleCallback?: (handle: number) => void;
+      }
+    ).requestIdleCallback;
+
+    let idleHandle: number | undefined;
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+    if (ric) {
+      idleHandle = ric(
+        () => {
+          connect();
+        },
+        { timeout: 3000 },
+      );
+    } else {
+      timeoutHandle = setTimeout(connect, 0);
+    }
 
     return () => {
-      mounted = false;
+      cancelled = true;
+      if (idleHandle !== undefined) {
+        (
+          globalThis as {
+            cancelIdleCallback?: (handle: number) => void;
+          }
+        ).cancelIdleCallback?.(idleHandle);
+      }
+      if (timeoutHandle !== undefined) clearTimeout(timeoutHandle);
       if (centrifugeRef.current) {
         centrifugeRef.current.disconnect();
         centrifugeRef.current = null;
