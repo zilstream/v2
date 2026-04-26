@@ -1,18 +1,13 @@
-import { Link } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
-import { useState } from "react";
-import { useAccount, useReadContract } from "wagmi";
-import { PriceAlertDialog } from "@/components/price-alert-dialog";
-import { usePriceAlertsContext } from "@/components/price-alerts-provider";
+import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { MEMBERSHIP_NFT_ABI } from "@/lib/abis";
-import { MEMBERSHIP_NFT_ADDRESS } from "@/lib/constants";
+import { useWalletReady } from "@/components/wallet-ready-context";
+
+const PriceAlertButtonInner = lazy(() =>
+  import("./price-alert-button-inner").then((m) => ({
+    default: m.PriceAlertButtonInner,
+  })),
+);
 
 interface PriceAlertButtonProps {
   token: {
@@ -23,64 +18,20 @@ interface PriceAlertButtonProps {
   };
 }
 
-export function PriceAlertButton({ token }: PriceAlertButtonProps) {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const { getAlertsForToken } = usePriceAlertsContext();
-  const { address, isConnected } = useAccount();
-
-  const { data: hasActiveMembership } = useReadContract({
-    address: MEMBERSHIP_NFT_ADDRESS,
-    abi: MEMBERSHIP_NFT_ABI,
-    functionName: "hasActiveMembership",
-    args: [address ?? "0x0"],
-    query: { enabled: !!address },
-  });
-
-  const tokenAlerts = getAlertsForToken(token.address);
-  const activeAlertCount = tokenAlerts.filter((a) => !a.triggered).length;
-
-  const isMember = isConnected && hasActiveMembership;
-
-  if (!isMember) {
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline" size="icon" asChild>
-              <Link to="/membership">
-                <Bell className="h-4 w-4" />
-              </Link>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Membership required for price alerts</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
-
+function PriceAlertButtonPlaceholder() {
   return (
-    <>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => setDialogOpen(true)}
-        className="relative"
-        title="Create price alert"
-      >
-        <Bell className="h-4 w-4" />
-        {activeAlertCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
-            {activeAlertCount}
-          </span>
-        )}
-      </Button>
-      <PriceAlertDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        token={token}
-      />
-    </>
+    <Button variant="outline" size="icon" disabled>
+      <Bell className="h-4 w-4" />
+    </Button>
+  );
+}
+
+export function PriceAlertButton(props: PriceAlertButtonProps) {
+  const ready = useWalletReady();
+  if (!ready) return <PriceAlertButtonPlaceholder />;
+  return (
+    <Suspense fallback={<PriceAlertButtonPlaceholder />}>
+      <PriceAlertButtonInner {...props} />
+    </Suspense>
   );
 }

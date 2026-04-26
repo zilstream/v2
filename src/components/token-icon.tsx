@@ -40,6 +40,8 @@ export function TokenIcon({
       alt={alt}
       width={size}
       height={size}
+      loading="lazy"
+      decoding="async"
       className={cn(
         "rounded-full border border-border/70 object-cover",
         className,

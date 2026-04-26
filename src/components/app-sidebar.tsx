@@ -12,8 +12,8 @@ import {
   Star,
   TrendingUp,
 } from "lucide-react";
-import { useAccount } from "wagmi";
 
+import { SidebarAddressLink } from "@/components/sidebar-address-link";
 import { SidebarMembershipBanner } from "@/components/sidebar-membership-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -55,7 +55,6 @@ const resourcesItems = [
 
 export function AppSidebar() {
   const pathname = useLocation({ select: (s) => s.pathname });
-  const { address } = useAccount();
 
   const isActive = (itemPath: string) => {
     if (pathname === itemPath) return true;
@@ -125,20 +124,7 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              {address && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive("/address")}>
-                    <Link
-                      to="/address/$address"
-                      params={{ address }}
-                      className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
-                    >
-                      <ArrowLeftRight />
-                      <span>Transactions</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
+              <SidebarAddressLink />
               {portfolioFooterItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={isActive(item.to)}>

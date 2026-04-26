@@ -1,18 +1,18 @@
 import { lazy, Suspense } from "react";
 import { useWalletReady } from "@/components/wallet-ready-context";
 
-const MembershipBadgeInner = lazy(() =>
-  import("./membership-badge-inner").then((m) => ({
-    default: m.MembershipBadgeInner,
+const SidebarAddressLinkInner = lazy(() =>
+  import("./sidebar-address-link-inner").then((m) => ({
+    default: m.SidebarAddressLinkInner,
   })),
 );
 
-export function MembershipBadge() {
+export function SidebarAddressLink() {
   const ready = useWalletReady();
   if (!ready) return null;
   return (
     <Suspense fallback={null}>
-      <MembershipBadgeInner />
+      <SidebarAddressLinkInner />
     </Suspense>
   );
 }
