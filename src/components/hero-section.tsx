@@ -54,26 +54,6 @@ export function HeroSection() {
               View tokens
             </Link>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Looking for the old ZilStream? Visit the{" "}
-            <a
-              href="https://legacy.zilstream.com"
-              target="_blank"
-              className="font-medium text-foreground underline decoration-border hover:text-primary hover:decoration-primary"
-              rel="noopener"
-            >
-              legacy site here
-            </a>{" "}
-            (
-            <Link
-              to="/news/$slug"
-              params={{ slug: "sunsetting-zilstream-legacy" }}
-              className="font-medium text-foreground underline decoration-border hover:text-primary hover:decoration-primary"
-            >
-              sunsetting early next year
-            </Link>
-            ).
-          </p>
         </div>
         <Card className="w-full max-w-sm bg-background/85 backdrop-blur">
           <CardHeader className="pb-3">
