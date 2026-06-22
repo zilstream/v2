@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DexSwap } from "@/components/dex-swap";
+import { WalletReadyGate } from "@/components/wallet-ready-gate";
 import { fetchTokens } from "@/lib/zilstream";
 
 export const Route = createFileRoute("/swap")({
@@ -25,7 +26,9 @@ function SwapPage() {
         <h1 className="text-3xl font-bold">Swap</h1>
         <p className="text-muted-foreground">Trade tokens instantly</p>
       </div>
-      <DexSwap initialTokens={tokens} />
+      <WalletReadyGate fallback={<div className="h-[420px] w-full max-w-md" />}>
+        <DexSwap initialTokens={tokens} />
+      </WalletReadyGate>
     </div>
   );
 }

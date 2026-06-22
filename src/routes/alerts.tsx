@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { WalletReadyGate } from "@/components/wallet-ready-gate";
 import { MEMBERSHIP_NFT_ABI } from "@/lib/abis";
 import { MEMBERSHIP_NFT_ADDRESS } from "@/lib/constants";
 import { formatAlertDescription } from "@/lib/price-alerts";
@@ -30,6 +31,14 @@ export const Route = createFileRoute("/alerts")({
 });
 
 function AlertsPage() {
+  return (
+    <WalletReadyGate>
+      <AlertsPageInner />
+    </WalletReadyGate>
+  );
+}
+
+function AlertsPageInner() {
   const { isConnected, address } = useAccount();
 
   const { data: hasActiveMembership, isLoading: isMembershipLoading } =

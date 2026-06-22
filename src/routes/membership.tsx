@@ -24,6 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { WalletReadyGate } from "@/components/wallet-ready-gate";
 import { MEMBERSHIP_NFT_ABI } from "@/lib/abis";
 import { MEMBERSHIP_NFT_ADDRESS } from "@/lib/constants";
 
@@ -66,6 +67,14 @@ const MEMBER_FEATURES = [
 ];
 
 function MembershipPage() {
+  return (
+    <WalletReadyGate>
+      <MembershipPageInner />
+    </WalletReadyGate>
+  );
+}
+
+function MembershipPageInner() {
   const [showGiftPurchase, setShowGiftPurchase] = React.useState(false);
   const { address: userAddress, isConnected } = useAccount();
 

@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { WalletReadyGate } from "@/components/wallet-ready-gate";
 import { MEMBERSHIP_NFT_ABI } from "@/lib/abis";
 import { MEMBERSHIP_NFT_ADDRESS } from "@/lib/constants";
 
@@ -19,6 +20,14 @@ export const Route = createFileRoute("/exports")({
 });
 
 function ExportsPage() {
+  return (
+    <WalletReadyGate>
+      <ExportsPageInner />
+    </WalletReadyGate>
+  );
+}
+
+function ExportsPageInner() {
   const { isConnected, address } = useAccount();
 
   const { data: hasActiveMembership, isLoading: isMembershipLoading } =
