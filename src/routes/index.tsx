@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { HeroSection } from "@/components/hero-section";
+import { ClosingBanner } from "@/components/closing-banner";
 import { LivePairsSection } from "@/components/live-pairs-section";
 
 export const Route = createFileRoute("/")({
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   return (
     <main className="flex w-full flex-col gap-4 p-3 md:gap-6 md:p-6">
-      <HeroSection />
+      <ClosingBanner />
       <LivePairsSection />
     </main>
   );

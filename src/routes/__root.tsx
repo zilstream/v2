@@ -5,6 +5,7 @@ import {
   HeadContent,
   Outlet,
   Scripts,
+  useLocation,
 } from "@tanstack/react-router";
 import { Suspense } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -41,6 +42,10 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const isClosingPage = useLocation({
+    select: (s) => s.pathname === "/closing",
+  });
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -53,21 +58,25 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          <Providers>
-            <DeferredWallet>
-              <Suspense fallback={null}>
-                <NavigationProgress />
-              </Suspense>
-              <SidebarProvider>
-                <AppSidebar />
-                <main className="flex min-h-screen w-full flex-col">
-                  <SiteHeader />
-                  <div className="flex-1">{children}</div>
-                </main>
-                <Toaster />
-              </SidebarProvider>
-            </DeferredWallet>
-          </Providers>
+          {isClosingPage ? (
+            children
+          ) : (
+            <Providers>
+              <DeferredWallet>
+                <Suspense fallback={null}>
+                  <NavigationProgress />
+                </Suspense>
+                <SidebarProvider>
+                  <AppSidebar />
+                  <main className="flex min-h-screen w-full flex-col">
+                    <SiteHeader />
+                    <div className="flex-1">{children}</div>
+                  </main>
+                  <Toaster />
+                </SidebarProvider>
+              </DeferredWallet>
+            </Providers>
+          )}
         </ThemeProvider>
         <Scripts />
       </body>
