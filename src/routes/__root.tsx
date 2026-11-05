@@ -4,6 +4,7 @@ import {
   createRootRouteWithContext,
   HeadContent,
   Outlet,
+  redirect,
   Scripts,
   useLocation,
 } from "@tanstack/react-router";
@@ -30,6 +31,11 @@ export const Route = createRootRouteWithContext<{
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
+  beforeLoad: ({ location }) => {
+    if (location.pathname !== "/closing") {
+      throw redirect({ to: "/closing" });
+    }
+  },
   component: RootComponent,
 });
 
